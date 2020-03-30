@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
-import { Form, Input, Button, Icon, message } from 'antd';
+import { Form, Input, Button, Icon, message } from 'antd'
+import { Redirect } from 'react-router-dom'
 
 import { reqLogin } from '../../api'
+import storageUtils from '../../utils/storageUtils'
+import memoryUtils from '../../utils/memoryUtils'
 
 import logo from '../../assets/images/logo.png'
 import './login.less'
@@ -17,7 +20,6 @@ const Item = Form.Item
 */
 
 class Login extends Component {
-
     
     handleSubmit = (e) => {
         e.preventDefault()
@@ -35,13 +37,20 @@ class Login extends Component {
         this.props.form.validateFields( async (err, {username, password}) => {
 
             if(!err){
-                
                 // 发送登录的请求
                 const result = await reqLogin(username, password)
                 if( result.code === 1 ){
                     // 跳转到 /admin 界面
                     this.props.history.replace( '/' )
                     message.success("登录成功！")
+
+                    // user保存到本地
+                    const user = result.data;
+                    // localStorage.setItem( "user_key", JSON.stringify(user) )
+                    storageUtils.saveUser(user)
+                    memoryUtils.user = user
+
+                    
                 }else{
                     message.error(result.message)
                 }
@@ -66,10 +75,18 @@ class Login extends Component {
         } else {
             callback() // 验证通过
         }
-
     }
 
     render() {
+
+        // 读取到保存的user，如果存在跳转到 admin 页面
+        // const user = JSON.parse(localStorage.getItem("user_key") || '{}')
+        // const user = storageUtils.getUser()
+        const user = memoryUtils.user
+        if(user.id){
+            return <Redirect to="/"/>
+        }
+
         const { getFieldDecorator } = this.props.form
         return (
             <div className="login">
@@ -83,7 +100,7 @@ class Login extends Component {
                         <Item>
                             {getFieldDecorator("username", {
                                 initialValue: '',   // 初始值
-                                rules: [ // 声明式验证，使用 插件定义好的规则 进行验证。
+                                rules: [ // 声明实时表单验证，使用 插件定义好的规则 进行验证。
                                     { required: true, whitespace: true, message: "必须输入用户名！" },
                                     { min: 4, message: "用户名不能小于4位！" },
                                     { max: 12, message: "用户名不能大于18位！" },
@@ -119,17 +136,11 @@ class Login extends Component {
     Form.create() 包装 Form 组件生成一个新的组件
     新组件向 Form 组件传递属性 form
 
-    高阶函数：接收参数时函数或返回值是函数，场景的有： 数组遍历的方法 / 定时器 / Promise / 高阶组件
+    高阶函数：接收参数时函数或返回值是函数，场景的有： 数组遍历的方法 / 定时器 / Promise / 高阶组件 / fn.bind(obj)()
     作用：实现动态功能
 
     高阶组件：函数接收一个组件，返回一个新的组件， Form.create() 返回的就是一个高阶组件
 
 */
 const WrapperForm = Form.create()(Login)
-
-
 export default WrapperForm
-
-
-
-

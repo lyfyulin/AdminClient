@@ -14,6 +14,7 @@ export default class App extends Component{
         return (
             <HashRouter>
                 <Switch>
+                {/* / 表示匹配任意路由， 下面的顺序表示：除了 /login，其他都匹配 / 路由 */}
                     <Route path="/login" component={Login}/>
                     <Route path="/" component={Admin}/>
                 </Switch>

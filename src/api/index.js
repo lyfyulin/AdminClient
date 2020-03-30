@@ -8,8 +8,6 @@ const base = ''
 export const reqLogin = (username, password) => ajax.post( base + "/login", {username, password} )
 
 
-
-
 /*
 const name = "admin"
 const pwd = "admin"
