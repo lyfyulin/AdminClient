@@ -3,28 +3,20 @@
  */
 import ajax from './ajax'
 
+const base = ''
 
-export function reqLogin(username, password){
-    ajax({
-        method: "post",
-        url: "/login",
-        data: {
-            username,
-            password
-        }
-    })
-}
+export const reqLogin = (username, password) => ajax.post( base + "/login", {username, password} )
 
 
 
 
-
-
-
-
-
-
-
+/*
+const name = "admin"
+const pwd = "admin"
+reqLogin(name, pwd).then(data => {
+    console.log(data);
+})
+*/
 
 
 

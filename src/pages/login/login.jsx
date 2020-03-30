@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
-import { Form, Input, Button, Icon } from 'antd';
+import { Form, Input, Button, Icon, message } from 'antd';
+
+import { reqLogin } from '../../api'
 
 import logo from '../../assets/images/logo.png'
 import './login.less'
@@ -30,18 +32,23 @@ class Login extends Component {
         */
 
         // 对表单所有字段进行 统一 验证(用户名和密码统一验证)
-        this.props.form.validateFields((err, {username, password}) => {
+        this.props.form.validateFields( async (err, {username, password}) => {
+
             if(!err){
-                console.log("获取到表单数据：", {username, password});
-                console.log(`发送ajax请求 username: ${username}, password: ${password}`)
+                
+                // 发送登录的请求
+                const result = await reqLogin(username, password)
+                if( result.code === 1 ){
+                    // 跳转到 /admin 界面
+                    this.props.history.replace( '/' )
+                    message.success("登录成功！")
+                }else{
+                    message.error(result.message)
+                }
             }else{
                 console.log("登录键出发的，用户名或密码验证失败！")
             }
         })
-
-        
-        // 发送登录的请求
-
     }
 
     // 对密码进行自定义验证
