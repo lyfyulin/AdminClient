@@ -38,17 +38,17 @@ const menulist = [
         children: [
             {
                 title: '折线图',
-                key: '/line',
+                key: '/charts/line',
                 icon: 'line-chart',
             },
             {
                 title: '柱状图',
-                key: '/bar',
+                key: '/charts/bar',
                 icon: 'bar-chart',
             },
             {
                 title: '扇形图',
-                key: '/pie',
+                key: '/charts/pie',
                 icon: 'pie-chart',
             }
         ]

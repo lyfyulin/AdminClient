@@ -7,7 +7,6 @@ import logo from '../../assets/images/logo.png'
 import './index.less'
 
 const { SubMenu } = Menu
-const { Item } = Menu
 /*
     左侧导航
 */
@@ -61,9 +60,9 @@ class LeftNav extends Component {
         }, [])
     }
 
-      /*
-  根据指定菜单数据列表产生<Menu>的子节点数组
-  使用 map() + 递归
+  /*
+      根据指定菜单数据列表产生<Menu>的子节点数组
+      使用 map() + 递归
   */
   getMenuNodes2 = (menuList) => {
 
@@ -102,27 +101,47 @@ class LeftNav extends Component {
     })
   }
 
-    render() {
-        let menuNodes = this.getMenuNodes(menuList)
-        let selectKey = this.props.location.pathname
-        return (
-            <div className="left-nav">
-                <Link className="left-nav-link" to="/home">
-                    <img src={logo} alt="logo"/>
-                    <h1>绿启信控</h1>
-                </Link>
-                <Menu
-                    SelectedKeys={[selectKey]}
-                    defaultOpenKeys={[this.openkey]}
-                    mode="inline"
-                    theme="dark"
-                >
-                    {
-                        menuNodes
-                    }
-                </Menu>
-            </div>
-        )
+  /**
+   *    第一次 render() 之后执行一次
+   *    执行异步任务：比如 发 ajax 请求， 启动定时器。
+   */
+  componentDidMount() {
+    
+  };
+  /**
+   *    第一次执行 render() 之前
+   *    第一次 render() 之前需要做的准备工作
+   */
+  componentWillMount() {
+    this.menuNodes = this.getMenuNodes(menuList)
+  }
+
+  render() {
+      
+      // let menuNodes = this.getMenuNodes(menuList)
+      let selectKey = this.props.location.pathname
+      return (
+          <div className="left-nav">
+              <Link className="left-nav-link" to="/home">
+                  <img src={logo} alt="logo"/>
+                  <h1>绿启信控</h1>
+              </Link>
+              {/* 
+                defaultSelectedKeys: 指定默认值后，通过编码更新为其他值，没有更新效果
+                selectedKeys: 
+                */}
+              <Menu
+                  selectedKeys={[selectKey]}
+                  defaultOpenKeys={[this.openkey]}
+                  mode="inline"
+                  theme="dark"
+              >
+                  {
+                      this.menuNodes
+                  }
+              </Menu>
+          </div>
+      )
     }
 }
 
