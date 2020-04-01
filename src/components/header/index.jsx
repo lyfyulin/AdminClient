@@ -37,7 +37,7 @@ class Header extends Component {
     }
 
     getTitle = () => {
-        const path = this.props.location.pathname
+        const path = '/' +  this.props.location.pathname.split('/')[1]
         let title = ''
         menuList.forEach( data => {
             if( data.key === path ){

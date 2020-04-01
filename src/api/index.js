@@ -43,6 +43,31 @@ export const reqSearchGoods = ({ pageNum, pageSize, searchName, searchType}) => 
     }
 })
 
+
+export const reqUpdateStatus = ( goodsId, status ) => ajax.post( base + "/update/good", JSON.stringify({ id : goodsId, status: status,}), {
+    headers: {
+        "Content-Type": 'application/json'
+    },
+})
+
+export const reqCategory = (categoryId) => ajax( base + "/product/info", {
+    params: {
+        id: categoryId
+    }
+} )
+
+export const reqDeleteImage = ( image ) => ajax.post( base + '/delete/image', { image } )
+
+export const reqAddUpdateProduct = (product) => ajax.post(
+     base + (product.id?'/update/good':'/insert/good'),
+     JSON.stringify(product),
+     {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+     }
+)
+
 /*
 const name = "admin"
 const pwd = "admin"

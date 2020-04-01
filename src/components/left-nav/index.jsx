@@ -119,7 +119,7 @@ class LeftNav extends Component {
   render() {
       
       // let menuNodes = this.getMenuNodes(menuList)
-      let selectKey = this.props.location.pathname
+      let selectKey = '/' + this.props.location.pathname.split('/')[1]
       return (
           <div className="left-nav">
               <Link className="left-nav-link" to="/home">
