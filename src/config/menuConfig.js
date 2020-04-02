@@ -1,8 +1,9 @@
-const menulist = [
+const menuList = [
     {
         title: '首页',
         key: '/home',
         icon: 'home',
+        public: true,
     },
     {
         title: '商品',
@@ -52,12 +53,7 @@ const menulist = [
                 icon: 'pie-chart',
             }
         ]
-    },
-    {
-        title: '订单管理',
-        key: '/pie',
-        icon: 'pie-chart',
     }
 ]
 
-export default menulist
+export default menuList

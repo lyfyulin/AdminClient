@@ -68,13 +68,41 @@ export const reqAddUpdateProduct = (product) => ajax.post(
      }
 )
 
-/*
-const name = "admin"
-const pwd = "admin"
-reqLogin(name, pwd).then(data => {
-    console.log(data);
-})
-*/
+export const reqRoles = () => ajax( base + "/role" )
 
+export const reqAddRole = ( role ) => ajax.post(
+    base + '/insert/role',
+    JSON.stringify( {...role} ),
+    {
+        headers: { "Content-Type": "application/json" }
+    }
+)
 
+export const reqUpdateRole = ( role ) => ajax.post(
+    base  + '/update/role',
+    JSON.stringify( { ...role } ),
+    {
+        headers: { 'Content-Type' : 'application/json' }
+    }
+)
+
+export const reqUsers = () => ajax( base + "/user" )
+
+export const reqAddUser = ( user ) => ajax.post(
+    base + '/insert/user',
+    JSON.stringify( {...user} ),
+    {
+        headers: { "Content-Type": "application/json" }
+    }
+)
+
+export const reqUpdateUser = ( user ) => ajax.post(
+    base  + '/update/user',
+    JSON.stringify( { ...user } ),
+    {
+        headers: { 'Content-Type' : 'application/json' }
+    }
+)
+
+export const reqDeleteUser = (id) => ajax.post( base + '/delete/user', {id} )
 

@@ -5,6 +5,7 @@ import {Menu, Icon} from 'antd'
 import menuList from '../../config/menuConfig'
 import logo from '../../assets/images/logo.png'
 import './index.less'
+import memoryUtils from '../../utils/memoryUtils'
 
 const { SubMenu } = Menu
 /*
@@ -14,6 +15,32 @@ const { SubMenu } = Menu
 
 
 class LeftNav extends Component {
+
+
+  /*
+    判断当前用户是否有此权限
+  */
+  hasAuth = (item) => {
+    // 得到当前用户所有权限
+    const user = memoryUtils.user
+    const menus = user.menus.split(";")
+    // 1.管理员用户 全部访问
+    // 2.item.public为true  则任何人都可以访问
+    // 3.当前用户有此item的权限
+    if(user.username === 'admin' || item.public || menus.indexOf(item.key)!== -1 ){
+      return true
+    }else if( item.children ) {
+      const cItem = item.children.find( cItem => menus.indexOf(cItem.key) !== -1 )
+      if(cItem){
+        return !!cItem
+      }
+    }
+
+    // 如果当前用户有 item 的某个子节点的权限， 当前 item 也应该显示
+
+
+    return false
+  }
 
     /*
     根据指定菜单数据列表产生<Menu>的子节点数组
@@ -26,7 +53,9 @@ class LeftNav extends Component {
 
         return menuList.reduce((pre, item) => {
             // 添加<Menu.Item></Menu.Item>
-            if (!item.children) {
+
+            if( this.hasAuth( item ) ){
+              if (!item.children) {
                 pre.push((
                     <Menu.Item key={item.key}>
                     <Link to={item.key}>
@@ -55,6 +84,7 @@ class LeftNav extends Component {
                     {this.getMenuNodes(item.children)}
                     </SubMenu>
                 ))
+            }
             }
             return pre
         }, [])

@@ -49,7 +49,6 @@ class Login extends Component {
                     // localStorage.setItem( "user_key", JSON.stringify(user) )
                     storageUtils.saveUser(user)
                     memoryUtils.user = user
-
                     
                 }else{
                     message.error(result.message)
