@@ -1,43 +1,46 @@
 /*
-应用根组件
+    UI组件：负责显示
+    没有使用任何 redux 相关语法
 */
 
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import { increment, decrement, incrementIfOdd, incrementAsync } from './redux/actions'
 
-
-export default class App extends Component{
+export default class Counter extends Component{
 
     static propTypes = {
-        store: PropTypes.object.isRequired
+        count: PropTypes.number.isRequired,
+        increment: PropTypes.func.isRequired,
+        decrement: PropTypes.func.isRequired,
+        incrementIfOdd: PropTypes.func.isRequired,
+        incrementAsync: PropTypes.func.isRequired,
     }
 
     increment = () => {
         const number = this.refs.numberSelect.value * 1
-        this.props.store.dispatch( increment( number ) )
+        this.props.increment( number )
     }
 
     decrement = () => {
         const number = this.refs.numberSelect.value * 1
-        this.props.store.dispatch( decrement( number ) )
+        this.props.decrement( number )
     }
     incrementIfOdd = () => {
         const number = this.refs.numberSelect.value * 1
-        const count = this.props.store.getState()
+        const count = this.props.count
         if( count%2 === 1 ){
-            this.props.store.dispatch( incrementIfOdd(number) )
+            this.props.incrementIfOdd(number)
         }
     }
     incrementAsync = () => {
         const number = this.refs.numberSelect.value * 1
         setTimeout( () => {
-            this.props.store.dispatch( incrementAsync(number) )
+            this.props.incrementAsync(number)
         }, 1000 )
     }
     render(){
         
-        const counter = this.props.store.getState()
+        const counter = this.props.count
         return (
             <div style={{ padding: 30, display:'flex' }}>
                 <p>click {counter} times</p>
