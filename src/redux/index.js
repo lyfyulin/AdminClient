@@ -1,5 +1,7 @@
-import { createStore } from 'redux' 
-import {counter} from './reducers'
+import { createStore, applyMiddleware } from 'redux' 
+import thunk from 'redux-thunk'
+import { composeWithDevTools } from 'redux-devtools-extension'
+import { counter } from './reducers'
 
 
 
@@ -12,9 +14,6 @@ import {counter} from './reducers'
 // store.dispatch( { type, data } )
 
 // createStore 必须传入一个 reducer 
-export const counterStore = createStore( counter )
-
-
-
+export const counterStore = createStore( counter, composeWithDevTools(applyMiddleware(thunk)) )
 
 
