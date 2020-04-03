@@ -67,6 +67,11 @@ export const reqAddUpdateProduct = (product) => ajax.post(
         },
      }
 )
+export const reqProductById = ( goodId ) => ajax( base + "/good/info", {
+    params: {
+        id: goodId
+    }
+} )
 
 export const reqRoles = () => ajax( base + "/role" )
 

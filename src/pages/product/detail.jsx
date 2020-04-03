@@ -5,10 +5,9 @@ import {
     Icon,
     List,
 } from 'antd'
-import {Redirect} from 'react-router-dom'
 
 import LinkButton from '../../components/link-button'
-import { reqCategory } from '../../api'
+import { reqCategory, reqProductById } from '../../api'
 import { BASE_IMG } from '../../utils/ConstantUtils'
 import memoryUtils from '../../utils/memoryUtils'
 const { Item } = List
@@ -17,8 +16,8 @@ export default class ProductDetail extends Component {
 
     state = {
         categoryName: '',
+        product: memoryUtils.product,
     }
-
 
     getCategory = async (categoryId) => {
         const result = await reqCategory( categoryId )
@@ -29,20 +28,33 @@ export default class ProductDetail extends Component {
         }
     }
 
-    componentDidMount() {
-        const product = memoryUtils.product
+    async componentDidMount() {
+        let product = this.state.product
         if( product.id ){
             this.getCategory( product.id )
+        } else {
+            const id = this.props.match.params.id
+            const result = await reqProductById( id )
+            if(result.code === 1){
+                product = result.data
+                this.setState({
+                    product
+                })
+                this.getCategory( product.id )
+            }
         }
     }
 
     render() {
         // const product = this.props.location.state
         const { categoryName } = this.state
-        const product = memoryUtils.product
+        const product =  this.state.product
+
+        /*
         if(!product.id || !product){
             return <Redirect to="/product"/>
         }
+        */
         
         const title = (
             <span>
