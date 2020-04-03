@@ -3,13 +3,17 @@ import React, { Component } from 'react'
 import { Modal } from 'antd'
 import { withRouter } from 'react-router-dom'
 import menuList from '../../config/menuConfig'
+import { connect } from 'react-redux'
+import { logout } from '../../redux/actions'
 import { reqWeather } from '../../api'
+
 
 import { formatDate } from '../../utils/dateUtils'
 import storageUtils from '../../utils/storageUtils'
 import memoryUtils from '../../utils/memoryUtils'
-import './index.less'
 import LinkButton from '../link-button'
+import './index.less'
+
 class Header extends Component {
 
     state = {
@@ -23,10 +27,14 @@ class Header extends Component {
         Modal.confirm({
             title: "是否退出?",
             onOk: () => {
+                // 注销后自动跳转到 /login 
+                this.props.logout()
+                /*
                 memoryUtils.user = {}
                 storageUtils.removeUser()
                 this.visible = false
                 this.props.history.replace('/login')
+                */
             },
             onCancel: () => {
                 console.log("退出登录取消了！")
@@ -37,6 +45,8 @@ class Header extends Component {
     }
 
     getTitle = () => {
+        return this.props.headerTitle
+        /*
         const path = '/' +  this.props.location.pathname.split('/')[1]
         let title = ''
         menuList.forEach( data => {
@@ -50,6 +60,7 @@ class Header extends Component {
             }
         })
         return title
+        */
     }
 
     getWeather = async () => {
@@ -75,7 +86,8 @@ class Header extends Component {
     
 
     render() {
-        const user = memoryUtils.user
+        // const user = memoryUtils.user
+        const user = this.props.user
         const title = this.getTitle()
         const time = formatDate(this.state.currentTime)
         const { dayPictureUrl, weather } = this.state
@@ -101,4 +113,7 @@ class Header extends Component {
 
 // 包装之后 可以 直接使用 this.props.history
 
-export default withRouter( Header )
+export default connect(
+    state => ({ headerTitle: state.headerTitle, user: state.user }),
+    { logout }
+)(withRouter( Header ))

@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Link, withRouter } from 'react-router-dom'
 import {Menu, Icon} from 'antd'
-
+import { connect } from 'react-redux'
+import { setHeaderTitle } from '../../redux/actions'
 import menuList from '../../config/menuConfig'
 import logo from '../../assets/images/logo.png'
 import './index.less'
@@ -12,17 +13,15 @@ const { SubMenu } = Menu
     左侧导航
 */
 
-
-
 class LeftNav extends Component {
-
 
   /*
     判断当前用户是否有此权限
   */
   hasAuth = (item) => {
     // 得到当前用户所有权限
-    const user = memoryUtils.user
+    // const user = memoryUtils.user
+    const user = this.props.user
     const menus = user.menus.split(";")
     // 1.管理员用户 全部访问
     // 2.item.public为true  则任何人都可以访问
@@ -35,10 +34,6 @@ class LeftNav extends Component {
         return !!cItem
       }
     }
-
-    // 如果当前用户有 item 的某个子节点的权限， 当前 item 也应该显示
-
-
     return false
   }
 
@@ -53,12 +48,16 @@ class LeftNav extends Component {
 
         return menuList.reduce((pre, item) => {
             // 添加<Menu.Item></Menu.Item>
+            // 如果 path 和 item.key 
+            if(item.key === path || path.indexOf(item.key) === 0){
+              this.props.setHeaderTitle(item.title)
+            }
 
             if( this.hasAuth( item ) ){
               if (!item.children) {
                 pre.push((
                     <Menu.Item key={item.key}>
-                    <Link to={item.key}>
+                    <Link to={item.key} onClick = { () => this.props.setHeaderTitle(item.title) } >
                         <Icon type={item.icon} />
                         <span>{item.title}</span>
                     </Link>
@@ -70,7 +69,6 @@ class LeftNav extends Component {
                 if (cItem) {
                     this.openKey = item.key
                 }
-
                 pre.push((
                     <SubMenu
                     key={item.key}
@@ -136,7 +134,6 @@ class LeftNav extends Component {
    *    执行异步任务：比如 发 ajax 请求， 启动定时器。
    */
   componentDidMount() {
-    
   };
   /**
    *    第一次执行 render() 之前
@@ -177,7 +174,10 @@ class LeftNav extends Component {
 
 // 高阶组件包装路由组件，形成新组件
 // 新组件 传递 3 个特别属性：history / location / match
-export default withRouter(LeftNav)
+export default connect(
+  state => ({ user: state.user }),
+  { setHeaderTitle }
+)( withRouter( LeftNav ) )
 /**
  * 默认选择对应的 menuItem
  * 有可能需要打开某个 SubMenu：访问的是某个二级菜单

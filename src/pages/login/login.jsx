@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Form, Input, Button, Icon, message } from 'antd'
 import { Redirect } from 'react-router-dom'
-
+import { connect } from 'react-redux'
+import { login } from '../../redux/actions'
 import { reqLogin } from '../../api'
 import storageUtils from '../../utils/storageUtils'
 import memoryUtils from '../../utils/memoryUtils'
@@ -24,38 +25,13 @@ class Login extends Component {
     handleSubmit = (e) => {
         e.preventDefault()
 
-        // 取出输入相关的数据
-        /*
-        const form = this.props.form
-        const values = form.getFieldsValue()
-        const username = form.getFieldValue("username")
-        console.log(values);
-        console.log(username);
-        */
-
         // 对表单所有字段进行 统一 验证(用户名和密码统一验证)
         this.props.form.validateFields( async (err, {username, password}) => {
 
             if(!err){
-                // 发送登录的请求
-                const result = await reqLogin(username, password)
-                if( result.code === 1 ){
-                    // 跳转到 /admin 界面
-                    this.props.history.replace( '/' )
-                    message.success("登录成功！")
-
-                    // user保存到本地
-                    const user = result.data;
-                    // localStorage.setItem( "user_key", JSON.stringify(user) )
-                    storageUtils.saveUser(user)
-                    memoryUtils.user = user
-                    
-                }else{
-                    message.error(result.message)
-                }
-            }else{
-                console.log("登录键出发的，用户名或密码验证失败！")
+                this.props.login(username, password)
             }
+
         })
     }
 
@@ -81,9 +57,11 @@ class Login extends Component {
         // 读取到保存的user，如果存在跳转到 admin 页面
         // const user = JSON.parse(localStorage.getItem("user_key") || '{}')
         // const user = storageUtils.getUser()
-        const user = memoryUtils.user
+        // const user = memoryUtils.user
+        const user = this.props.user
+        const errorMsg = user.errorMsg
         if(user.id){
-            return <Redirect to="/"/>
+            return <Redirect to="/home"/>
         }
 
         const { getFieldDecorator } = this.props.form
@@ -95,6 +73,7 @@ class Login extends Component {
                 </div>
                 <div className="login-content">
                     <h1>登 录</h1>
+                    { errorMsg?(<p style={{color:'red'}}>登录失败：{errorMsg}</p>):null}
                     <Form className="login-form" onSubmit={this.handleSubmit} >
                         <Item>
                             {getFieldDecorator("username", {
@@ -142,4 +121,8 @@ class Login extends Component {
 
 */
 const WrapperForm = Form.create()(Login)
-export default WrapperForm
+
+export default connect(
+    state => ({ user: state.user }),
+    { login }
+)(WrapperForm)

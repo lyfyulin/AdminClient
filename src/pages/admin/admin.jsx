@@ -16,17 +16,19 @@ import User from '../user/user'
 import Bar from '../charts/bar'
 import Line from '../charts/line'
 import Pie from '../charts/pie'
+import { connect } from 'react-redux'
 
 
 const { Content, Footer, Sider } = Layout
 
-export default class Admin extends Component {
+class Admin extends Component {
     render() {
 
         // 读取保存的user信息，不存在则跳到登录界面
         // const user = JSON.parse(localStorage.getItem("user_key") || '{}')   // 如果没有则为 空对象 {}
         // const user = storageUtils.getUser()
-        const user = memoryUtils.user
+        // const user = memoryUtils.user
+        const user = this.props.user
         if(!user.id){
             // this.props.history.replace( "/login" )   // render中不使用这个，得回调函数中使用
             return <Redirect to="/login"/>
@@ -57,3 +59,8 @@ export default class Admin extends Component {
         )
     }
 }
+
+export default  connect(
+    state => ({ user: state.user }),
+    { }
+)(Admin)
