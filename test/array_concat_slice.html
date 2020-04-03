@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>array原生方法</title>
+</head>
+<body>
+<script>
+    
+    // concat
+    Array.prototype.concat = function() {
+        const args = arguments
+        let res = [...this]
+        for (let i = 0; i < args.length; i++) {
+            if(args[i] instanceof Array ){
+                res = [...res, ...args[i]]
+            }else{
+                res.push(args[i])
+            }
+        }
+        return res
+    }
+    a = [1,3,4]
+    b = ['1', 6, 8]
+    c = a.concat(b)
+    console.log(c)
+
+
+    // slice
+
+
+    // copyWithin
+
+    // entries
+    // every
+    // fill
+    // filter
+    // find
+    // findIndex
+    // flat
+    // flatMap
+    // forEach
+    // includes
+    // indexOf
+    // join
+    // keys
+    // lastIndexOf
+    // map
+    // pop
+    // push
+    // reduce
+    // reduceRight
+    // reverse
+    // shift
+    // slice
+    // some
+    // sort
+    // splice
+    // toLocaleString
+    // toSource
+    // toString
+    // unshift
+    // values
+    // [@@iterator]
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
