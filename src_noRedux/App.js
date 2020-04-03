@@ -3,44 +3,47 @@
 */
 
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import { increment, decrement, incrementIfOdd, incrementAsync } from './redux/actions'
-
-
 export default class App extends Component{
 
-    static propTypes = {
-        store: PropTypes.object.isRequired
+    state = {
+        count: 0,
     }
 
     increment = () => {
         const number = this.refs.numberSelect.value * 1
-        this.props.store.dispatch( increment( number ) )
+        this.setState({
+            count: this.state.count + number
+        })
     }
-
     decrement = () => {
         const number = this.refs.numberSelect.value * 1
-        this.props.store.dispatch( decrement( number ) )
+        this.setState({
+            count: this.state.count - number
+        })
     }
     incrementIfOdd = () => {
         const number = this.refs.numberSelect.value * 1
-        const count = this.props.store.getState()
+        const {count} = this.state
         if( count%2 === 1 ){
-            this.props.store.dispatch( incrementIfOdd(number) )
+            this.setState({
+                count: count + number
+            })
         }
     }
     incrementAsync = () => {
         const number = this.refs.numberSelect.value * 1
+        const {count} = this.state
         setTimeout( () => {
-            this.props.store.dispatch( incrementAsync(number) )
+            this.setState({
+                count: count + number
+            })
         }, 1000 )
     }
     render(){
-        
-        const counter = this.props.store.getState()
+        const {count} = this.state
         return (
             <div style={{ padding: 30, display:'flex' }}>
-                <p>click {counter} times</p>
+                <p>click {count} times</p>
                 <select ref = "numberSelect">
                     <option value="1">1</option>
                     <option value="2">2</option>
