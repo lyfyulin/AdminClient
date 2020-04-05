@@ -111,3 +111,31 @@ export const reqUpdateUser = ( user ) => ajax.post(
 
 export const reqDeleteUser = (id) => ajax.post( base + '/delete/user', {id} )
 
+export const reqAvgSpeed = ( start_time, end_time ) => ajax( base + '/avgspeed', {
+    params: {
+        start_time,
+        end_time,
+    }
+} )
+
+export const reqVnIn = ( start_time, end_time ) => ajax( base + '/vnin', {
+    params: {
+        start_time,
+        end_time,
+    }
+} )
+
+export const reqVnOut = ( start_time, end_time ) => ajax( base + '/vnout', {
+    params: {
+        start_time,
+        end_time,
+    }
+} )
+
+export const reqVnInfo = ( start_time, end_time ) => ajax( base + '/vninfo', {
+    params: {
+        start_time,
+        end_time,
+    }
+} )
+

@@ -6,51 +6,51 @@ const menuList = [
         public: true,
     },
     {
-        title: '商品',
+        title: '数据中心',
         key: '/products',
-        icon: 'appstore',
+        icon: 'database',
         children: [
             {
-                title: '品类管理',
+                title: '路网数据',
                 key: '/category',
-                icon: 'bars',
+                icon: 'table',
             },
             {
-                title: '商品管理',
+                title: '结构化数据',
                 key: '/product',
-                icon: 'tool',
+                icon: 'video-camera',
             },
         ]
     },
     {
-        title: '用户管理',
+        title: '信号控制',
         key: '/user',
-        icon: 'user'
+        icon: 'car'
     },
     {
-        title: '角色管理',
+        title: '信号评价',
         key: '/role',
-        icon: 'book'
+        icon: 'area-chart'
     },
     {
-        title: '图表',
+        title: '堵点治理',
         key: '/charts',
-        icon: 'bars',
+        icon: 'alert',
         children: [
             {
-                title: '折线图',
-                key: '/charts/line',
-                icon: 'line-chart',
+                title: '拥堵交叉口',
+                key: '/charts/interstate',
+                icon: 'plus',
             },
             {
-                title: '柱状图',
-                key: '/charts/bar',
-                icon: 'bar-chart',
+                title: '拥堵路段',
+                key: '/charts/roadstate',
+                icon: 'pause',
             },
             {
-                title: '扇形图',
-                key: '/charts/pie',
-                icon: 'pie-chart',
+                title: '拥堵区域',
+                key: '/charts/areastate',
+                icon: 'number',
             }
         ]
     }
