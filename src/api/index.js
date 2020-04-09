@@ -56,7 +56,7 @@ export const reqCategory = (categoryId) => ajax( base + "/product/info", {
     }
 } )
 
-export const reqDeleteImage = ( image ) => ajax.post( base + '/delete/image', { image } )
+export const reqDeleteImage = ( image ) => ajax.post( base + '/image/delete', { image } )
 
 export const reqAddUpdateProduct = (product) => ajax.post(
      base + (product.id?'/update/good':'/insert/good'),
@@ -94,7 +94,7 @@ export const reqUpdateRole = ( role ) => ajax.post(
 export const reqUsers = () => ajax( base + "/user" )
 
 export const reqAddUser = ( user ) => ajax.post(
-    base + '/insert/user',
+    base + '/user/insert',
     JSON.stringify( {...user} ),
     {
         headers: { "Content-Type": "application/json" }
@@ -102,14 +102,14 @@ export const reqAddUser = ( user ) => ajax.post(
 )
 
 export const reqUpdateUser = ( user ) => ajax.post(
-    base  + '/update/user',
+    base  + '/user/update',
     JSON.stringify( { ...user } ),
     {
         headers: { 'Content-Type' : 'application/json' }
     }
 )
 
-export const reqDeleteUser = (id) => ajax.post( base + '/delete/user', {id} )
+export const reqDeleteUser = (id) => ajax.post( base + '/user/delete', {id} )
 
 export const reqAvgSpeed = ( start_time, end_time ) => ajax( base + '/avgspeed', {
     params: {

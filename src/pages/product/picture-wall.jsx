@@ -101,7 +101,7 @@ export default class PictureWall extends Component {
         return (
             <div className="clearfix">
                 <Upload
-                    action = "/upload"              // 上传 url
+                    action = "/image/upload"              // 上传 url
                     name = "image"                  // 图片文件 的参数名
                     listType="picture-card"              // 显示风格   picture    picture-card
                     fileList={fileList}             // 文件信息对象的数组
@@ -109,7 +109,6 @@ export default class PictureWall extends Component {
                     onChange={this.handleChange}
                 >
                     {
-
                         fileList.length >= IMG_THRESHOLD ? null : uploadButton
                     }
                 </Upload>

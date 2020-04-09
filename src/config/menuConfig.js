@@ -53,7 +53,32 @@ const menuList = [
                 icon: 'number',
             }
         ]
-    }
+    },
+    {
+        title: '交叉口管理',
+        key: '/intersection-info',
+        icon: 'area-chart'
+    },
+    {
+        title: '路段管理',
+        key: '/link-info',
+        icon: 'area-chart'
+    },
+    {
+        title: '流量管理',
+        key: '/flow-info',
+        icon: 'area-chart'
+    },
+    {
+        title: '设备管理',
+        key: '/device-info',
+        icon: 'area-chart'
+    },
+    {
+        title: '信号管理',
+        key: '/signal-info',
+        icon: 'area-chart'
+    },
 ]
 
 export default menuList

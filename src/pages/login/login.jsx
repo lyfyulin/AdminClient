@@ -1,11 +1,8 @@
 import React, { Component } from 'react'
-import { Form, Input, Button, Icon, message } from 'antd'
+import { Form, Input, Button, Icon } from 'antd'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { login } from '../../redux/actions'
-import { reqLogin } from '../../api'
-import storageUtils from '../../utils/storageUtils'
-import memoryUtils from '../../utils/memoryUtils'
 
 import logo from '../../assets/images/logo.png'
 import './login.less'
@@ -55,9 +52,6 @@ class Login extends Component {
     render() {
 
         // 读取到保存的user，如果存在跳转到 admin 页面
-        // const user = JSON.parse(localStorage.getItem("user_key") || '{}')
-        // const user = storageUtils.getUser()
-        // const user = memoryUtils.user
         const user = this.props.user
         const errorMsg = user.errorMsg
         if(user.id){

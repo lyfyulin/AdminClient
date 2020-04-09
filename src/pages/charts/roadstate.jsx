@@ -14,7 +14,6 @@ import {
 import { reqAvgSpeed, reqVnIn, reqVnInfo, reqVnOut } from '../../api'
 import { intersection_titles } from '../../config/chartsTitle'
 import './charts.less'
-import Line from './interstate'
 
 export default class RoadState extends Component{
     
@@ -55,7 +54,7 @@ export default class RoadState extends Component{
     render() {
         const { avg_speed, vn_in, vn_out, vn_info } = this.state
         return (
-            <div className = "lvqi-row2-co2">
+            <div className = "lvqi-row2-col2">
                 <div className = "lvqi-row-2">
                     <div className = "lvqi-col-2">
                         <div className = "lvqi-chart-title">

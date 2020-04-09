@@ -2,15 +2,12 @@ import React, { Component } from 'react'
 
 import { Modal } from 'antd'
 import { withRouter } from 'react-router-dom'
-import menuList from '../../config/menuConfig'
 import { connect } from 'react-redux'
 import { logout } from '../../redux/actions'
 import { reqWeather } from '../../api'
 
 
 import { formatDate } from '../../utils/dateUtils'
-import storageUtils from '../../utils/storageUtils'
-import memoryUtils from '../../utils/memoryUtils'
 import LinkButton from '../link-button'
 import './index.less'
 
@@ -29,12 +26,6 @@ class Header extends Component {
             onOk: () => {
                 // 注销后自动跳转到 /login 
                 this.props.logout()
-                /*
-                memoryUtils.user = {}
-                storageUtils.removeUser()
-                this.visible = false
-                this.props.history.replace('/login')
-                */
             },
             onCancel: () => {
                 console.log("退出登录取消了！")
@@ -46,21 +37,6 @@ class Header extends Component {
 
     getTitle = () => {
         return this.props.headerTitle
-        /*
-        const path = '/' +  this.props.location.pathname.split('/')[1]
-        let title = ''
-        menuList.forEach( data => {
-            if( data.key === path ){
-                title = data.title
-            } else if( data.children ){
-                const cItem = data.children.find( cItem => cItem.key === path )
-                if(cItem){
-                    title = cItem.title
-                }
-            }
-        })
-        return title
-        */
     }
 
     getWeather = async () => {

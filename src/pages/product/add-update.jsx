@@ -105,7 +105,7 @@ class ProductAddUpdate extends Component {
         const { getFieldDecorator }  = this.props.form
         const title = (
             <span>
-                <LinkButton onClick = { () => { this.props.history.goBack() } } >
+                <LinkButton onClick = { () => { this.props.history.replace("/product") } } >
                     <Icon type = "arrow-left" />
                 </LinkButton>
                 <span> { isUpdate ? "更新货物" : "添加货物" } </span>

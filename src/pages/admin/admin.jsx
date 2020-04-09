@@ -1,12 +1,9 @@
 import React, { Component } from 'react'
 import { Redirect, Switch, Route } from 'react-router-dom'
-import { Layout } from 'antd'
+import { Layout } from 'antd' 
 
-// import storageUtils from '../../utils/storageUtils'
-import memoryUtils from '../../utils/memoryUtils'
 import LeftNav from '../../components/left-nav'
 import Header from '../../components/header'
-
 import Home from '../home/home'
 import Category from '../category/category'
 import Product from '../product/product'
@@ -15,6 +12,12 @@ import User from '../user/user'
 import RoadState from '../charts/roadstate'
 import InterState from '../charts/interstate'
 import AreaState from '../charts/areastate'
+import IntersectionInfo from '../intersection/intersection-info'
+import LinkInfo from '../link/link-info'
+import DeviceInfo from '../device/device-info'
+import FlowInfo from '../flow/flow-info'
+import SignalInfo from '../signal/signal-info'
+
 import { connect } from 'react-redux'
 
 
@@ -22,18 +25,10 @@ const { Content, Footer, Sider } = Layout
 
 class Admin extends Component {
 
-    componentDidMount(){
-        let content = document.getElementById("content")
-        console.log(content.clientHeight);
-    }
     render() {
         // 读取保存的user信息，不存在则跳到登录界面
-        // const user = JSON.parse(localStorage.getItem("user_key") || '{}')   // 如果没有则为 空对象 {}
-        // const user = storageUtils.getUser()
-        // const user = memoryUtils.user
         const user = this.props.user
         if(!user.id){
-            // this.props.history.replace( "/login" )   // render中不使用这个，得回调函数中使用
             return <Redirect to="/login"/>
         }
         return (
@@ -56,6 +51,11 @@ class Admin extends Component {
                             <Route path="/charts/roadstate" component={ RoadState }></Route>
                             <Route path="/charts/interstate" component={ InterState }></Route>
                             <Route path="/charts/areastate" component={ AreaState }></Route>
+                            <Route path="/intersection-info" component={ IntersectionInfo }></Route>
+                            <Route path="/link-info" component={ LinkInfo }></Route>
+                            <Route path="/device-info" component={ DeviceInfo }></Route>
+                            <Route path="/flow-info" component={ FlowInfo }></Route>
+                            <Route path="/signal-info" component={ SignalInfo }></Route>
                             <Redirect to="/home" />
                         </Switch>
                     </Content>

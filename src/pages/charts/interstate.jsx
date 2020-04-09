@@ -52,7 +52,7 @@ export default class InterState extends Component {
     render() {
         const { avg_speed, vn_in, vn_out, vn_info } = this.state
         return (
-            <div className = "lvqi-row2-co2">
+            <div className = "lvqi-row2-col2">
                 <div className = "lvqi-row-2">
                     <div className = "lvqi-col-2">
                         <div className = "lvqi-chart-title">
