@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 
+
 export default class SignalInfo extends Component {
     render() {
         return (
             <div>
-                信号控制方案
+                <a href="http://localhost:3005/daily/abc.pdf" target="blank">pdf reader</a>
             </div>
         )
     }
