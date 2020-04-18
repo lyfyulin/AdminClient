@@ -12,12 +12,12 @@ import User from '../user/user'
 import RoadState from '../charts/roadstate'
 import InterState from '../charts/interstate'
 import AreaState from '../charts/areastate'
-import IntersectionInfo from '../intersection/intersection-info'
-import LinkInfo from '../link/link-info'
+import Intersection from '../intersection/intersection'
+import Link from '../link/link'
 import DeviceInfo from '../device/device-info'
 import FlowInfo from '../flow/flow-info'
 import SignalInfo from '../signal/signal-info'
-
+import Accidents from '../accidents/accidents'
 import { connect } from 'react-redux'
 
 
@@ -51,11 +51,12 @@ class Admin extends Component {
                             <Route path="/charts/roadstate" component={ RoadState }></Route>
                             <Route path="/charts/interstate" component={ InterState }></Route>
                             <Route path="/charts/areastate" component={ AreaState }></Route>
-                            <Route path="/intersection-info" component={ IntersectionInfo }></Route>
-                            <Route path="/link-info" component={ LinkInfo }></Route>
+                            <Route path="/intersection" component={ Intersection }></Route>
+                            <Route path="/link" component={ Link }></Route>
                             <Route path="/device-info" component={ DeviceInfo }></Route>
                             <Route path="/flow-info" component={ FlowInfo }></Route>
                             <Route path="/signal-info" component={ SignalInfo }></Route>
+                            <Route path="/accidents" component={ Accidents }></Route>
                             <Redirect to="/home" />
                         </Switch>
                     </Content>

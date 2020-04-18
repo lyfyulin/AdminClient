@@ -3,6 +3,7 @@ import { Table } from 'antd'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './intersection-info.less'
+import LinkButton from '../../components/link-button'
 
 export default class IntersectionInfo extends Component {
 
@@ -17,27 +18,22 @@ export default class IntersectionInfo extends Component {
             dataIndex: 'name'
         },{
             title: '几何布局',
-            render: intersection => (<span>查看布局</span>)
+            render: intersection => (
+                <LinkButton onClick = { () => { 
+                    this.props.history.push("/intersection/geometry")
+                } }>查看布局</LinkButton>
+            )
         },{
             title: '流量信息',
-            render: intersection => (<span>查看详情</span>)
+            render: intersection => (
+                <LinkButton onClick = { () => { 
+                    this.props.history.push("/intersection/flow")
+                } }>查看流量</LinkButton>
+            )
         },]
     }
 
-    componentWillMount() {
-        this.columns = this.initColumns()
-
-    }
-
-    componentDidMount() {
-
-        this.map = L.map('map', {
-            center: [23, 99],
-            zoom: 13
-        });
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        }).addTo(this.map);
-        
+    initIntersections = () => {
         const intersections = [{
             id: 1,
             name: "正阳路-保岫路交叉口",
@@ -71,7 +67,28 @@ export default class IntersectionInfo extends Component {
         },]
         this.setState({ 
             intersections,
-         })
+        })
+    }
+
+    initMap = () => {
+        if(!this.map){
+            this.map = L.map('map', {
+                center: [25.12, 99.175],
+                zoom: 14
+            })
+            L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}', {}).addTo(this.map)
+            this.map._onResize()
+        }
+    }
+
+    componentWillMount() {
+        this.columns = this.initColumns()
+        this.initIntersections()
+
+    }
+    
+    componentDidMount() {
+        this.initMap()
     }
 
     render() {

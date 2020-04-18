@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { Table } from 'antd'
 import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import './link-info.less'
+import LinkButton from '../../components/link-button'
 
 export default class LinkInfo extends Component {
 
     state = {
         loading: false,
-        intersections: [],
+        links: [],
     }
 
     initColumns = () => {
@@ -16,29 +16,24 @@ export default class LinkInfo extends Component {
             title: '路段名称',
             dataIndex: 'name'
         },{
-            title: '几何布局',
-            render: intersection => (<span>查看布局</span>)
+            title: '路段详情',
+            render: intersection => (<span>
+                <LinkButton onClick = { () => {
+                    this.props.history.push("/link/detail")
+                } }>查看路段</LinkButton>
+            </span>)
         },{
-            title: '流量信息',
-            render: intersection => (<span>查看详情</span>)
+            title: '交通参数',
+            render: intersection => (<span>
+                <LinkButton onClick = { () => {
+                    this.props.history.push("/link/param")
+                } }>查看参数</LinkButton>
+            </span>)
         },]
     }
 
-    componentWillMount() {
-        this.columns = this.initColumns()
-
-    }
-
-    componentDidMount() {
-
-        this.map = L.map('map', {
-            center: [23, 99],
-            zoom: 13
-        });
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        }).addTo(this.map);
-        
-        const intersections = [{
+    initLinks = () => {
+        const links = [{
             id: 1,
             name: "正阳路-保岫路路段",
         },{
@@ -68,14 +63,33 @@ export default class LinkInfo extends Component {
         },{
             id: 10,
             name: "太保路-人民路路段",
-        },]
+        }]
         this.setState({ 
-            intersections,
-         })
+            links,
+        })
+    }
+
+    componentWillMount() {
+        this.columns = this.initColumns()
+        this.initLinks()
+    }
+
+    componentDidMount() {
+
+        if(!this.map){
+            this.map = L.map('map', {
+                center: [25.12, 99.175],
+                zoom: 14
+            })
+            L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}', {}).addTo(this.map)
+            this.map._onResize()
+        }
+
+
     }
 
     render() {
-        const { loading, intersections } = this.state
+        const { loading, links } = this.state
         return (
             <div className = "lvqi-row1-col2">
                 <div className = "lvqi-col-2">
@@ -94,11 +108,12 @@ export default class LinkInfo extends Component {
                             bordered = { true }
                             rowKey = "id"
                             columns = { this.columns }
-                            dataSource = { intersections }
+                            dataSource = { links }
                             loading = { loading }
                             pagination = { false }
                             scroll={{ y: 480 }}
                         >
+
                         </Table>
                     </div>
                 </div>

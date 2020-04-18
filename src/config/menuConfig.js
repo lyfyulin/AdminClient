@@ -56,12 +56,12 @@ const menuList = [
     },
     {
         title: '交叉口管理',
-        key: '/intersection-info',
+        key: '/intersection',
         icon: 'area-chart'
     },
     {
         title: '路段管理',
-        key: '/link-info',
+        key: '/link',
         icon: 'area-chart'
     },
     {
@@ -77,6 +77,11 @@ const menuList = [
     {
         title: '信号管理',
         key: '/signal-info',
+        icon: 'area-chart'
+    },
+    {
+        title: '事故处理',
+        key: '/accidents',
         icon: 'area-chart'
     },
 ]
