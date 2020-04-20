@@ -84,6 +84,11 @@ const menuList = [
         key: '/accidents',
         icon: 'area-chart'
     },
+    {
+        title: '设置',
+        key: '/settings',
+        icon: 'area-chart'
+    },
 ]
 
 export default menuList

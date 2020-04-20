@@ -19,6 +19,7 @@ import FlowInfo from '../flow/flow-info'
 import SignalInfo from '../signal/signal-info'
 import Accidents from '../accidents/accidents'
 import { connect } from 'react-redux'
+import Settings from '../settings/settings'
 
 
 const { Content, Footer, Sider } = Layout
@@ -57,6 +58,7 @@ class Admin extends Component {
                             <Route path="/flow-info" component={ FlowInfo }></Route>
                             <Route path="/signal-info" component={ SignalInfo }></Route>
                             <Route path="/accidents" component={ Accidents }></Route>
+                            <Route path="/settings" component={ Settings }></Route>
                             <Redirect to="/home" />
                         </Switch>
                     </Content>

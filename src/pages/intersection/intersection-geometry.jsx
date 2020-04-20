@@ -31,7 +31,7 @@ class IntersectionGeometry extends Component {
                     center: [25.12, 99.175],
                     zoom: 14
                 })
-                L.tileLayer('http://localhost:8082/map/baoshan02/{z}/{x}/{y}.png', { maxZoom: 16 }).addTo(this.map)
+                L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(this.map)
                 this.node_location = L.circle([25.12, 99.175], {radius:20}).addTo(this.map)
                 this.map.on("click", (e) => {
                     this.node_location.setLatLng([e.latlng.lat, e.latlng.lng])

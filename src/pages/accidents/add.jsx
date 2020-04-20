@@ -91,19 +91,30 @@ class AddAccidents extends Component {
         accident_location_visible: false,
     }
 
-    add = () => {
-        const {panes} = this.state
+    initMap = () => {
+        const { setFieldsValue }  = this.props.form
+        window.onload = () => {
+            if(!this.map){
+                this.map = L.map('accident_map', {
+                    center: [25.12, 99.175],
+                    zoom: 14
+                })
+                L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(this.map)
+                this.node_location = L.circle([25.12, 99.175], {radius:20}).addTo(this.map)
+                this.map.on("click", (e) => {
+                    this.node_location.setLatLng([e.latlng.lat, e.latlng.lng])
+                    setFieldsValue({ accident_gpsx_gpsy: e.latlng.lat + ',' + e.latlng.lng })
+                })
+                this.map._onResize()
+            }
+        }
+    }
+
+    addObject = () => {
+        const { panes } = this.state
         const activeKey = `${panes.length + 1}`
         panes.push({ title: `当事人${panes.length + 1}`, key: panes.length + 1})
         this.setState({ panes, activeKey })
-    }
-
-    onChange = value => {
-        console.log(value);
-    }
-
-    onTabChange = activeKey => {
-        this.setState({ activeKey });
     }
 
     handleSubmit = ( e ) => {
@@ -115,23 +126,17 @@ class AddAccidents extends Component {
         } )
     }
 
-    setLatLng = () => {
-
-        console.log("set lat lng")
-        
-    }
     showLocation = () => {
-        if(!this.map){
-            this.map = L.map('accident_map', {
-                center: [24, 99],
-                zoom: 10
-            })
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { }).addTo(this.map)
-        }
         this.setState({
             accident_location_visible: true
         })
+        if(this.map){
+            this.map._onResize()
+        }
+    }
 
+    componentDidMount() {
+        this.initMap()
     }
 
     render() {
@@ -174,7 +179,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="事故时间">
                                     {
-                                        getFieldDecorator("accident_type", {
+                                        getFieldDecorator("accident_time", {
                                             initialValue: '',
                                             rules: [
                                             ]
@@ -185,7 +190,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="事故地点">
                                     {
-                                        getFieldDecorator("time", {
+                                        getFieldDecorator("accident_location", {
                                             initialValue: '',
                                             rules: [
                                             ]
@@ -205,7 +210,7 @@ class AddAccidents extends Component {
                                     <Modal
                                         title="选择经纬度"
                                         visible={ accident_location_visible }
-                                        onOk={ this.setLatLng }
+                                        onOk={ () => this.setState({ accident_location_visible: false }) }
                                         onCancel={ () => this.setState({ accident_location_visible: false }) }
                                         forceRender = { true }
                                     >
@@ -214,7 +219,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="事故具体位置">
                                     {
-                                        getFieldDecorator("location", {
+                                        getFieldDecorator("special_location", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -226,7 +231,6 @@ class AddAccidents extends Component {
                                                 placeholder="Please select"
                                                 allowClear
                                                 treeDefaultExpandAll
-                                                onChange={this.onChange}
                                             >
                                                 <TreeNode value="路口" title="路口" disabled>
                                                     <TreeNode value="1" title="路口中央" />
@@ -257,7 +261,7 @@ class AddAccidents extends Component {
                             <div className="lyf-col3">
                                 <Item label="天气">
                                     {
-                                        getFieldDecorator("accidents_style", {
+                                        getFieldDecorator("accidents_climate", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -277,7 +281,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="道路条件">
                                     {
-                                        getFieldDecorator("accident_type", {
+                                        getFieldDecorator("road_type", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -300,7 +304,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="事故形态">
                                     {
-                                        getFieldDecorator("accidents_location", {
+                                        getFieldDecorator("accidents_style", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -316,7 +320,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="事故类型">
                                     {
-                                        getFieldDecorator("single_accidents", {
+                                        getFieldDecorator("accidents_type", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -328,7 +332,6 @@ class AddAccidents extends Component {
                                                 placeholder="Please select"
                                                 allowClear
                                                 treeDefaultExpandAll
-                                                onChange={this.onChange}
                                             >
                                                 <TreeNode value="追尾" title="追尾" disabled>
                                                     <TreeNode value="1" title="机动车追尾机动车" />
@@ -361,7 +364,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="照明条件">
                                     {
-                                        getFieldDecorator("damage", {
+                                        getFieldDecorator("light_condition", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -376,7 +379,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="标志标线">
                                     {
-                                        getFieldDecorator("toll", {
+                                        getFieldDecorator("traffic_sign", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -392,15 +395,15 @@ class AddAccidents extends Component {
                                 </Item>
                             </div>
                             <div className="lyf-col3">
-                                <Button onClick={this.add}>添加当事人</Button>
+                                <Button onClick={ this.addObject }>添加当事人</Button>
                                 <Tabs 
                                     activeKey={activeKey}
-                                    onChange={this.onTabChange}
+                                    onChange={ activeKey => this.setState({ activeKey }) }
                                 >
                                 {
                                     panes.map( e => (
                                         <TabPane tab={e.title} key={e.key}>
-                                            <LyfItem label="当事人">
+                                            <LyfItem label="是否在场">
                                                 {
                                                     getFieldDecorator("is_present_person" + e.key, {
                                                         initialValue: '1',
