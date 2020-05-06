@@ -73,7 +73,7 @@ export const reqProductById = ( goodId ) => ajax( base + "/good/info", {
     }
 } )
 
-export const reqRoles = () => ajax( base + "/role" )
+export const reqRoles = () => ajax( base + "/role/list" )
 
 export const reqAddRole = ( role ) => ajax.post(
     base + '/insert/role',
@@ -91,7 +91,7 @@ export const reqUpdateRole = ( role ) => ajax.post(
     }
 )
 
-export const reqUsers = () => ajax( base + "/user" )
+export const reqUsers = () => ajax( base + "/user/list" )
 
 export const reqAddUser = ( user ) => ajax.post(
     base + '/insert/user',

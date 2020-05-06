@@ -24,7 +24,7 @@ export default class AuthForm extends Component {
     }
 
     componentWillMount() {
-        const checkedKeys = this.props.role.menus.split(";")
+        const checkedKeys = this.props.role.MENU.split(";")
         this.setState({
             checkedKeys: checkedKeys
         })
@@ -34,7 +34,7 @@ export default class AuthForm extends Component {
     // nextProps: 接收到的新的属性对象
     componentWillReceiveProps (nextProps) {
 
-        const menus = nextProps.role.menus.split(";")
+        const menus = nextProps.role.MENU.split(";")
         this.setState({
             checkedKeys: menus
         })

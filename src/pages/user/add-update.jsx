@@ -24,17 +24,16 @@ class AddUpdateUser extends Component {
         let rolesSelect
 
         if(roles){
-            rolesSelect = roles.map( item => (<Option key={item.id} value={item.id}>{item.name}</Option>) )
+            rolesSelect = roles.map( item => (<Option key={item.ROLE_ID} value={item.ROLE_ID}>{item.ROLE_NAME}</Option>) )
         }
 
         return (
             <Form
-
             >
                 <Item>
                     {
-                        getFieldDecorator("username", {
-                            initialValue: user.username || '',
+                        getFieldDecorator("USERNAME", {
+                            initialValue: user.USERNAME || '',
                             rules: [
                                 { required: true, message: '必须输入用户名' },
                                 { max: 12, message: '最大输入12位' }
@@ -44,8 +43,8 @@ class AddUpdateUser extends Component {
                 </Item>
                 <Item>
                     {
-                        getFieldDecorator("password", {
-                            initialValue: user.password || '',
+                        getFieldDecorator("PASSWORD", {
+                            initialValue: user.PASSWORD || '',
                             rules: [
                                 { required: true, message: '必须输入密码' },
                                 { max: 12, message: '最大输入12位密码' }
@@ -55,21 +54,21 @@ class AddUpdateUser extends Component {
                 </Item>
                 <Item>
                     {
-                        getFieldDecorator("email", {
-                            initialValue: user.email || '',
+                        getFieldDecorator("PHONE_NUMBER", {
+                            initialValue: user.PHONE_NUMBER || '',
                             rules: [
-                                { required: true, message: '必须输入电子邮箱' },
+                                { required: true, message: '必须输入手机号' },
                                 { max: 12, message: '最大输入12位' }
                             ]
-                        })( <Input placeholder = "请输入电子邮箱" /> )
+                        })( <Input placeholder = "请输入手机号" /> )
                     }
                 </Item>
                 <Item>
                     {
-                        getFieldDecorator("role", {
-                            initialValue: user.role || '',
+                        getFieldDecorator("ROLE_ID", {
+                            initialValue: user.ROLE_ID || '',
                             rules: [
-                                { required: true, message: '必须输入电子邮箱' },
+                                { required: true, message: '必须输入橘色名称' },
                             ]
                         })( <Select>
                             <Option value = "">请选择</Option>

@@ -20,7 +20,7 @@ class AddForm extends PureComponent {
                 onSubmit = { this.handleOk }
             >
                 {
-                    getFieldDecorator("role_name", {
+                    getFieldDecorator("ROLE_NAME", {
                         initialValue: '',
                         rules: [
                             { required: true, message: "请输入角色名称" }

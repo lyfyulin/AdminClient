@@ -30,18 +30,18 @@ export default class Role extends Component {
     initColumns = () => {
         this.columns = [{
             title: '角色名称',
-            dataIndex: 'name',
+            dataIndex: 'ROLE_NAME',
         },{
             title: '创建时间',
-            dataIndex: 'create_time',
-            render: formatDate,
+            dataIndex: 'CREATE_TIME',
+            // render: formatDate,
         },{
             title: '授权时间',
-            dataIndex: 'auth_time',
-            render: formatDate,
+            dataIndex: 'AUTH_TIME',
+            // render: formatDate,
         },{
             title: '授权人',
-            dataIndex: 'auth_name',
+            dataIndex: 'AUTH_NAME',
         },{
             title: '操作',
             render: role => <LinkButton onClick = { () => { this.showAuth(role) } } >设置权限</LinkButton>
@@ -57,6 +57,7 @@ export default class Role extends Component {
 
     getRoles = async () => {
         const result = await reqRoles()
+
         if( result.code === 1 ){
             const roles = result.data
             this.setState({
@@ -89,10 +90,15 @@ export default class Role extends Component {
 
         this.setState({ isShowAuth: false })
 
-        let {role } = this
-        role.menus = this.authRef.current.getMenus().join(";")
-        role.auth_name = memoryUtils.user.username
+        let role = {}
         
+        role.role_id = this.role.ROLE_ID
+        role.role_name = this.role.ROLE_NAME
+        role.create_time = this.role.CREATE_TIME
+        role.menu = this.authRef.current.getMenus().join(";")
+        role.auth_name = memoryUtils.user.username
+        role.auth_time = formatDate(new Date().getTime())
+
         const result = await reqUpdateRole( role )
         if(result.code === 1){
             message.success("设置权限成功！")
@@ -124,7 +130,7 @@ export default class Role extends Component {
                 <Table
                     columns = { this.columns }
                     dataSource = { roles }
-                    rowKey = "id"
+                    rowKey = "ROLE_ID"
                     pagination={{ pageSize: 5 }}
                 >
 

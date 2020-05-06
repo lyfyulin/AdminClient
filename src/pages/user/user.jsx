@@ -17,21 +17,21 @@ export default class User extends Component {
     initColumns = () => {
         this.columns = [{
             title: '用户名',
-            dataIndex: 'username',
+            dataIndex: 'USERNAME',
         },{
             title: '创建时间',
-            dataIndex: 'create_time',
-            render: formatDate,
+            dataIndex: 'CREATE_TIME',
+            // render: formatDate,
         },{
-            title: '邮箱',
-            dataIndex: 'email',
+            title: '电话号',
+            dataIndex: 'PHONE_NUMBER',
         },{
             title: '所属角色',
-            dataIndex: 'role',
+            dataIndex: 'ROLE_ID',
             render: role => this.roleNames[role],
         },{
             title: '描述',
-            dataIndex: 'info',
+            dataIndex: 'INFO',
         },{
             title: '操作',
             render: user => <span><Button type = "default" onClick = { () => { this.updateUser(user) } } >修改</Button>&nbsp;&nbsp;
@@ -50,7 +50,9 @@ export default class User extends Component {
                 let users = usersRes.data
                 let roles = rolesRes.data
                 this.roleNames = {}
-                roles.forEach((item,index)=>{this.roleNames[''+index]=item.name})
+                roles.forEach((item)=>{ 
+                    this.roleNames[item.ROLE_ID] = item.ROLE_NAME
+                })
                 this.setState({
                     users,
                     roles
@@ -58,6 +60,7 @@ export default class User extends Component {
             }
 
         }
+        
     }
 
     addUser = () => {
@@ -67,6 +70,8 @@ export default class User extends Component {
 
     updateUser = (user) => {
         this.user = user
+        console.log(user);
+        
         this.setState({
             showOrAddOrUpdate: 2
         })
@@ -130,7 +135,7 @@ export default class User extends Component {
                 <Table
                     columns = { this.columns }
                     dataSource = { users }
-                    rowKey = "id"
+                    rowKey = "USER_ID"
                     pagination = {{ pageSize: PAGE_SIZE }}
                 >
                 </Table>
