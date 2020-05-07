@@ -4,6 +4,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import LyfItem from '../../components/item/item'
 import LinkButton from '../../components/link-button'
+import { TMS, MAP_CENTER } from '../../utils/baoshan'
 
 const Item = Form.Item
 const Option = Select.Option
@@ -96,10 +97,10 @@ class AddAccidents extends Component {
         window.onload = () => {
             if(!this.map){
                 this.map = L.map('accident_map', {
-                    center: [25.12, 99.175],
+                    center: MAP_CENTER,
                     zoom: 14
                 })
-                L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(this.map)
+                L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
                 this.node_location = L.circle([25.12, 99.175], {radius:20}).addTo(this.map)
                 this.map.on("click", (e) => {
                     this.node_location.setLatLng([e.latlng.lat, e.latlng.lng])

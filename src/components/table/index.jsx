@@ -18,10 +18,12 @@ export default class LvqiTable extends Component {
 
         let oDiv = document.getElementById("scrollList")
 
+        let rowNum = this.props.rowNum || 3
+
         if( oDiv && oDiv.getElementsByTagName("li") && oDiv.getElementsByTagName("li").length > 0){
 
             if( itemHeight !== document.getElementById("list").clientHeight / 3 ){
-                this.setState({ itemHeight: document.getElementById("list").clientHeight / 3 })
+                this.setState({ itemHeight: document.getElementById("list").clientHeight / rowNum })
             }
             
             let height = oDiv.getElementsByTagName("li")[0].scrollHeight + 1
@@ -45,8 +47,10 @@ export default class LvqiTable extends Component {
 
     componentDidMount() {
         let { itemHeight } = this.state
-        if( itemHeight !== document.getElementById("list").clientHeight / 3 ){
-            this.setState({ itemHeight: document.getElementById("list").clientHeight / 3 })
+        let rowNum = this.props.rowNum || 3
+        
+        if( itemHeight !== document.getElementById("list").clientHeight / rowNum ){
+            this.setState({ itemHeight: document.getElementById("list").clientHeight / rowNum })
         }
         this.interval1 = setInterval( this.scrollUp, this.props.timer || 4000 )
     }

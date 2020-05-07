@@ -3,6 +3,7 @@ import { Table } from 'antd'
 import L from 'leaflet'
 import './link-info.less'
 import LinkButton from '../../components/link-button'
+import { TMS, MAP_CENTER } from '../../utils/baoshan'
 
 export default class LinkInfo extends Component {
 
@@ -78,13 +79,12 @@ export default class LinkInfo extends Component {
 
         if(!this.map){
             this.map = L.map('map', {
-                center: [25.12, 99.175],
+                center: MAP_CENTER,
                 zoom: 14
             })
-            L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}', {}).addTo(this.map)
+            L.tileLayer(TMS, {}).addTo(this.map)
             this.map._onResize()
         }
-
 
     }
 

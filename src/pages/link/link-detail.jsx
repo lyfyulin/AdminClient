@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Card, Icon, List, Button, Modal } from 'antd'
 import LinkButton from '../../components/link-button'
 import L from 'leaflet'
+import { TMS, MAP_CENTER } from '../../utils/baoshan'
 
 const Item = List.Item
 
@@ -21,10 +22,10 @@ export default class LinkDetail extends Component {
         window.onload = () => {
             if(!this.map){
                 this.map = L.map('map', {
-                    center: [25.12, 99.175],
+                    center: MAP_CENTER,
                     zoom: 14
                 })
-                L.tileLayer('http://localhost:8082/map/baoshan02/{z}/{x}/{y}.png', { maxZoom: 16 }).addTo(this.map)
+                L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
                 this.node_location = L.circle([25.12, 99.175], {radius:20}).addTo(this.map)
                 this.map.on("click", (e) => {
                     console.log("clicked:", e)
@@ -39,9 +40,9 @@ export default class LinkDetail extends Component {
         if(!this.map){
             this.map = L.map('map', {
                 center: [25.12, 99.175],
-                zoom: 14
+                zoom: 14,
             })
-            L.tileLayer('http://localhost:8082/map/baoshan02/{z}/{x}/{y}.png', { maxZoom: 16 }).addTo(this.map)
+            L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
             this.node_location = L.circle([25.12, 99.175], {radius:20}).addTo(this.map)
             this.map.on("click", (e) => {
                 console.log("clicked:", e)

@@ -54,7 +54,7 @@ class Login extends Component {
         // 读取到保存的user，如果存在跳转到 admin 页面
         const user = this.props.user
         const errorMsg = user.errorMsg
-        if(user.id){
+        if(user.user_id){
             return <Redirect to="/home"/>
         }
 

@@ -27,14 +27,14 @@ class LeftNav extends Component {
   hasAuth = (item) => {
     // 得到当前用户所有权限
     const user = this.props.user
-    const menus = user.menus.split(";")
+    const menu = user.menu.split(";")
     // 1.管理员用户 全部访问
     // 2.item.public为true  则任何人都可以访问
     // 3.当前用户有此item的权限
-    if(user.username === 'admin' || item.public || menus.indexOf(item.key)!== -1 ){
+    if(user.username === 'admin' || item.public || menu.indexOf(item.key)!== -1 ){
       return true
     }else if( item.children ) {
-      const cItem = item.children.find( cItem => menus.indexOf(cItem.key) !== -1 )
+      const cItem = item.children.find( cItem => menu.indexOf(cItem.key) !== -1 )
       if(cItem){
         return !!cItem
       }
@@ -61,9 +61,9 @@ class LeftNav extends Component {
         if( this.hasAuth( item ) ){
           if (!item.children) {
             pre.push((
-                <Menu.Item key={item.key}>
-                  <Link to={item.key} onClick = { () => this.props.setHeaderTitle(item.title) } >
-                      <Icon type={item.icon} />
+                <Menu.Item key = {item.key}>
+                  <Link to = {item.key} onClick = { () => this.props.setHeaderTitle(item.title) } >
+                      <Icon type = {item.icon} />
                       <span>{item.title}</span>
                   </Link>
                 </Menu.Item>
@@ -87,7 +87,7 @@ class LeftNav extends Component {
                 {this.getMenuNodes(item.children)}
                 </SubMenu>
             ))
-        }
+          }
         }
         return pre
     }, [])
@@ -102,8 +102,7 @@ class LeftNav extends Component {
   }
 
   render() {
-    
-    let selectKey = '/' + this.props.location.pathname.split('/')[1]
+    let selectKey = '/' + this.props.location.pathname.split('/').slice(1).join("/")
     const { collapsed }  = this.state
     return (
       <div className="left-nav">

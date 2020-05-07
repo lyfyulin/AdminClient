@@ -29,7 +29,7 @@ class Admin extends Component {
     render() {
         // 读取保存的user信息，不存在则跳到登录界面
         const user = this.props.user
-        if(!user.id){
+        if(!user.user_id){
             return <Redirect to="/login"/>
         }
         return (

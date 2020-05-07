@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import L from 'leaflet'
 import PropTypes from 'prop-types'
-import { LINK_INFO, LINK_COLOR, INTER_INFO } from '../../utils/baoshan'
+import { LINK_INFO, LINK_COLOR, INTER_INFO, TMS, MAP_CENTER } from '../../utils/baoshan'
 import { bd09togcj02 } from '../../utils/lnglatUtils'
 
 export default class LvqiMap extends Component {
@@ -12,6 +12,7 @@ export default class LvqiMap extends Component {
     
     state = {
         firstRender: true,
+        firstInit: true,
     }
 
     initLink = () => {
@@ -63,30 +64,30 @@ export default class LvqiMap extends Component {
         if( firstRender ){
             this.setState({ firstRender: false })
             this.map = L.map('map', {
-                center: [25.12, 99.225], 
+                center: MAP_CENTER, 
                 zoom: 12, 
                 zoomControl: false, 
                 attributionControl: false, 
             })
-            L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(this.map)
+            L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
         }
-
-        if(this.props.dataType === "link"){
-            this.initLink()
-        }else if(this.props.dataType === "inter"){
-            this.initInter()
-        }
-
         this.map._onResize()
-        this.setState({ loading: false })
-    }
-
-    componentDidMount() {
-        this.initMap()
+        
     }
 
     componentWillReceiveProps = (nextProps) => {
         let { data } = nextProps
+
+        if(this.state.firstInit){
+            this.initMap()
+            if(this.props.dataType === "link"){
+                this.initLink()
+            }else if(this.props.dataType === "inter"){
+                this.initInter()
+            }
+            this.setState({ firstInit: false })
+        }
+
         if(this.props.dataType === "link"){
             this.setLink(data)
         }else if(this.props.dataType === "inter"){
