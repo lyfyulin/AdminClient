@@ -4,8 +4,8 @@ import { DatePicker, Button, TimePicker, Form, Input, Table } from 'antd'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import L from 'leaflet'
-import heatlayer from '../../utils/heatlayer'
 import LinkButton from '../../components/link-button'
+import { MAP_CENTER, TMS } from '../../utils/baoshan'
 
 
 class AccidentsInfo extends Component {
@@ -22,10 +22,10 @@ class AccidentsInfo extends Component {
 
     initMap = () => {
         this.map = L.map('map', {
-            center: [25.12, 99.175],
+            center: MAP_CENTER,
             zoom: 14
         })
-        L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}', {}).addTo(this.map)
+        L.tileLayer(TMS, {}).addTo(this.map)
         this.map._onResize()
     }
 
@@ -70,7 +70,7 @@ class AccidentsInfo extends Component {
 
     componentDidMount() {
         this.initMap()
-        let heat2 = heatlayer([[25.13, 99.175, 1]]).addTo(this.map);
+        // let heat2 = heatlayer([[25.13, 99.175, 1]]).addTo(this.map);
         // this.map.on("mousemove",  _.throttle( e => heat2.addLatLng([e.latlng.lat, e.latlng.lng]), 100 ))
     }
 

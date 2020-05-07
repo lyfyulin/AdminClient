@@ -23,14 +23,14 @@ const menuList = [
         ]
     },
     {
-        title: '信号控制',
+        title: '用户管理',
         key: '/user',
-        icon: 'car'
+        icon: 'user'
     },
     {
-        title: '信号评价',
+        title: '角色管理',
         key: '/role',
-        icon: 'area-chart'
+        icon: 'team'
     },
     {
         title: '堵点治理',

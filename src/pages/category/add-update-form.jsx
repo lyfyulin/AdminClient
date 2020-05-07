@@ -9,7 +9,6 @@ class AddUpdateForm extends Component {
     static props = {
         setForm : PropTypes.func.isRequired,
         category: PropTypes.string,
-
     }
 
     componentWillMount() {

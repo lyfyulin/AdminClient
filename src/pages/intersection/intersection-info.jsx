@@ -4,6 +4,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './intersection-info.less'
 import LinkButton from '../../components/link-button'
+import { TMS, MAP_CENTER } from '../../utils/baoshan'
 
 export default class IntersectionInfo extends Component {
 
@@ -73,10 +74,10 @@ export default class IntersectionInfo extends Component {
     initMap = () => {
         if(!this.map){
             this.map = L.map('map', {
-                center: [25.12, 99.175],
+                center: MAP_CENTER,
                 zoom: 14
             })
-            L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}', {}).addTo(this.map)
+            L.tileLayer(TMS, {}).addTo(this.map)
             this.map._onResize()
         }
     }

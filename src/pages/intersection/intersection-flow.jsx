@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Icon, Button, Form, Input, DatePicker, TimePicker, Tabs, Table } from 'antd'
+import { Icon, Button, Form, Input, DatePicker, TimePicker, Tabs } from 'antd'
 import LinkButton from '../../components/link-button'
 import LyfItem from '../../components/item/item'
 import NodeFlow from '../../utils/node-flow'

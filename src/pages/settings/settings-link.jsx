@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import L from 'leaflet'
 import LinkButton from '../../components/link-button'
 import { Icon } from 'antd'
+import { TMS, MAP_CENTER } from '../../utils/baoshan'
 
 export default class SettingsLink extends Component {
 
@@ -11,10 +12,10 @@ export default class SettingsLink extends Component {
 
     initMap = () => {
         this.map = L.map('map', {
-            center: [25.12, 99.175],
+            center: MAP_CENTER,
             zoom: 14
         })
-        L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}', {}).addTo(this.map)
+        L.tileLayer(TMS, {}).addTo(this.map)
         this.map._onResize()
     }
 
@@ -24,7 +25,6 @@ export default class SettingsLink extends Component {
         let reg = /^([0-9]{2,3}\.[0-9]{2,}\,[0-9]{2,3}\.[0-9]{2,}\;){1,}([0-9]{2,3}\.[0-9]{2,}\,[0-9]{2,3}\.[0-9]{2,})$/i
         if(reg.test(value)){
             let latlngs = value.split(';')
-            console.log(latlngs);
             
             for (let index = 0; index < latlngs.length; index++) {
                 link_latlngs.push( [parseFloat(latlngs[index].split(",")[1]), parseFloat(latlngs[index].split(",")[0])] )
@@ -56,8 +56,8 @@ export default class SettingsLink extends Component {
                     <span>设置</span>
                 </div>
                 <div className="lyf-card-content">
-                    <div className="lyf-col2" id="map">map</div>
-                    <div className="lyf-col2">
+                    <div className="lyf-col-5" id="map">map</div>
+                    <div className="lyf-col-5">
                         <textarea onChange = { this.onTextChange } style={{ width: '100%', height: '100%' }}>
 
                         </textarea>

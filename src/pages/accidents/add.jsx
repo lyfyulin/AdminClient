@@ -166,8 +166,8 @@ class AddAccidents extends Component {
                         style = {{ width: '100%', height: '100%' }}
                     >
 
-                        <div className="lyf-row1" style={{ height: '90%' }}>
-                            <div className="lyf-col3">
+                        <div className="full" style={{ height: '90%', display: "flex", flexWrap: 'nowrap' }}>
+                            <div className="lyf-3-col">
                                 <Item label="负责民警">
                                     {
                                         getFieldDecorator("county", {
@@ -258,7 +258,7 @@ class AddAccidents extends Component {
                                     }
                                 </Item>
                             </div>
-                            <div className="lyf-col3">
+                            <div className="lyf-3-col">
                                 <Item label="天气">
                                     {
                                         getFieldDecorator("accidents_climate", {
@@ -394,7 +394,7 @@ class AddAccidents extends Component {
                                     }
                                 </Item>
                             </div>
-                            <div className="lyf-col3">
+                            <div className="lyf-3-col">
                                 <Button onClick={ this.addObject }>添加当事人</Button>
                                 <Tabs 
                                     activeKey={activeKey}
@@ -523,7 +523,7 @@ class AddAccidents extends Component {
                                 </Tabs>
                             </div>
                         </div>
-                        <div className="lyf-row1"  style={{ height: '10%' }}>
+                        <div className="full lyf-center"  style={{ height: '10%' }}>
                             <Item>
                                 <Button type = "primary" htmlType = "submit"> 提交 </Button>
                             </Item>

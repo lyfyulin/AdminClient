@@ -30,7 +30,7 @@ export default class Role extends Component {
     initColumns = () => {
         this.columns = [{
             title: '角色名称',
-            dataIndex: 'name',
+            dataIndex: 'role_name',
         },{
             title: '创建时间',
             dataIndex: 'create_time',
@@ -57,6 +57,8 @@ export default class Role extends Component {
 
     getRoles = async () => {
         const result = await reqRoles()
+        console.log(result);
+        
         if( result.code === 1 ){
             const roles = result.data
             this.setState({
@@ -90,9 +92,10 @@ export default class Role extends Component {
         this.setState({ isShowAuth: false })
 
         let {role } = this
-        role.menus = this.authRef.current.getMenus().join(";")
+        role.menu = this.authRef.current.getMenus().join(";")
         role.auth_name = memoryUtils.user.username
-        
+        role.auth_time = formatDate(new Date().getTime())
+
         const result = await reqUpdateRole( role )
         if(result.code === 1){
             message.success("设置权限成功！")
@@ -124,7 +127,7 @@ export default class Role extends Component {
                 <Table
                     columns = { this.columns }
                     dataSource = { roles }
-                    rowKey = "id"
+                    rowKey = "role_id"
                     pagination={{ pageSize: 5 }}
                 >
 

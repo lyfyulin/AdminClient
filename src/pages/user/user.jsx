@@ -23,12 +23,12 @@ export default class User extends Component {
             dataIndex: 'create_time',
             render: formatDate,
         },{
-            title: '邮箱',
-            dataIndex: 'email',
+            title: '电话号',
+            dataIndex: 'phone_number',
         },{
             title: '所属角色',
-            dataIndex: 'role',
-            render: role => this.roleNames[role],
+            dataIndex: 'role_id',
+            render: role_id => this.roleNames[role_id],
         },{
             title: '描述',
             dataIndex: 'info',
@@ -50,7 +50,7 @@ export default class User extends Component {
                 let users = usersRes.data
                 let roles = rolesRes.data
                 this.roleNames = {}
-                roles.forEach((item,index)=>{this.roleNames[''+index]=item.name})
+                roles.forEach((item)=>{this.roleNames['' + item.role_id] = item.role_name})
                 this.setState({
                     users,
                     roles
@@ -76,7 +76,7 @@ export default class User extends Component {
         Modal.confirm({
             title: "是否删除该用户?",
             onOk:  async () => {
-                const result = await reqDeleteUser( user.id )
+                const result = await reqDeleteUser( user.user_id )
                 if(result.code === 1){
                     message.success("删除成功！")
                     this.getUsers()
@@ -93,10 +93,11 @@ export default class User extends Component {
             if(!error){
                 const user = values
                 let result
+
                 if(showOrAddOrUpdate === 1){
                     result = await reqAddUser(user)
                 }else{
-                    user.id = this.user.id
+                    user.user_id = this.user.user_id
                     result = await reqUpdateUser(user)
                 }
                 if(result.code === 1){
@@ -130,7 +131,7 @@ export default class User extends Component {
                 <Table
                     columns = { this.columns }
                     dataSource = { users }
-                    rowKey = "id"
+                    rowKey = "user_id"
                     pagination = {{ pageSize: PAGE_SIZE }}
                 >
                 </Table>

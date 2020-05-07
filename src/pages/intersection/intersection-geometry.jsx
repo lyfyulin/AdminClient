@@ -3,6 +3,7 @@ import { Form, Input, Tabs, Radio, Button, TreeSelect, Icon, Select, Modal, Chec
 import { DIRECTION_LIST, LANE, DIRECTION } from '../../utils/ConstantUtils'
 import LinkButton from '../../components/link-button'
 import L from 'leaflet'
+import { MAP_CENTER, TMS } from '../../utils/baoshan'
 
 
 const { TabPane } = Tabs
@@ -28,10 +29,10 @@ class IntersectionGeometry extends Component {
         window.onload = () => {
             if(!this.map){
                 this.map = L.map('map', {
-                    center: [25.12, 99.175],
+                    center: MAP_CENTER,
                     zoom: 14
                 })
-                L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(this.map)
+                L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
                 this.node_location = L.circle([25.12, 99.175], {radius:20}).addTo(this.map)
                 this.map.on("click", (e) => {
                     this.node_location.setLatLng([e.latlng.lat, e.latlng.lng])

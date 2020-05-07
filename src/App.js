@@ -7,6 +7,7 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import Login from './pages/login/login'
 import Admin from './pages/admin/admin'
+import Platform from './pages/platform/platform'
 
 export default class App extends Component{
 
@@ -19,6 +20,7 @@ export default class App extends Component{
                         用 exact 来表示 / 的精确匹配
                  */}
                     <Route path = "/login" component={ Login }/>
+                    <Route path = "/platform" component={ Platform }/>
                     <Route path = "/" component={ Admin }/>
                 </Switch>
             </BrowserRouter>

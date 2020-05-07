@@ -24,7 +24,7 @@ class AddUpdateUser extends Component {
         let rolesSelect
 
         if(roles){
-            rolesSelect = roles.map( item => (<Option key={item.id} value={item.id}>{item.name}</Option>) )
+            rolesSelect = roles.map( item => (<Option key={item.role_id} value={item.role_id}>{item.role_name}</Option>) )
         }
 
         return (
@@ -55,21 +55,40 @@ class AddUpdateUser extends Component {
                 </Item>
                 <Item>
                     {
-                        getFieldDecorator("email", {
-                            initialValue: user.email || '',
+                        getFieldDecorator("name", {
+                            initialValue: user.name || '',
                             rules: [
-                                { required: true, message: '必须输入电子邮箱' },
-                                { max: 12, message: '最大输入12位' }
+                                { required: true, message: '必须输入姓名' },
+                                { min: 1, message: '最大输入1位' }
                             ]
-                        })( <Input placeholder = "请输入电子邮箱" /> )
+                        })( <Input placeholder = "请输入姓名" /> )
                     }
                 </Item>
                 <Item>
                     {
-                        getFieldDecorator("role", {
-                            initialValue: user.role || '',
+                        getFieldDecorator("info", {
+                            initialValue: user.info || '',
+                            rules: []
+                        })( <Input placeholder = "请输入用户详情" /> )
+                    }
+                </Item>
+                <Item>
+                    {
+                        getFieldDecorator("phone_number", {
+                            initialValue: user.phone_number || '',
                             rules: [
-                                { required: true, message: '必须输入电子邮箱' },
+                                { required: true, message: '必须输入电话号' },
+                                { max: 12, message: '最大输入12位' }
+                            ]
+                        })( <Input placeholder = "请输入电话号" /> )
+                    }
+                </Item>
+                <Item>
+                    {
+                        getFieldDecorator("role_id", {
+                            initialValue: user.role_id || '',
+                            rules: [
+                                { required: true, message: '必须输入角色' },
                             ]
                         })( <Select>
                             <Option value = "">请选择</Option>
