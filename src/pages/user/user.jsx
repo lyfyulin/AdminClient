@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Card, Button, Table, message, Modal } from 'antd'
 
-import {formatDate} from '../../utils/dateUtils'
+import {getTimeString} from '../../utils/dateUtils'
 import { reqUsers, reqRoles, reqAddUser, reqUpdateUser, reqDeleteUser } from '../../api'
 import AddUpdateUser from './add-update'
 import { PAGE_SIZE } from '../../utils/ConstantUtils'
@@ -21,7 +21,7 @@ export default class User extends Component {
         },{
             title: '创建时间',
             dataIndex: 'create_time',
-            render: formatDate,
+            render: getTimeString,
         },{
             title: '电话号',
             dataIndex: 'phone_number',

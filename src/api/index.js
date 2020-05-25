@@ -372,7 +372,7 @@ export const reqAvgTripFreqSearch = (start_date, end_date) => ajax( base + "/sea
 // accident
 export const reqAccidents = () => ajax( base + "/accident/list")
 
-export const reqAccidentInfo = (accident_id) => ajax( base + "/accident/info", {
+export const reqAccidentById = (accident_id) => ajax( base + "/accident/info", {
     params: {
         accident_id
     }
@@ -463,4 +463,374 @@ export const reqWeekInterDelay = (inter_id) => ajax( base + "/inter/delay/week",
         inter_id
     }
 } )	
+
+
+
+
+
+// rdnet
+
+export const reqNodes = () => ajax( base + "/node/list" )	
+
+export const  reqNodeById = ( node_id ) => ajax( base + "/node/info", {
+    params: {
+        node_id
+    }
+}  )	
+
+export const reqInsertNode = (node) => ajax.post( base + "/insert/node",
+    JSON.stringify(node),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)	
+
+export const reqUpdateNode = (node) => ajax.post( base + "/update/node",
+    JSON.stringify(node),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)	
+
+export const reqDeleteNode = ( node_id ) => ajax.post("/delete/node", {node_id})	
+
+export const reqDirectionById = ( direction_id ) => ajax( base + "/node/direction/info", {
+    params: {
+        direction_id
+    }
+} )	
+
+export const reqNodeDirections = ( node_id ) => ajax( base + "/node/directions", {
+    params: {
+        node_id
+    }
+} )
+
+export const reqInsertNodeDirection = (direction) => ajax.post( base + "/insert/node/direction",
+    JSON.stringify(direction),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)
+
+export const reqUpdateNodeDirection = (direction) => ajax.post( base + "/update/node/direction",
+    JSON.stringify(direction),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)	
+
+export const reqDeleteNodeDirection = ( direction_id ) => ajax.post( base + "/delete/node/direction", { direction_id } )	
+
+export const reqDeleteNodeDirections = ( node_id ) => ajax.post( base + "/delete/node/directions", { node_id } )	
+
+export const reqLinks = () => ajax( base + "/link/list" )	
+
+export const reqLinkById = ( link_id ) => ajax( base + "/link/info", {
+    params: {
+        link_id
+    }
+} )	
+
+export const reqInsertLink = ( link ) => ajax.post( base + "/insert/link",
+    JSON.stringify(link),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)	
+
+export const reqUpdateLink = ( link ) => ajax.post( base + "/update/link",
+    JSON.stringify(link),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)	
+
+export const reqDeleteLink = ( link_id ) => ajax.post( base + "/delete/link", { link_id } )	
+
+export const reqLines = () => ajax( base + "/line/list" )	
+
+export const reqLineById = ( line_id ) => ajax( base + "/line/info", {
+    params: {
+        line_id
+    }
+} )	
+
+export const reqInsertLine = ( line ) => ajax.post( base + "/insert/line",
+    JSON.stringify(line),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)	
+
+export const reqUpdateLine = ( line ) => ajax.post( base + "/update/line",
+    JSON.stringify(line),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)	
+
+export const reqDeleteLine = ( line_id ) => ajax.post( base + "/delete/line", { line_id } )	
+
+export const reqNodeFlowByNodeId = ( start_time, end_time, node_id ) => ajax( base + "/node/flow", {
+    params: {
+        start_time, end_time, node_id 
+    }
+} )
+
+export const reqAreas = () => ajax( base + "/area/list" )	
+
+export const reqAreaById = ( area_id ) => ajax( base + "/area/info", {
+    params: {
+        area_id
+    }
+} )	
+
+export const reqInsertArea = ( area ) => ajax.post( base + "/insert/area",
+    JSON.stringify(area),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)	
+
+export const  reqUpdateArea = ( area ) => ajax.post( base + "/update/area",
+    JSON.stringify(area),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)
+
+export const reqDeleteArea = ( area_id ) => ajax.post( base + "/delete/area", {
+    params: {
+        area_id
+    }
+} )
+
+
+
+
+
+// evaluation
+export const reqCurrentNodesDelay = () => ajax( base + "/current/nodes/delay" )
+
+export const reqNodesDelaySearch = ( start_time, end_time ) => ajax( base + "/search/nodes/delay", {
+    params: {
+        start_time, end_time
+    }
+} )
+
+export const reqCurrentNodeDelay = ( node_id ) => ajax( base + "/current/node/delay", {
+    params: {
+        node_id
+    }
+} )
+
+export const reqNodeDelaySearch = ( start_time, end_time, node_id ) => ajax( base + "/search/node/delay", {
+    params: {
+        start_time, end_time, node_id
+    }
+} )
+
+export const reqCurrentNodeDirDelay = ( node_id ) => ajax( base + "/current/node/dir/delay", {
+    params: {
+        node_id
+    }
+} )
+
+export const reqNodeDirDelaySearch = ( start_time, end_time, node_id ) => ajax( base + "/search/node/dir/delay", {
+    params: {
+        start_time, end_time, node_id
+    }
+} )
+
+export const reqCurrentNodeFlowDelay = ( node_id ) => ajax( base + "/current/node/flow/delay", {
+    params: {
+        node_id
+    }
+} )
+
+export const reqNodeFlowDelaySearch = ( start_time, end_time, node_id ) => ajax( base + "/search/node/flow/delay", {
+    params: {
+        start_time, end_time, node_id
+    }
+} )
+
+export const reqCurrentLineSchemaDisorderRate = ( line_schema_id ) => ajax( base + "/current/line/schema/disorderrate", {
+    params: {
+        line_schema_id
+    }
+} )
+
+export const reqLineSchemaDisorderRateSearch = ( start_time , end_time , line_schema_id ) => ajax( base + "/search/line/schema/disorderrate", {
+    params: {
+        start_time, end_time, line_schema_id
+    }
+} )
+
+
+// schema
+
+
+export const reqNodeSchemas = ( node_id ) => ajax( base + "/node/schema/list", {
+    params: {
+        node_id
+    }
+} )
+
+export const reqNodeSchemaExec = ( node_id ) => ajax( base + "/node/schema/execution", {
+    params: {
+        node_id
+    }
+} )
+
+export const reqNodeSchemaById = ( node_schema_id ) => ajax( base + "/node/schema/info", {
+    params: {
+        node_schema_id
+    }
+} )
+
+export const reqInsertNodeSchema = ( node_schema ) => ajax.post( base + "/insert/node/schema",
+    JSON.stringify(node_schema),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)
+
+export const reqUpdateNodeSchema = ( node_schema ) => ajax.post( base + "/update/node/schema",
+    JSON.stringify(node_schema),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)
+
+export const reqDeleteNodeSchemas = ( node_id ) => ajax.post( base + "/delete/node/schemas", { node_id } )
+
+export const reqDeleteNodeSchema = ( node_schema_id ) => ajax.post( base + "/delete/node/schema", { node_schema_id } )
+
+export const reqLineSchemas = ( line_id ) => ajax( base + "/line/schema/list", {
+    params: {
+        line_id
+    }
+} )
+
+export const reqLineSchemaById = ( line_schema_id ) => ajax( base + "/line/schema/info", {
+    params: {
+        line_schema_id
+    }
+} )
+
+export const reqLineSchemaExec = ( line_id ) => ajax( base + "/line/schema/execution", {
+    params: {
+        line_id
+    }
+} )
+
+export const reqLineSchemaSearch = ( start_time, end_time, line_id ) => ajax( base + "/search/line/schema", {
+    params: {
+        start_time, end_time, line_id
+    }
+} )
+
+export const reqInsertLineSchema = ( line_schema ) => ajax.post( base + "/insert/line/schema",
+    JSON.stringify(line_schema),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)
+
+export const reqUpdateLineSchema = ( line_schema ) => ajax.post( base + "/update/line/schema",
+    JSON.stringify(line_schema),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)
+
+export const reqDeleteLineSchemas = ( line_id ) => ajax.post( base + "/delete/line/schemas", { line_id } )
+
+export const reqDeleteLineSchema = ( line_schema_id ) => ajax.post( base + "/delete/line/schema", { line_schema_id } )
+
+export const reqAreaSchemas = ( area_id ) => ajax( base + "/area/schema/list", {
+    params: {
+        area_id
+    }
+} )
+
+export const reqAreaSchemaById = ( area_schema_id ) => ajax( base + "/area/schema/info", {
+    params: {
+        area_schema_id
+    }
+} )
+
+export const reqAreaSchemaExec = ( area_id ) => ajax( base + "/area/schema/execution", {
+    params: {
+        area_id
+    }
+} )
+
+export const reqAreaSchemaSearch = ( start_time, end_time, area_id ) => ajax( base + "/search/area/schema", {
+    params: {
+        start_time, end_time, area_id
+    }
+} )
+
+export const reqInsertAreaSchema = ( area_schema ) => ajax.post( base + "/insert/area/schema",
+    JSON.stringify(area_schema),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)
+
+export const reqUpdateAreaSchema = ( area_schema ) => ajax.post( base + "/update/area/schema",
+    JSON.stringify(area_schema),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)
+
+export const reqDeleteAreaSchemas = ( area_id ) => ajax.post( base + "/delete/area/schemas", { area_id } )
+
+export const reqDeleteAreaSchema = ( area_schema_id ) => ajax.post( base + "/delete/area/schema", { area_schema_id } )
+
+
+
+
+
+
+
+
+
+
+
 

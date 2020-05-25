@@ -1,22 +1,19 @@
 import React, { Component } from 'react'
 import LyfItem from '../../components/item/item'
-import { DatePicker, Button, TimePicker, Form, Input, Table } from 'antd'
+import { DatePicker, Button, TimePicker, Form, Input, Table, message } from 'antd'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import L from 'leaflet'
 import LinkButton from '../../components/link-button'
 import { MAP_CENTER, TMS } from '../../utils/baoshan'
+import { reqAccidents, reqDeleteAccident } from '../../api'
+import memoryUtils from '../../utils/memoryUtils'
 
 
 class AccidentsInfo extends Component {
 
     state = {
-        accidents: [
-            { id: 1, index: 1, time: '2019-08-13' },
-            { id: 2, index: 3, time: '2019-08-14' },
-            { id: 3, index: 4, time: '2019-08-16' },
-            { id: 4, index: 5, time: '2019-08-17' },
-        ],
+        accidents: [],
         loading: false,
     }
 
@@ -32,25 +29,39 @@ class AccidentsInfo extends Component {
     initColumns = () => {
         this.columns = [{
             title: '序号',
-            dataIndex: 'index',
-            key: 'index',
+            dataIndex: 'accident_id',
         },{
             title: '时间',
-            dataIndex: 'time',
-            key: 'time',
+            dataIndex: 'accident_time',
         },{
             title: '查看详情',
             render: accident => (
                 <LinkButton onClick = {() => {
-                    this.props.history.push( "/accidents/detail", accident )
+                    memoryUtils.accident = accident
+                    this.props.history.push( "/accidents/detail/" + accident.accident_id )
                 }}>查看详情</LinkButton>
+            )
+        },{
+            title: '删除',
+            render: accident => (
+                <LinkButton onClick = {async () => {
+                    const result = await reqDeleteAccident(accident.accident_id)
+                    result.code === 1?message.success("删除事故信息成功！"):message.error(result.message)
+                    this.loadAccidents()
+                }}>删除</LinkButton>
             )
         }]
     }
 
-    loadAccidents = () => {
+    loadAccidents = async () => {
         this.setState({ loading: true })
-        this.setState({ loading: false })
+        const result = await reqAccidents()
+        if(result.code === 1){
+            this.setState({ accidents: result.data, loading: false })
+        }else{
+            message.error(result.message)
+            this.setState({ loading: false })
+        }
     }
 
     handleSubmit = ( e ) => {
@@ -221,7 +232,7 @@ class AccidentsInfo extends Component {
                     <div style={{ width: "40%", height: '100%' }}>
                         <Table
                             bordered = { true }
-                            rowKey = "id"
+                            rowKey = "accident_id"
                             columns = { this.columns }
                             dataSource = { accidents }
                             loading = { loading }

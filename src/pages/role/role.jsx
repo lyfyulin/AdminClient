@@ -11,7 +11,7 @@ import AuthForm from './auth-form'
 import { reqRoles, reqAddRole, reqUpdateRole } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import { BASE_MENU } from '../../utils/ConstantUtils'
-import { formatDate } from '../../utils/dateUtils'
+import { getTimeString } from '../../utils/dateUtils'
 import LinkButton from '../../components/link-button'
 
 export default class Role extends Component {
@@ -34,11 +34,11 @@ export default class Role extends Component {
         },{
             title: '创建时间',
             dataIndex: 'create_time',
-            render: formatDate,
+            render: getTimeString,
         },{
             title: '授权时间',
             dataIndex: 'auth_time',
-            render: formatDate,
+            render: getTimeString,
         },{
             title: '授权人',
             dataIndex: 'auth_name',
@@ -92,7 +92,7 @@ export default class Role extends Component {
         let {role } = this
         role.menu = this.authRef.current.getMenus().join(";")
         role.auth_name = memoryUtils.user.username
-        role.auth_time = formatDate(new Date().getTime())
+        role.auth_time = getTimeString(new Date().getTime())
 
         const result = await reqUpdateRole( role )
         if(result.code === 1){

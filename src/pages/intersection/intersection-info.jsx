@@ -5,69 +5,44 @@ import 'leaflet/dist/leaflet.css'
 import './intersection-info.less'
 import LinkButton from '../../components/link-button'
 import { TMS, MAP_CENTER } from '../../utils/baoshan'
+import { reqNodes } from '../../api'
+import memoryUtils from '../../utils/memoryUtils'
 
 export default class IntersectionInfo extends Component {
 
     state = {
         loading: false,
-        intersections: [],
+        nodes: [],
     }
 
     initColumns = () => {
         return [{
             title: '交叉口名称',
-            dataIndex: 'name'
+            dataIndex: 'node_name'
         },{
             title: '几何布局',
-            render: intersection => (
-                <LinkButton onClick = { () => { 
-                    this.props.history.push("/intersection/geometry")
+            render: node => (
+                <LinkButton onClick = { () => {
+                    memoryUtils.node = node
+                    this.props.history.push({ pathname: "/intersection/geometry/" + node.node_id })
                 } }>查看布局</LinkButton>
             )
         },{
             title: '流量信息',
-            render: intersection => (
-                <LinkButton onClick = { () => { 
-                    this.props.history.push("/intersection/flow")
+            render: node => (
+                <LinkButton onClick = { async () => { 
+                    memoryUtils.node = node
+                    this.props.history.push({ pathname: "/intersection/flow/" + node.node_id })
                 } }>查看流量</LinkButton>
             )
         },]
     }
 
-    initIntersections = () => {
-        const intersections = [{
-            id: 1,
-            name: "正阳路-保岫路交叉口",
-        },{
-            id: 2,
-            name: "正阳路-龙泉路交叉口",
-        },{
-            id: 3,
-            name: "正阳路-玉泉路交叉口",
-        },{
-            id: 4,
-            name: "正阳路-升阳路交叉口",
-        },{
-            id: 5,
-            name: "正阳路-人民路交叉口",
-        },{
-            id: 6,
-            name: "太保路-龙泉路交叉口",
-        },{
-            id: 7,
-            name: "太保路-玉泉路交叉口",
-        },{
-            id: 8,
-            name: "太保路-升阳路交叉口",
-        },{
-            id: 9,
-            name: "太保路-人民路交叉口",
-        },{
-            id: 10,
-            name: "太保路-人民路交叉口",
-        },]
+    initNodes = async () => {
+        const result = await reqNodes()
+        const nodes = result.data
         this.setState({ 
-            intersections,
+            nodes,
         })
     }
 
@@ -84,7 +59,7 @@ export default class IntersectionInfo extends Component {
 
     componentWillMount() {
         this.columns = this.initColumns()
-        this.initIntersections()
+        this.initNodes()
 
     }
     
@@ -93,7 +68,7 @@ export default class IntersectionInfo extends Component {
     }
 
     render() {
-        const { loading, intersections } = this.state
+        const { loading, nodes } = this.state
         return (
             <div className = "lvqi-row1-col2">
                 <div className = "lvqi-col-2">
@@ -110,9 +85,9 @@ export default class IntersectionInfo extends Component {
                     <div className="lvqi-card-content" id="table">
                         <Table 
                             bordered = { true }
-                            rowKey = "id"
+                            rowKey = "node_id"
                             columns = { this.columns }
-                            dataSource = { intersections }
+                            dataSource = { nodes }
                             loading = { loading }
                             pagination = { false }
                             scroll={{ y: 480 }}

@@ -1,43 +1,94 @@
 import React, { Component } from 'react'
-import { Icon, Button, Form, Input, DatePicker, TimePicker, Tabs } from 'antd'
+import { Icon, Button, Form, Input, DatePicker, TimePicker, Tabs, message, Table } from 'antd'
 import LinkButton from '../../components/link-button'
 import LyfItem from '../../components/item/item'
 import NodeFlow from '../../utils/node-flow'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
+import memoryUtils from '../../utils/memoryUtils'
+import { getDateString, getNowTimeString, getTodayTimeString, getTimeString } from '../../utils/dateUtils'
+import { reqNodeFlowByNodeId, reqNodeById } from '../../api'
+import { DIRECTION_LIST } from '../../utils/ConstantUtils'
 
 const { TabPane } = Tabs
 
 class IntersectionFlow extends Component {
 
     state = {
+        node: memoryUtils.node,
         activeDirection: '1',
         flow: [],
     }
 
-    onChange = (value, dateString) => {
-        console.log('Selected Time: ', value)
-        console.log('Formatted Selected Time: ', dateString)
+    initColumns = () => {
+        this.columns = [{
+            title: '方向',
+            dataIndex: "direction",
+            render: direction => DIRECTION_LIST[direction - 1]
+        },{
+            title: '直行',
+            dataIndex: "t_flow"
+        },{
+            title: '左转',
+            dataIndex: "left_flow"
+        },{
+            title: '右转',
+            dataIndex: "right_flow"
+        }]
     }
-
 
     handleSubmit = ( event ) => {
-        event.preventDefault();
+        event.preventDefault()
         this.props.form.validateFields( (error, values) => {
             if( !error ){
-                console.log( values );
+                
+                let start_date = "2019-05-13"   //getDateString(values["start_date"])
+                let end_date = "2019-05-14"     //getDateString(values["end_date"])
+                let start_time = getTimeString(values["start_time"]).substr(11, 10)
+                let end_time = getTimeString(values["end_time"]).substr(11, 10)
+                this.getNodeFlow(start_date + " " + start_time, end_date + " " + end_time, this.state.node.node_id)
+                
             }
         } )
-        this.flow_chart.setOption( [100,2,3,4,5,6,6,7,8,9,9,9] )
     }
 
-    componentDidMount() {
+    getNodeFlow = async (start_time, end_time, node_id) => {
+
+        const result = await reqNodeFlowByNodeId(start_time, end_time, node_id)
+        
+        if(result.code === 1){
+            const flow = result.data.map( e => [ e.t_flow, e.left_flow, e.right_flow ])
+            this.flow_chart.setOption(flow.flat())
+            this.setState({ flow: result.data })
+        } else {
+            message.error(result.message)
+        }
+        
+    }
+
+    componentWillMount() {
+        this.initColumns()
+    }
+    
+
+    async componentDidMount() {
+
+        let node = this.state.node
+        if( node.node_id ){
+            this.getNodeFlow(getTodayTimeString(), getNowTimeString(), node.node_id)
+        }else{
+            const node_id = this.props.match.params.id
+            const result = await reqNodeById(node_id)
+            this.setState({ node: result.data })
+            this.getNodeFlow(getTodayTimeString(), getNowTimeString(), node_id)
+        }
+
         this.flow_chart = new NodeFlow("#flow")
         this.flow_chart.draw()
     }
 
     render() {
-        const { activeDirection } = this.state
+        const { activeDirection, node, flow } = this.state
         const { getFieldDecorator } = this.props.form
         const formLayout = {
             labelCol : { span: 11 } ,
@@ -53,7 +104,7 @@ class IntersectionFlow extends Component {
                     <span>交叉口</span>
                 </div>
                 <div className="lyf-card-content">
-                    <div className="lyf-col2">
+                    <div className="lyf-col-5">
                         <div className="lyf-row2">
                             <Form
                                 { ...formLayout } 
@@ -62,8 +113,8 @@ class IntersectionFlow extends Component {
                             >
                                 <LyfItem label="交叉口名称">
                                     {
-                                        getFieldDecorator("intersection_name", {
-                                            initialValue: '交叉口1',
+                                        getFieldDecorator("node_name", {
+                                            initialValue: node.node_name||"",
                                         })(<Input size="small"/>)
                                     }
                                 </LyfItem>
@@ -97,7 +148,7 @@ class IntersectionFlow extends Component {
                                 <LyfItem label="时间范围">
                                     {
                                         getFieldDecorator("start_time", {
-                                            initialValue: moment('2020-01-01 00:00:00'),
+                                            initialValue: moment("2020-01-01 00:00:00"),
                                         })(
                                             <TimePicker 
                                                 style={{ width:'100%' }} 
@@ -121,20 +172,6 @@ class IntersectionFlow extends Component {
                                         )
                                     }
                                 </LyfItem>
-                                <LyfItem label="结束时间">
-                                    {
-                                        getFieldDecorator("end_time", {
-                                            initialValue: moment(),
-                                        })(
-                                            <TimePicker 
-                                                style={{ width:'100%' }} 
-                                                placeholder="请选择时间" 
-                                                size="small"
-                                                format = "HH:mm:ss"
-                                            />
-                                        )
-                                    }
-                                </LyfItem>
                                 <div style={{ textAlign: 'center' }}>
                                     <Button htmlType="submit">查询</Button>
                                 </div>
@@ -143,7 +180,7 @@ class IntersectionFlow extends Component {
                         <div className="lyf-row2">
                         </div>
                     </div>
-                    <div className="lyf-col2">
+                    <div className="lyf-col-5">
                         <div className="lyf-row1">
                             <Tabs
                                 activeKey = { activeDirection }
@@ -153,7 +190,14 @@ class IntersectionFlow extends Component {
                                 <TabPane tab="流量图" key="1" id="flow" style={{ width: '100%', height: 500, margin: 0, padding: 0 }}>
                                 </TabPane>
                                 <TabPane tab="流量表" key="2" style={{ width: '100%', height: 500, margin: 0, padding: 0, backgroundColor: '#fcc' }}>
-                                    Content of Tab Pane 2
+                                    <Table
+                                        bordered = { true }
+                                        rowKey = "direction"
+                                        columns = { this.columns }
+                                        dataSource = { flow }
+                                        pagination = { false }
+                                        scroll={{ y: 480 }}
+                                    />
                                 </TabPane>
                             </Tabs>
                         </div>

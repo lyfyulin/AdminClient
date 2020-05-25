@@ -7,7 +7,7 @@ import { logout } from '../../redux/actions'
 import { reqWeather } from '../../api'
 
 
-import { formatDate } from '../../utils/dateUtils'
+import { getTimeString } from '../../utils/dateUtils'
 import LinkButton from '../link-button'
 import './index.less'
 
@@ -65,7 +65,7 @@ class Header extends Component {
         // const user = memoryUtils.user
         const user = this.props.user
         const title = this.getTitle()
-        const time = formatDate(this.state.currentTime)
+        const time = getTimeString(this.state.currentTime)
         const { dayPictureUrl, weather } = this.state
 
         return (

@@ -1,10 +1,13 @@
 import React, { Component } from 'react'
-import { Form, Input, Button, Select, Tabs, TreeSelect, Radio, Modal, Icon } from 'antd'
+import { Form, Input, Button, Select, Tabs, TreeSelect, Radio, Modal, Icon, message } from 'antd'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import LyfItem from '../../components/item/item'
 import LinkButton from '../../components/link-button'
 import { TMS, MAP_CENTER } from '../../utils/baoshan'
+import memoryUtils from '../../utils/memoryUtils'
+import { getNowTimeString } from '../../utils/dateUtils'
+import { reqInsertAccident } from '../../api'
 
 const Item = Form.Item
 const Option = Select.Option
@@ -104,7 +107,7 @@ class AddAccidents extends Component {
                 this.node_location = L.circle([25.12, 99.175], {radius:20}).addTo(this.map)
                 this.map.on("click", (e) => {
                     this.node_location.setLatLng([e.latlng.lat, e.latlng.lng])
-                    setFieldsValue({ accident_gpsx_gpsy: e.latlng.lat + ',' + e.latlng.lng })
+                    setFieldsValue({ accident_lng_lat: e.latlng.lng.toFixed(8) + ',' + e.latlng.lat.toFixed(8) })
                 })
                 this.map._onResize()
             }
@@ -118,11 +121,36 @@ class AddAccidents extends Component {
         this.setState({ panes, activeKey })
     }
 
+    convertData = (accident) => {
+        let accident_info = {}
+        const acc_properties = Object.entries(accident)
+        let parties = []
+        this.state.panes.forEach( party => {
+            let party_object = {}
+            acc_properties.filter( e => e[0].indexOf("person" + party.key) !== -1 ).forEach(e => party_object[e[0].replace("_person" + party.key, "")] = e[1] )
+            parties.push(party_object)
+        } )
+        acc_properties.filter( e => e[0].indexOf("person") === -1 ).forEach( e => accident_info[e[0]] = e[1] )
+        accident_info["parties"] = parties
+        accident_info["police_id"] = memoryUtils.user.user_id
+        accident_info["accidents_type"] = 1
+
+        return accident_info
+    }
+
     handleSubmit = ( e ) => {
         e.preventDefault();
-        this.props.form.validateFields( (err, values) => {
+        this.props.form.validateFields( async (err, values) => {
             if( !err ){
-                console.log( values );
+                let accident_info = this.convertData(values)
+                const result = await reqInsertAccident(accident_info)
+                if(result.code === 1){
+                    message.success("事故信息添加成功！")
+                    this.props.history.replace("/accidents")
+                }else{
+                    message.error(result.message)
+                }
+
             }
         } )
     }
@@ -132,7 +160,7 @@ class AddAccidents extends Component {
             accident_location_visible: true
         })
         if(this.map){
-            this.map._onResize()
+            setTimeout(() => {this.map._onResize()}, 1000)
         }
     }
 
@@ -171,19 +199,17 @@ class AddAccidents extends Component {
                             <div className="lyf-3-col">
                                 <Item label="负责民警">
                                     {
-                                        getFieldDecorator("county", {
-                                            initialValue: '李某某',
-                                            rules: [
-                                            ]
+                                        getFieldDecorator("police_name", {
+                                            initialValue: memoryUtils.user.username,
+                                            rules: []
                                         })(<Input disabled />)
                                     }
                                 </Item>
                                 <Item label="事故时间">
                                     {
                                         getFieldDecorator("accident_time", {
-                                            initialValue: '',
-                                            rules: [
-                                            ]
+                                            initialValue: getNowTimeString(),
+                                            rules: []
                                         })(
                                             <Input />
                                         )
@@ -200,7 +226,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="事故经纬度">
                                     {
-                                        getFieldDecorator("accident_gpsx_gpsy", {
+                                        getFieldDecorator("accident_lng_lat", {
                                             initialValue: '',
                                             rules: [
                                             ]
@@ -220,7 +246,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="事故具体位置">
                                     {
-                                        getFieldDecorator("special_location", {
+                                        getFieldDecorator("accident_specific_location", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -229,7 +255,7 @@ class AddAccidents extends Component {
                                                 showSearch
                                                 style={{ width: '100%' }}
                                                 dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                                                placeholder="Please select"
+                                                placeholder="请选择"
                                                 allowClear
                                                 treeDefaultExpandAll
                                             >
@@ -262,7 +288,7 @@ class AddAccidents extends Component {
                             <div className="lyf-3-col">
                                 <Item label="天气">
                                     {
-                                        getFieldDecorator("accidents_climate", {
+                                        getFieldDecorator("climate", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -282,7 +308,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="道路条件">
                                     {
-                                        getFieldDecorator("road_type", {
+                                        getFieldDecorator("road_condition", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -305,7 +331,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="事故形态">
                                     {
-                                        getFieldDecorator("accidents_style", {
+                                        getFieldDecorator("accident_pattern", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -321,7 +347,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="事故类型">
                                     {
-                                        getFieldDecorator("accidents_type", {
+                                        getFieldDecorator("accident_type", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -380,7 +406,7 @@ class AddAccidents extends Component {
                                 </Item>
                                 <Item label="标志标线">
                                     {
-                                        getFieldDecorator("traffic_sign", {
+                                        getFieldDecorator("sign_marking_condition", {
                                             initialValue: '1',
                                             rules: [
                                             ]
@@ -406,7 +432,7 @@ class AddAccidents extends Component {
                                         <TabPane tab={e.title} key={e.key}>
                                             <LyfItem label="是否在场">
                                                 {
-                                                    getFieldDecorator("is_present_person" + e.key, {
+                                                    getFieldDecorator("is_presence_person" + e.key, {
                                                         initialValue: '1',
                                                         rules: [
                                                         ]
@@ -451,7 +477,17 @@ class AddAccidents extends Component {
                                             </LyfItem>
                                             <LyfItem label="车牌号码">
                                                 {
-                                                    getFieldDecorator("plage_number_person" + e.key, {
+                                                    getFieldDecorator("plate_number_person" + e.key, {
+                                                        initialValue: '',
+                                                        rules: []
+                                                    })(
+                                                        <Input />
+                                                    )
+                                                }
+                                            </LyfItem>
+                                            <LyfItem label="姓名">
+                                                {
+                                                    getFieldDecorator("party_name_person" + e.key, {
                                                         initialValue: '',
                                                         rules: []
                                                     })(
@@ -473,7 +509,7 @@ class AddAccidents extends Component {
                                                     )
                                                 }
                                             </LyfItem>
-                                            <LyfItem label="是否存在违法行为">
+                                            <LyfItem label="是否违法">
                                                 {
                                                     getFieldDecorator("illegal_behavior_person" + e.key, {
                                                         initialValue: '1',
@@ -487,12 +523,13 @@ class AddAccidents extends Component {
                                                     )
                                                 }
                                             </LyfItem>
+                                           <div style={{ display: 'flex' }}>
+                                           <div className="lyf-col-5">
                                             <LyfItem label="车损情况">
                                                 {
                                                     getFieldDecorator("car_damage_person" + e.key, {
                                                         initialValue: '1',
-                                                        rules: [
-                                                        ]
+                                                        rules: []
                                                     })(
                                                         <Select>
                                                             <Option value="1">无车损</Option>
@@ -502,22 +539,40 @@ class AddAccidents extends Component {
                                                     )
                                                 }
                                             </LyfItem>
-                                            <LyfItem label="人伤情况">
+                                            <LyfItem label="轻伤人数">
                                                 {
-                                                    getFieldDecorator("people_hurt_person" + e.key, {
-                                                        initialValue: '1',
-                                                        rules: [
-                                                        ]
+                                                    getFieldDecorator("minor_injure_person" + e.key, {
+                                                        initialValue: 0,
+                                                        rules: []
                                                     })(
-                                                        <Select>
-                                                            <Option value="1">无伤亡</Option>
-                                                            <Option value="2">有轻伤</Option>
-                                                            <Option value="3">有重伤</Option>
-                                                            <Option value="4">有死亡</Option>
-                                                        </Select>
+                                                        <Input />
                                                     )
                                                 }
                                             </LyfItem>
+                                            </div>
+                                            <div className="lyf-col-5">
+                                            <LyfItem label="重伤人数">
+                                                {
+                                                    getFieldDecorator("serious_injure_person" + e.key, {
+                                                        initialValue: 0,
+                                                        rules: []
+                                                    })(
+                                                        <Input />
+                                                    )
+                                                }
+                                            </LyfItem>
+                                            <LyfItem label="死亡人数">
+                                                {
+                                                    getFieldDecorator("death_person" + e.key, {
+                                                        initialValue: 0,
+                                                        rules: []
+                                                    })(
+                                                        <Input />
+                                                    )
+                                                }
+                                            </LyfItem>
+                                            </div>
+                                           </div>
                                         </TabPane>
                                     ) )
                                 }

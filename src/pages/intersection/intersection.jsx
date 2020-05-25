@@ -11,8 +11,8 @@ export default class Intersection extends Component {
         return (
             <Switch>
                 <Route path = "/intersection" exact component = { IntersectionInfo }/>
-                <Route path = "/intersection/geometry" component = { IntersectionGeometry }/>
-                <Route path = "/intersection/flow" component = { IntersectionFlow }/>
+                <Route path = "/intersection/geometry/:id" component = { IntersectionGeometry }/>
+                <Route path = "/intersection/flow/:id" component = { IntersectionFlow }/>
                 <Redirect to = "/intersection" />
             </Switch>
         )

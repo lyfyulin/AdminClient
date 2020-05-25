@@ -13,7 +13,9 @@ export default class SettingsLink extends Component {
     initMap = () => {
         this.map = L.map('map', {
             center: MAP_CENTER,
-            zoom: 14
+            zoom: 14,
+            zoomControl: false,
+            attributionControl: false,
         })
         L.tileLayer(TMS, {}).addTo(this.map)
         this.map._onResize()
@@ -23,10 +25,12 @@ export default class SettingsLink extends Component {
         let link_latlngs = []
         let value = e.target.value
         let reg = /^([0-9]{2,3}\.[0-9]{2,}\,[0-9]{2,3}\.[0-9]{2,}\;){1,}([0-9]{2,3}\.[0-9]{2,}\,[0-9]{2,3}\.[0-9]{2,})$/i
+                
         if(reg.test(value)){
             let latlngs = value.split(';')
             
             for (let index = 0; index < latlngs.length; index++) {
+                console.log([parseFloat(latlngs[index].split(",")[1]), parseFloat(latlngs[index].split(",")[0])])
                 link_latlngs.push( [parseFloat(latlngs[index].split(",")[1]), parseFloat(latlngs[index].split(",")[0])] )
             }
         }
@@ -59,7 +63,6 @@ export default class SettingsLink extends Component {
                     <div className="lyf-col-5" id="map">map</div>
                     <div className="lyf-col-5">
                         <textarea onChange = { this.onTextChange } style={{ width: '100%', height: '100%' }}>
-
                         </textarea>
                     </div>
                 </div>

@@ -10,7 +10,7 @@ export default class Accidents extends Component {
             <Switch>
                 <Route path="/accidents" exact component={ AccidentsInfo }/>
                 <Route path="/accidents/add" component={ AddAccidents }/>
-                <Route path="/accidents/detail" component={ AccidentsDetail }/>
+                <Route path="/accidents/detail/:id" component={ AccidentsDetail }/>
             </Switch>
         )
     }

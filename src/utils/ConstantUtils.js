@@ -13,37 +13,49 @@ export const LANE = [
     { key: 7, title: '调头', value: 'U' },
     { key: 8, title: '左转调头', value: 'LU' },
     { key: 9, title: '直行调头', value: 'TU' },
-    { key: 10, title: '左右转', value: 'LR' }
+    { key: 0, title: '左右转', value: 'LR' },
+    { key: -1, title: '出口道', value: 'E'}
 ]
 export const DIRECTION = [
-    { key: 1, title: '主道进口车道宽度', value: 'main_entry_width', defaultValue: '3' },
-    { key: 2, title: '主道出口车道宽度', value: 'main_entry_width', defaultValue: '3' },
-    { key: 3, title: '辅道进口车道宽度', value: 'main_entry_width', defaultValue: '3' },
-    { key: 4, title: '辅道出口车道宽度', value: 'main_entry_width', defaultValue: '3' },
-    { key: 5, title: '进口非机动车道宽度', value: 'main_entry_width', defaultValue: '2' },
-    { key: 6, title: '出口非机动车道宽度', value: 'main_entry_width', defaultValue: '2' },
-    { key: 7, title: '进口道渠化方式', value: 'main_entry_width', defaultValue: '1', children: [
+    { key: 1, title: '主道进口车道宽度', value: 'entry_main_width', defaultValue: '3' },
+    { key: 2, title: '主道出口车道宽度', value: 'exit_main_width', defaultValue: '3' },
+    { key: 3, title: '辅道进口车道宽度', value: 'entry_sub_width', defaultValue: '3' },
+    { key: 4, title: '辅道出口车道宽度', value: 'exit_sub_width', defaultValue: '3' },
+    { key: 5, title: '进口非机动车道宽度', value: 'entry_bike_width', defaultValue: '2' },
+    { key: 6, title: '出口非机动车道宽度', value: 'exit_bike_width', defaultValue: '2' },
+    { key: 7, title: '中央分隔方式', value: 'median', defaultValue: '1', children: [
         { key: 1, title: '分隔线', value: '1' },
         { key: 2, title: '分隔栏', value: '2' },
         { key: 3, title: '分隔带', value: '3' },
     ] },
     { key: 8, title: '中央分隔宽度', value: 'median_width', defaultValue: '2' },
-    { key: 9, title: '主辅分隔方式', value: 'main_sub_type', defaultValue: '1', children: [
+    { key: 9, title: '进口主辅分隔方式', value: 'entry_main_sub_sep', defaultValue: '1', children: [
         { key: 1, title: '分隔线', value: '1' },
         { key: 2, title: '分隔栏', value: '2' },
         { key: 3, title: '分隔带', value: '3' },
     ] },
-    { key: 10, title: '主辅分隔宽度', value: 'main_sub_width', defaultValue: '2' },
-    { key: 11, title: '机非分隔方式', value: 'separation_type', defaultValue: '1', children: [
+    { key: 10, title: '进口主辅分隔宽度', value: 'entry_main_sub_sep_width', defaultValue: '2' },
+    { key: 11, title: '出口主辅分隔方式', value: 'exit_main_sub_sep', defaultValue: '1', children: [
         { key: 1, title: '分隔线', value: '1' },
         { key: 2, title: '分隔栏', value: '2' },
         { key: 3, title: '分隔带', value: '3' },
     ] },
-    { key: 12, title: '机非分隔宽度', value: 'separation_width', defaultValue: '2' },
-    { key: 13, title: '提前右转距停车线距离', value: 'right2stop_length', defaultValue: '30' },
-    { key: 14, title: '渠化长度', value: 'channelized_length', defaultValue: '50' },
-    { key: 15, title: '待行区长度', value: 'left_wait_length', defaultValue: '6' },
-
+    { key: 12, title: '出口主辅分隔宽度', value: 'exit_main_sub_sep_width', defaultValue: '2' },
+    { key: 13, title: '进口机非分隔方式', value: 'entry_car_bike_sep', defaultValue: '1', children: [
+        { key: 1, title: '分隔线', value: '1' },
+        { key: 2, title: '分隔栏', value: '2' },
+        { key: 3, title: '分隔带', value: '3' },
+    ] },
+    { key: 14, title: '进口机非分隔方式', value: 'exit_car_bike_sep', defaultValue: '1', children: [
+        { key: 1, title: '分隔线', value: '1' },
+        { key: 2, title: '分隔栏', value: '2' },
+        { key: 3, title: '分隔带', value: '3' },
+    ] },
+    { key: 15, title: '机非分隔宽度', value: 'entry_car_bike_sep_width', defaultValue: '2' },
+    { key: 16, title: '机非分隔宽度', value: 'exit_car_bike_sep_width', defaultValue: '2' },
+    { key: 17, title: '提前右转距停车线距离', value: 'ahead_right_dist', defaultValue: '30' },
+    { key: 18, title: '渠化长度', value: 'channelized_length', defaultValue: '50' },
+    { key: 19, title: '左转待行区长度', value: 'left_wait_length', defaultValue: '6' },
 ]
 export const TIME_POINT = ["00:00", "00:05", "00:10", "00:15", "00:20", "00:25", "00:30", "00:35", "00:40", "00:45", "00:50", "00:55", "01:00", "01:05", "01:10", "01:15", "01:20", "01:25", "01:30", "01:35", "01:40", "01:45", "01:50", "01:55", "02:00", "02:05", "02:10", "02:15", "02:20", "02:25", "02:30", "02:35", "02:40", "02:45", "02:50", "02:55", "03:00", "03:05", "03:10", "03:15", "03:20", "03:25", "03:30", "03:35", "03:40", "03:45", "03:50", "03:55", "04:00", "04:05", "04:10", "04:15", "04:20", "04:25", "04:30", "04:35", "04:40", "04:45", "04:50", "04:55", "05:00", "05:05", "05:10", "05:15", "05:20", "05:25", "05:30", "05:35", "05:40", "05:45", "05:50", "05:55",
 "06:00", "06:05", "06:10", "06:15", "06:20", "06:25", "06:30", "06:35", "06:40", "06:45", "06:50", "06:55", "07:00", "07:05", "07:10", "07:15", "07:20", "07:25", "07:30", "07:35", "07:40", "07:45", "07:50", "07:55", "08:00", "08:05", "08:10", "08:15", "08:20", "08:25", "08:30", "08:35", "08:40", "08:45", "08:50", "08:55", "09:00", "09:05", "09:10", "09:15", "09:20", "09:25", "09:30", "09:35", "09:40", "09:45", "09:50", "09:55", "10:00", "10:05", "10:10", "10:15", "10:20", "10:25", "10:30", "10:35", "10:40", "10:45", "10:50", "10:55", "11:00", "11:05", "11:10", "11:15", "11:20", "11:25", "11:30", "11:35", "11:40", "11:45", "11:50", "11:55", 
