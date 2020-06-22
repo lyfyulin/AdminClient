@@ -10,6 +10,7 @@ export default class Device extends Component {
             <Switch>
                 <Route path="/device" exact component={ DeviceInfo }/>
                 <Route path="/device/detail/:id" component = { DeviceDetail }/>
+                <Route path="/device/add" component = { DeviceDetail }/>
                 <Redirect to="/device"/>
             </Switch>
         )

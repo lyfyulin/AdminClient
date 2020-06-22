@@ -2,13 +2,11 @@ import React, { Component } from 'react'
 import { Form, Input, Button, Select, Tabs, TreeSelect, Radio, Modal, Icon, message, Table } from 'antd'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import LyfItem from '../../components/item/item'
 import LinkButton from '../../components/link-button'
 import { TMS, MAP_CENTER, DEVICE_CAP_DIR } from '../../utils/baoshan'
 import memoryUtils from '../../utils/memoryUtils'
-import { getNowDateTimeString } from '../../utils/dateUtils'
-import { reqInsertAccident, reqDeviceById, reqNodes } from '../../api'
-import { connect } from 'react-redux'
+import { getTodayDateString } from '../../utils/dateUtils'
+import { reqDeviceById, reqNodes, reqUpdateDevice, reqInsertDevice } from '../../api'
 
 const Item = Form.Item
 const Option = Select.Option
@@ -17,6 +15,7 @@ class DeviceDetail extends Component {
 
     state = {
         device: memoryUtils.device||{},
+        isUpdate: false,
         map_visible: false,
         nodes: [],
     }
@@ -31,7 +30,9 @@ class DeviceDetail extends Component {
                 attributionControl: false,
             })
             L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
-            let dev_lat_lng = [this.state.device.dev_lat, this.state.device.dev_lng]
+
+            const{ isUpdate } = this.state
+            let dev_lat_lng = isUpdate?[this.state.device.dev_lat, this.state.device.dev_lng]:[25.12,99.175]
             this.dev = L.circle(dev_lat_lng, {radius:20, fillOpacity: 1}).addTo(this.map)
             this.map.setView(dev_lat_lng)
             this.map.setZoom(15)
@@ -73,19 +74,34 @@ class DeviceDetail extends Component {
         !this.map||this.map === null ?this.initMap():this.map._onResize()
     }
 
-    componentWillMount() {
-        this.loadNodes()
+    handleSubmit = (e) => {
+        e.preventDefault()
+        const { isUpdate } = this.state
+        this.props.form.validateFields( async (err, values) => {
+            if( !err ){
+                let device = values
+                let lng = values.dev_lat_lng.split(",")[0]
+                let lat = values.dev_lat_lng.split(",")[1]
+                device.dev_lat = lat
+                device.dev_lng = lng
+                const result = isUpdate?await reqUpdateDevice(device):await reqInsertDevice(device)
+                if(result.code === 1){
+                    message.success(isUpdate?"更新点位成功！":"添加点位成功！")
+                    this.props.history.replace("/device")
+                }else{
+                    message.error(result.msg)
+                }
+            }
+        } )
     }
-    
 
     componentDidMount() {
         let { device } = this.state
-        if( !device.dev_id ){
-            const dev_id = this.props.match.params.id
-            this.loadDeviceById(dev_id)
-        }else{
+        if(device.dev_id){
+            this.setState({ isUpdate: true })
             this.loadDeviceById(device.dev_id)
         }
+        this.loadNodes()
     }
     
     componentWillUnmount = () => {
@@ -106,6 +122,10 @@ class DeviceDetail extends Component {
             wrapperCol: { span: 8 },
         }
 
+        const tailLayout = {
+            wrapperCol: { offset: 10, span: 12 },
+        }
+
         return (
             <div className="lyf-card">
                 <div className="lyf-card-title">
@@ -121,6 +141,15 @@ class DeviceDetail extends Component {
                         onSubmit = { this.handleSubmit }
                         className="full"
                     >
+                        <Item label="设备编号">
+                            {
+                                getFieldDecorator("dev_id", {
+                                    initialValue: device.dev_id || '',
+                                })(
+                                    <Input />
+                                )
+                            }
+                        </Item>
                         <Item label="设备名称">
                             {
                                 getFieldDecorator("dev_name", {
@@ -133,7 +162,7 @@ class DeviceDetail extends Component {
                         <Item label="设备坐标">
                             {
                                 getFieldDecorator("dev_lat_lng", {
-                                    initialValue: (device.dev_lng + ',' + device.dev_lat)||"",
+                                    initialValue: device.dev_lng?(device.dev_lng + ',' + device.dev_lat):"99.175,25.12",
                                     rules: [
                                         { required: false, message: "必须选择经纬度！" }
                                     ]
@@ -157,7 +186,7 @@ class DeviceDetail extends Component {
                         <Item label="拍摄角度">
                             {
                                 getFieldDecorator("cap_angle", {
-                                    initialValue: (''+device.cap_angle)||'',
+                                    initialValue: device.cap_angle?(device.cap_angle):'0',
                                 })(
                                     <Input/>
                                 )
@@ -193,7 +222,7 @@ class DeviceDetail extends Component {
                         <Item label="拍摄车道数">
                             {
                                 getFieldDecorator("cap_num", {
-                                    initialValue: device.cap_num || '',
+                                    initialValue: device.cap_num || '2',
                                 })(
                                     <Input/>
                                 )
@@ -211,7 +240,7 @@ class DeviceDetail extends Component {
                         <Item label="IP地址">
                             {
                                 getFieldDecorator("ip_address", {
-                                    initialValue: device.ip_address || '',
+                                    initialValue: device.ip_address || '192.',
                                 })(
                                     <Input/>
                                 )
@@ -229,7 +258,16 @@ class DeviceDetail extends Component {
                         <Item label="创建日期">
                             {
                                 getFieldDecorator("create_time", {
-                                    initialValue: device.create_time || '',
+                                    initialValue: device.create_time || getTodayDateString(),
+                                })(
+                                    <Input/>
+                                )
+                            }
+                        </Item>
+                        <Item label="距标准位置">
+                            {
+                                getFieldDecorator("dist_to_norm", {
+                                    initialValue: device.dist_to_norm || '0',
                                 })(
                                     <Input/>
                                 )
@@ -238,11 +276,14 @@ class DeviceDetail extends Component {
                         <Item label="设备描述">
                             {
                                 getFieldDecorator("description", {
-                                    initialValue: device.description || '',
+                                    initialValue: device.description || '无',
                                 })(
                                     <Input/>
                                 )
                             }
+                        </Item>
+                        <Item {...tailLayout}>
+                            <Button htmlType="submit" type="primary">提交</Button>
                         </Item>
                     </Form>
                 </div>

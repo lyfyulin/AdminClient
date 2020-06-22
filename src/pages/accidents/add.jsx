@@ -182,6 +182,10 @@ class AddAccidents extends Component {
             wrapperCol : { span: 12 },
         }
 
+        const tailLayout = {
+            wrapperCol: { offset: 10, span: 12 },
+        }
+
         return (
             <div className="lyf-card">
                 <div className="lyf-card-title">
@@ -587,8 +591,8 @@ class AddAccidents extends Component {
                             </div>
                         </div>
                         <div className="full lyf-center"  style={{ height: '10%' }}>
-                            <Item>
-                                <Button type = "primary" htmlType = "submit"> 提交 </Button>
+                            <Item {...tailLayout}>
+                                <Button htmlType="submit" type="primary">提交</Button>
                             </Item>
                         </div>
 

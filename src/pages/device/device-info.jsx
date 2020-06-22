@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import { Table, message } from 'antd'
+import { Table, message, Icon, Popconfirm } from 'antd'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import '../node/node-info.less'
 import LinkButton from '../../components/link-button'
 import { TMS, MAP_CENTER, DEVICE_CONFIG } from '../../utils/baoshan'
-import { reqDevices } from '../../api'
+import { reqDevices, reqDeleteDevice } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import { bd09togcj02 } from '../../utils/lnglatUtils'
 import _ from 'lodash'
@@ -38,6 +38,20 @@ export default class DeviceInfo extends Component {
                     this.props.history.push({ pathname: "/device/detail/" + device.dev_id })
                 } }>详情</LinkButton>
             )
+        },{
+            title: '操作',
+            width: 300,
+            render: device => <Popconfirm 
+                title="是否删除?" 
+                onConfirm={async() => {
+                    console.log(device.dev_id)
+                    const result = await reqDeleteDevice(device.dev_id)
+                    result.code === 1? message.success("删除点位成功！"):message.error(result.message)
+                    this.loadDevices()
+                } }
+            >
+                <a href="#">删除</a>
+            </Popconfirm>
         }]
     }
 
@@ -69,7 +83,9 @@ export default class DeviceInfo extends Component {
             let lng = bd09togcj02(e.dev_lng, e.dev_lat)[0]
             this.device.push( L.circle([lat, lng], { ...DEVICE_CONFIG }).bindPopup(e.dev_name) )
         })
-        L.layerGroup(this.device).addTo(this.map)
+        this.map.removeLayer(this.devices_circle)
+        this.devices_circle = L.layerGroup(this.device)
+        this.devices_circle.addTo(this.map)
     }
 
     // 初始化地图
@@ -83,6 +99,7 @@ export default class DeviceInfo extends Component {
             })
             L.tileLayer(TMS, {}).addTo(this.map)
             this.map._onResize()
+            this.devices_circle = L.layerGroup()
             // L.Control({position:'topright'}).addTo(this.map)
         }
     }
@@ -122,6 +139,10 @@ export default class DeviceInfo extends Component {
                 <div className = "lvqi-col-2">
                     <div className="lvqi-card-title">
                         设备列表
+                        <Icon type="plus" style={{ float:'right' }} onClick={ () => {
+                            memoryUtils.device = {}
+                            this.props.history.push({ pathname: "/device/add" })
+                        } }></Icon>
                     </div>
                     <div className="lvqi-card-content" id="table">
                         <Table 

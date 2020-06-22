@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import LyfItem from '../../components/item/item'
-import { Button, TimePicker, Form, TreeSelect, Table, message, Select, Checkbox } from 'antd'
+import { Button, TimePicker, Form, TreeSelect, Table, message, Select, Checkbox, Popconfirm } from 'antd'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import L from 'leaflet'
@@ -123,13 +123,16 @@ class AccidentsInfo extends Component {
             )
         },{
             title: '删除',
-            render: accident => (
-                <LinkButton onClick = {async () => {
+            render: accident => <Popconfirm 
+                title="是否删除?" 
+                onConfirm={async() => {
                     const result = await reqDeleteAccident(accident.accident_id)
                     result.code === 1?message.success("删除事故信息成功！"):message.error(result.message)
                     this.loadAccidents()
-                }}>删除</LinkButton>
-            )
+                } }
+            >
+                <a href="#">删除</a>
+            </Popconfirm>
         }]
     }
 

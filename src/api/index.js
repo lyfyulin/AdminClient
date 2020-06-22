@@ -201,6 +201,27 @@ export const reqDeviceById = (dev_id) => ajax( base + "/device/info", {
     }
 })
 
+export const reqInsertDevice = (device) => ajax.post( base + "/insert/device",
+    JSON.stringify(device),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)	
+
+export const reqUpdateDevice = (device) => ajax.post( base + "/update/device",
+    JSON.stringify(device),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)	
+
+export const reqDeleteDevice = ( dev_id ) => ajax.post( base + "/delete/device", {dev_id})	
+
+
 export const reqCurrentDevNotMiss = () => ajax( base + "/device/current/each/not_miss_rate")
 
 export const reqDevNotMissSearch = (start_date, end_date, dev_id) => ajax( base + "/search/device/dev/not_miss_rate", {
@@ -503,7 +524,7 @@ export const reqUpdateNode = (node) => ajax.post( base + "/update/node",
     }
 )	
 
-export const reqDeleteNode = ( node_id ) => ajax.post("/delete/node", {node_id})	
+export const reqDeleteNode = ( node_id ) => ajax.post( base + "/delete/node", {node_id})	
 
 export const reqDirectionById = ( direction_id ) => ajax( base + "/node/direction/info", {
     params: {
