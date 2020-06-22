@@ -5,16 +5,14 @@ import L from 'leaflet'
 import { DIRECTION_LIST, LANE, DIRECTION } from '../../utils/ConstantUtils'
 import { MAP_CENTER, TMS } from '../../utils/baoshan'
 import memoryUtils from '../../utils/memoryUtils'
-import { reqNodeById, reqUpdateNode } from '../../api'
+import { reqNodeById, reqUpdateNode, reqInsertNode } from '../../api'
 
-import { d3 } from 'd3-node'
-import { ang } from '../../utils/ArrayCal'
 import { NodeDepict } from '../../utils/traffic/node-depict'
 
 const { TabPane } = Tabs
 const { Option } = Select
 
-class NodeGeometry extends Component {
+class NodeDetail extends Component {
 
     constructor(props) {
         super(props)
@@ -22,18 +20,18 @@ class NodeGeometry extends Component {
     }
 
     state = {
-        node: memoryUtils.node,
+        node: memoryUtils.node || {},
         activeDirection: '1',
         direction_list: ['1', '2', '3', '4'],
         direction_lane_dir: [3, 3, 3, 3],
         node_location_visible: false,
+        isUpdate: false,
         more_settings: false,
     }
 
     // 初始化地图
     initMap = () => {
         const { setFieldsValue }  = this.props.form
-        // window.onload = () => {
             if(!this.map){
                 this.map = L.map('map', {
                     center: MAP_CENTER,
@@ -42,7 +40,7 @@ class NodeGeometry extends Component {
                     attributionControl: false,
                 })
                 L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
-                let node_lng_lat = this.state.node.node_lng_lat
+                let node_lng_lat = this.state.node.node_lng_lat||"99.175,25.12;99.175,25.122"
                 node_lng_lat = node_lng_lat?[parseFloat(node_lng_lat.split(",")[1]), parseFloat(node_lng_lat.split(",")[0])]:[0,0]
                 this.node_location = L.circle(node_lng_lat, {radius:20, fillOpacity: 1}).addTo(this.map)
                 this.map.setView(node_lng_lat)
@@ -54,7 +52,6 @@ class NodeGeometry extends Component {
                 })
                 this.map._onResize()
             }
-        // }
     }
 
 
@@ -68,7 +65,7 @@ class NodeGeometry extends Component {
         this.node_depict.draw(this.state.node)
     }
 
-    // 将数据转化为 插入格式
+    // 将 表单数据格式 转化为 插入格式
     convertData = (node) => {
         let data = Object.entries(node)
         const { direction_list } = this.state
@@ -78,12 +75,15 @@ class NodeGeometry extends Component {
         direction_list.forEach( direction => {
             let dir = direction
             let dir_object = {}
-            dir_object["node_id"] = this.state.node.node_id
+            if(this.state.isUpdate){
+                dir_object["node_id"] = this.state.node.node_id
+            }
             dir_object["direction"] = dir
             dir_object["lane_dir"] = data.filter( (item, index) => item[0].indexOf("dir" + dir + "_lane_dir") !== -1).map( e => e[1]).join(",")
             data.filter( (item, index) => item[0].indexOf("dir" + dir) !== -1 && item[0].indexOf("lane_dir") === -1 ).forEach( e => dir_object[e[0].replace("dir" + dir + "_", "")] = e[1] === true?1:e[1] === false?0:e[1] )
             directions.push(dir_object)
         })
+        node_info.node_type = direction_list.length
         node_info.directions = directions
         data.filter( item => item[0].indexOf("dir") === -1 ).forEach( e => node_info[e[0]] = e[1] )
         return node_info
@@ -92,12 +92,15 @@ class NodeGeometry extends Component {
     // 提交修改
     handleSubmit = ( e ) => {
         e.preventDefault()
+        const { isUpdate } = this.state
         this.props.form.validateFields( async (err, values) => {
             if( !err ){
                 let node_info = this.convertData(values)
-                const result = await reqUpdateNode(node_info)
+                console.log(node_info);
+                
+                const result = isUpdate?await reqUpdateNode(node_info):await reqInsertNode(node_info)
                 if(result.code === 1){
-                    message.success("更新点位成功！")
+                    message.success(isUpdate?"更新点位成功！":"添加点位成功！")
                     this.props.history.replace("/node")
                 }else{
                     message.error(result.msg)
@@ -120,16 +123,7 @@ class NodeGeometry extends Component {
     }
 
     // 根据ID获取点位详情
-    getNode = async () => {
-       
-        let { node } = this.state
-        let node_id
-        if( node.node_id ){
-            node_id = node.node_id
-        }else{
-            node_id = this.props.match.params.id
-        }
-
+    loadNodeById = async(node_id) => {
         const result = await reqNodeById(node_id)
         if(result.code === 1){
             let direction_list = result.data.directions.map( e => e.direction + '' )
@@ -147,8 +141,12 @@ class NodeGeometry extends Component {
     }
 
     componentDidMount () {
-        this.node_depict = new NodeDepict("geometry", 250, 320)
-        this.getNode()
+        let { node } = this.state
+        if(node.node_id){
+            this.setState({ isUpdate: true })
+            this.node_depict = new NodeDepict("geometry", 250, 320)
+            this.loadNodeById(node.node_id)
+        }
     }
     
     componentWillUnmount = () => {
@@ -165,11 +163,14 @@ class NodeGeometry extends Component {
 
         let Dirs = DIRECTION_LIST.map( (e, i) => ({ title: e, key: i + 1, value: i+1 }))
 
-        let node_directions = direction_list.map( item => ({title: DIRECTION_LIST[item - 1], key: item, value: item}))
+        let node_directions = direction_list.map( item => ({title: DIRECTION_LIST[item - 1], key: item, value: item, direction: item}))
 
         if(node.directions){
             node_directions = direction_list.map( (item, key) => ({title: DIRECTION_LIST[item - 1], key: item, value: item, ...node.directions[item - 1]}))
         }
+
+        console.log(node_directions)
+        
 
         const formLayout = {
             labelCol : { span: 11 } ,
@@ -286,7 +287,7 @@ class NodeGeometry extends Component {
                                                                 <div style = {{ width: '40%' }}>
                                                                     {
                                                                         getFieldDecorator("dir" + item.direction + "_angle", {
-                                                                            initialValue: item.angle || (450 - 90 * item.direction)%360 + '',
+                                                                            initialValue: item.angle || item.direction?((450 - 90 * item.direction)%360 + ''):"",
                                                                         })(
                                                                             <Input size="small" />
                                                                         )
@@ -426,12 +427,12 @@ class NodeGeometry extends Component {
                                                                                     <div style = {{ width: '40%', display: 'flex', flexWrap: "wrap" }}>
                                                                                         {
                                                                                             item.direction?ele.children?getFieldDecorator("dir" + item.direction + "_" + ele.value, {
-                                                                                                initialValue: item[ele.value] + '' || ele.defaultValue,
+                                                                                                initialValue: item[ele.value] || "1",
                                                                                             })(
                                                                                                 <Select>
                                                                                                     {
                                                                                                         ele.children.map( opt => (
-                                                                                                            <Option key = { opt.key } value = {opt.value}>{opt.title}</Option>
+                                                                                                            <Option key = { opt.key } value = {opt.value + ''}>{opt.title}</Option>
                                                                                                         ) )
                                                                                                     }
                                                                                                 </Select>
@@ -476,5 +477,4 @@ class NodeGeometry extends Component {
     }
 }
 
-
-export default Form.create()( NodeGeometry )
+export default Form.create()( NodeDetail )

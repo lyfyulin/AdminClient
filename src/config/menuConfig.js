@@ -16,8 +16,18 @@ const menuList = [
         icon: 'team'
     },
     {
+        title: '设备管理',
+        key: '/device',
+        icon: 'area-chart'
+    },
+    {
         title: '路口管理',
         key: '/node',
+        icon: 'area-chart'
+    },
+    {
+        title: '单点控制',
+        key: '/node-signal',
         icon: 'area-chart'
     },
     {
@@ -33,16 +43,6 @@ const menuList = [
     {
         title: '区域管理',
         key: '/area',
-        icon: 'area-chart'
-    },
-    {
-        title: '设备管理',
-        key: '/device',
-        icon: 'area-chart'
-    },
-    {
-        title: '单点控制',
-        key: '/node-signal',
         icon: 'area-chart'
     },
     {

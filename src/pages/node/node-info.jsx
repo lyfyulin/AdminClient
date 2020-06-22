@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Table, message } from 'antd'
+import { Table, message, Icon } from 'antd'
 import L from 'leaflet'
 import LinkButton from '../../components/link-button'
 import { reqNodes } from '../../api'
@@ -108,7 +108,11 @@ export default class NodeInfo extends Component {
                 </div>
                 <div className = "lvqi-col-2">
                     <div className="lvqi-card-title">
-                        交叉口列表
+                        路口列表
+                        <Icon type="plus" style={{ float:'right' }} onClick={ () => {
+                            memoryUtils.node = {}
+                            this.props.history.push({ pathname: "/node/add" })
+                        } }></Icon>
                     </div>
                     <div className="lvqi-card-content" id="table">
                         <Table 
