@@ -4,8 +4,9 @@
 import ajax from './ajax'
 import jsonp from 'jsonp'
 import { message } from 'antd'
-const base = ''
-export const reqLogin = (username, password) => ajax.post( base + "/login", {username, password} )
+// const base = 'http://192.122.2.196:3005'
+const base = 'http://192.122.1.246:3005'
+export const reqLogin = (username, password) => ajax.post( base + "/login_verify", {username, password} )
 
 // jsonp 只能解决 GET 类型的 ajax 请求跨域问题
 // jsonp 请求不是 ajax 请求，而是一般的 get 请求 
@@ -192,7 +193,13 @@ export const reqNonlocalVnSearch = (start_date, end_date) => ajax( base + "/sear
 } )	
 	
 // device
-export const reqDevices = () => ajax( base + "//device/list")
+export const reqDevices = () => ajax( base + "/device/list")
+
+export const reqDeviceById = (dev_id) => ajax( base + "/device/info", {
+    params: {
+        dev_id
+    }
+})
 
 export const reqCurrentDevNotMiss = () => ajax( base + "/device/current/each/not_miss_rate")
 
@@ -204,9 +211,9 @@ export const reqDevNotMissSearch = (start_date, end_date, dev_id) => ajax( base 
 
 export const reqTodayNotMiss = () => ajax( base + "/device/not_miss_rate")
 
-export const reqNotMissSearch = (start_date, end_date) => ajax( base + "/search/device/not_miss_rate", {
+export const reqNotMissSearch = (start_date, end_date, start_time, end_time) => ajax( base + "/search/device/not_miss_rate", {
     params: {
-        start_date, end_date
+        start_date, end_date, start_time, end_time
     }
 } )	
 
@@ -588,9 +595,9 @@ export const reqUpdateLine = ( line ) => ajax.post( base + "/update/line",
 
 export const reqDeleteLine = ( line_id ) => ajax.post( base + "/delete/line", { line_id } )	
 
-export const reqNodeFlowByNodeId = ( start_time, end_time, node_id ) => ajax( base + "/node/flow", {
+export const reqNodeFlowByNodeId = ( start_date, end_date, start_time, end_time, node_id ) => ajax( base + "/node/flow", {
     params: {
-        start_time, end_time, node_id 
+        start_date, end_date, start_time, end_time, node_id
     }
 } )
 
@@ -700,6 +707,12 @@ export const reqNodeSchemas = ( node_id ) => ajax( base + "/node/schema/list", {
 export const reqNodeSchemaExec = ( node_id ) => ajax( base + "/node/schema/execution", {
     params: {
         node_id
+    }
+} )
+
+export const reqNodeSchemaExecSearch = ( start_date, end_date, start_time, end_time, node_id ) => ajax( base + "/node/schema/execution/search", {
+    params: {
+        start_date, end_date, start_time, end_time, node_id
     }
 } )
 
@@ -824,7 +837,12 @@ export const reqDeleteAreaSchemas = ( area_id ) => ajax.post( base + "/delete/ar
 export const reqDeleteAreaSchema = ( area_schema_id ) => ajax.post( base + "/delete/area/schema", { area_schema_id } )
 
 
-
+// 文件下载
+export const reqSearchData = ( search_keys ) => ajax( base + "/search/data", {
+    params: {
+        ...search_keys
+    }
+} )
 
 
 

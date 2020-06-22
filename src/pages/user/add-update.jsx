@@ -27,11 +27,16 @@ class AddUpdateUser extends Component {
             rolesSelect = roles.map( item => (<Option key={item.role_id} value={item.role_id}>{item.role_name}</Option>) )
         }
 
+        const formLayout = {
+            labelCol: { span: 7 },
+            wrapperCol: { span: 17 },
+        }
+
         return (
             <Form
-
+                { ...formLayout }
             >
-                <Item>
+                <Item label="用户名">
                     {
                         getFieldDecorator("username", {
                             initialValue: user.username || '',
@@ -42,7 +47,7 @@ class AddUpdateUser extends Component {
                         })( <Input placeholder = "请输入用户名" /> )
                     }
                 </Item>
-                <Item>
+                <Item label="密码">
                     {
                         getFieldDecorator("password", {
                             initialValue: user.password || '',
@@ -53,7 +58,7 @@ class AddUpdateUser extends Component {
                         })( <Input type = "text" placeholder = "请输入密码" /> )
                     }
                 </Item>
-                <Item>
+                <Item label="姓名">
                     {
                         getFieldDecorator("name", {
                             initialValue: user.name || '',
@@ -64,7 +69,7 @@ class AddUpdateUser extends Component {
                         })( <Input placeholder = "请输入姓名" /> )
                     }
                 </Item>
-                <Item>
+                <Item label="用户详情">
                     {
                         getFieldDecorator("info", {
                             initialValue: user.info || '',
@@ -72,7 +77,7 @@ class AddUpdateUser extends Component {
                         })( <Input placeholder = "请输入用户详情" /> )
                     }
                 </Item>
-                <Item>
+                <Item label="电话号">
                     {
                         getFieldDecorator("phone_number", {
                             initialValue: user.phone_number || '',
@@ -83,7 +88,7 @@ class AddUpdateUser extends Component {
                         })( <Input placeholder = "请输入电话号" /> )
                     }
                 </Item>
-                <Item>
+                <Item label="角色名称">
                     {
                         getFieldDecorator("role_id", {
                             initialValue: user.role_id || '',

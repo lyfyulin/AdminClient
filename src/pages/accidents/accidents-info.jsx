@@ -1,31 +1,111 @@
 import React, { Component } from 'react'
 import LyfItem from '../../components/item/item'
-import { DatePicker, Button, TimePicker, Form, Input, Table, message } from 'antd'
+import { Button, TimePicker, Form, TreeSelect, Table, message, Select, Checkbox } from 'antd'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import L from 'leaflet'
+import heatlayer from '../../utils/leaflet/heatlayer'
 import LinkButton from '../../components/link-button'
 import { MAP_CENTER, TMS } from '../../utils/baoshan'
 import { reqAccidents, reqDeleteAccident } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
+import _ from 'lodash'
+import { getTodayDateTimeString } from '../../utils/dateUtils'
 
+const Item = Form.Item
+const Option = Select.Option
+const TreeNode = TreeSelect.TreeNode
 
 class AccidentsInfo extends Component {
 
     state = {
         accidents: [],
         loading: false,
+        illegal_behavior: [{
+            title: '无违法行为',
+            value: '1',
+            key: '1',
+        },{
+            title: '闯红灯',
+            value: '2',
+            key: '2',
+        },{
+            title: '机动车',
+            value: '机动车',
+            key: '机动车',
+            disabled: true,
+            children: [{
+                title: '酒驾醉驾',
+                value: '3',
+                key: '3',
+            },{
+                title: '无证驾驶',
+                value: '4',
+                key: '4',
+            },{
+                title: '超速行驶',
+                value: '5',
+                key: '5',
+            },{
+                title: '违停',
+                value: '6',
+                key: '6',
+            },{
+                title: '占用非机动车道',
+                value: '7',
+                key: '7',
+            },{
+                title: '占用对向车道',
+                value: '8',
+                key: '8',
+            },{
+                title: '占用人行道',
+                value: '9',
+                key: '9',
+            }],
+        },
+        {
+            title: '非机动车',
+            value: '非机动车',
+            key: '非机动车',
+            disabled: true,
+            children: [{
+                title: '占用机动车道',
+                value: '10',
+                key: '10',
+            },{
+                title: '逆行',
+                value: '11',
+                key: '11',
+            }],
+        },
+        {
+            title: '行人',
+            value: '行人',
+            key: '行人',
+            disabled: true,
+            children: [{
+                title: '随意横穿马路',
+                value: '12',
+                key: '12',
+            }],
+        }],
     }
 
+    // 初始化地图
     initMap = () => {
         this.map = L.map('map', {
             center: MAP_CENTER,
-            zoom: 14
+            zoom: 14,
+            zoomControl: false,
+            attributionControl: false,
         })
+        this.heat = heatlayer([[0.1, 0.1, 1]])
         L.tileLayer(TMS, {}).addTo(this.map)
         this.map._onResize()
     }
 
+    // 设置表格列
     initColumns = () => {
         this.columns = [{
             title: '序号',
@@ -53,10 +133,12 @@ class AccidentsInfo extends Component {
         }]
     }
 
+    // 加载事故数据
     loadAccidents = async () => {
         this.setState({ loading: true })
         const result = await reqAccidents()
         if(result.code === 1){
+            this.setHeat(result.data)
             this.setState({ accidents: result.data, loading: false })
         }else{
             message.error(result.message)
@@ -64,6 +146,19 @@ class AccidentsInfo extends Component {
         }
     }
 
+    // 设置事故热力图
+    setHeat = (accidents) => {
+        accidents.forEach( accident => {
+            let lng_lat = accident.accident_lng_lat
+            this.heat.addLatLng([parseFloat(lng_lat.split(',')[1]), parseFloat(lng_lat.split(',')[0])])
+        })
+        this.heat.addTo(this.map)
+
+        // let heat2 = heatlayer([[25.13, 99.175, 1]]).addTo(this.map);
+        // this.map.on("mousemove",  _.throttle( e => heat2.addLatLng([e.latlng.lat, e.latlng.lng]), 100 ))
+    }
+
+    // 查询提交
     handleSubmit = ( e ) => {
         e.preventDefault();
         this.props.form.validateFields( (err, values) => {
@@ -75,159 +170,252 @@ class AccidentsInfo extends Component {
 
     componentWillMount() {
         this.initColumns()
-        this.loadAccidents()
     }
     
-
     componentDidMount() {
         this.initMap()
-        // let heat2 = heatlayer([[25.13, 99.175, 1]]).addTo(this.map);
-        // this.map.on("mousemove",  _.throttle( e => heat2.addLatLng([e.latlng.lat, e.latlng.lng]), 100 ))
+        this.loadAccidents()
     }
 
     render() {
 
-        const { accidents, loading } = this.state
+        const { accidents, loading, illegal_behavior } = this.state
 
         const { getFieldDecorator } = this.props.form
 
+        const formLayout = {
+            labelCol: { span: 7 },
+            wrapperCol: { span: 17 },
+        }
+
         return (
-            <div className="lyf-card">
+            <div className="full">
                 <Form
+                    style={{ height: 120, width:'100%' }}
+                    { ...formLayout }
                     onSubmit = { this.handleSubmit }
-                    style = {{ width: '100%', height: '20%' }}
                 >
-
-                    <div style={{ display: 'flex', flexWrap: 'wrap', height: "50%", paddingTop: '1%' }}>
-                        <div style={{ width: '30%' }}>
-                        <LyfItem label="日期范围">
-                            {
-                                getFieldDecorator("start_date", {
-                                    initialValue: moment(),
-                                })(
-                                    <DatePicker 
-                                        style={{ width:'100%' }} 
-                                        placeholder="请选择日期" 
-                                        size="small"
-                                        format = "YYYY-MM-DD"
-                                    />
-                                )
-                            }
-                            &nbsp;-&nbsp;
-                            {
-                                getFieldDecorator("end_date", {
-                                    initialValue: moment(),
-                                })(
-                                    <DatePicker 
-                                        style={{ width:'100%' }} 
-                                        placeholder="请选择日期" 
-                                        size="small"
-                                        format = "YYYY-MM-DD"
-                                    />
-                                )
-                            }
-                        </LyfItem>
+                    <div className="lyf-center" style={{ width: '100%', height: 60, borderBottom: '1px solid #1DA57A', borderTop: '1px solid #1DA57A' }}>
+                        <div className="lyf-col-2 lyf-center">
+                            <Item label="起始时间" name="start_time">
+                                {
+                                    getFieldDecorator("start_time", {
+                                        initialValue: moment(getTodayDateTimeString()),
+                                    })(
+                                        <TimePicker 
+                                            style={{ width:'100%' }} 
+                                            placeholder="请选择时间" 
+                                            size="small"
+                                            format = "YYYY-MM-DD HH:mm:ss"
+                                        />
+                                    )
+                                }
+                            </Item>
                         </div>
-                        <div style={{ width: '30%' }}>
-                        <LyfItem label="时间范围">
-                            {
-                                getFieldDecorator("start_time", {
-                                    initialValue: moment('2020-01-01 00:00:00'),
-                                })(
-                                    <TimePicker 
-                                        style={{ width:'100%' }} 
-                                        placeholder="请选择时间" 
-                                        size="small"
-                                        format = "HH:mm:ss"
-                                    />
-                                )
-                            }
-                            &nbsp;-&nbsp;
-                            {
-                                getFieldDecorator("end_time", {
-                                    initialValue: moment(),
-                                })(
-                                    <TimePicker 
-                                        style={{ width:'100%' }} 
-                                        placeholder="请选择时间" 
-                                        size="small"
-                                        format = "HH:mm:ss"
-                                    />
-                                )
-                            }
-                        </LyfItem>
+                        <div className="lyf-col-2 lyf-center">
+                            <Item label="结束时间" name="end_time">
+                                {
+                                    getFieldDecorator("end_time", {
+                                        initialValue: moment("2020-01-01 08:00:00"),
+                                    })(
+                                        <TimePicker 
+                                            size="small"
+                                            style={{ width:'100%' }} 
+                                            placeholder="请选择时间" 
+                                            size="small"
+                                            format = "YYYY-MM-DD HH:mm:ss"
+                                        />
+                                    )
+                                }
+                            </Item>
                         </div>
-                        <div style={{ width: '15%' }}>
-                            <LyfItem label="年龄">
-                            {
-                                getFieldDecorator("filter_options", {
-                                    initialValue: "",
-                                })(
-                                    <Input size="small"/>
-                                )
-                            }
-                            </LyfItem>
+                        <div className="lyf-col-2 lyf-center">
+                            <Item label="事故类型" name="accidents_type">
+                                {
+                                    getFieldDecorator("accident_type", {
+                                        initialValue: '1',
+                                        rules: [
+                                        ]
+                                    })(
+                                        <TreeSelect
+                                            showSearch
+                                            style={{ width: '100%' }}
+                                            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                                            size="small"
+                                            allowClear
+                                            treeDefaultExpandAll
+                                        >
+                                            <TreeNode value="追尾" title="追尾" disabled>
+                                                <TreeNode value="1" title="机动车追尾机动车" />
+                                                <TreeNode value="2" title="机动车追尾停驶车辆" />
+                                            </TreeNode>
+                                            <TreeNode value="刮擦" title="刮擦" disabled>
+                                                <TreeNode value="3" title="机动车同向刮擦" />
+                                                <TreeNode value="4" title="机动车对向刮擦" />
+                                            </TreeNode>
+                                            <TreeNode value="碰撞" title="碰撞" disabled>
+                                                <TreeNode value="5" title="机动车违反车道行驶发生碰撞" />
+                                                <TreeNode value="6" title="机动车正面碰撞" />
+                                                <TreeNode value="7" title="机动车直角碰撞" />
+                                                <TreeNode value="8" title="机动车撞非机动车" />
+                                                <TreeNode value="9" title="机动车撞行人" />
+                                                <TreeNode value="10" title="机动车撞固定物" />
+                                            </TreeNode>
+                                            <TreeNode value="其它" title="其它" disabled>
+                                                <TreeNode value="11" title="机动车侧翻" />
+                                                <TreeNode value="12" title="多车事故" />
+                                                <TreeNode value="13" title="非机动车撞固定物" />
+                                                <TreeNode value="14" title="非机动车撞非机动车" />
+                                                <TreeNode value="15" title="非机动车撞行人" />
+                                                <TreeNode value="16" title="非机动车撞停驶车辆" />
+                                                <TreeNode value="17" title="非机动车单车事故" />
+                                            </TreeNode>
+                                        </TreeSelect>
+                                    )
+                                }
+                            </Item>
                         </div>
-                        <div style={{ width: '15%' }}>
-                            <LyfItem label="性别">
-                            {
-                                getFieldDecorator("filter_options", {
-                                    initialValue: "",
-                                })(
-                                    <Input size="small"/>
-                                )
-                            }
-                            </LyfItem>
+                        <div className="lyf-col-2 lyf-center">
+                            <Item label="道路条件" name="road_condition">
+                                {
+                                    getFieldDecorator("road_condition", {
+                                        initialValue: '1',
+                                        rules: []
+                                    })(
+                                        <Select
+                                            size="small"
+                                        >
+                                            <Option value="1">普通道路</Option>
+                                            <Option value="2">桥梁</Option>
+                                            <Option value="3">隧道</Option>
+                                            <Option value="4">匝道</Option>
+                                            <Option value="5">长下坡</Option>
+                                            <Option value="6">陡坡</Option>
+                                            <Option value="7">急转弯</Option>
+                                            <Option value="8">施工路段</Option>
+                                            <Option value="9">结冰路面</Option>
+                                            <Option value="10">湿滑路面</Option>
+                                            <Option value="11">其他</Option>
+                                        </Select>
+                                    )
+                                }
+                            </Item>
+                        </div>
+                        <div className="lyf-col-2 lyf-center">
+                            <Item label="天气" name="climate">
+                                {
+                                    getFieldDecorator("climate", {
+                                        initialValue: '1',
+                                        rules: [
+                                        ]
+                                    })(
+                                        <Select
+                                            size="small"
+                                        >
+                                            <Option value="1">晴天</Option>
+                                            <Option value="2">阴天</Option>
+                                            <Option value="3">雨天</Option>
+                                            <Option value="4">雪天</Option>
+                                            <Option value="5">大风</Option>
+                                            <Option value="6">沙尘</Option>
+                                            <Option value="7">冰雹</Option>
+                                            <Option value="8">其他</Option>
+                                        </Select>    
+                                    )
+                                }
+                            </Item>
                         </div>
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', height: "50%" }}>
-                        <div style={{ width: '30%' }}>
-                            <LyfItem label="事故类型">
+                    <div className="lyf-center" style={{ width: '100%', height: 60, borderBottom: '1px solid #1DA57A', borderTop: '1px solid #1DA57A' }}>
+                        <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
+                            {
+                                getFieldDecorator("people_hurt", {
+                                    initialValue: false,
+                                })(
+                                    <Checkbox style={{ width: '100%' }}>人伤</Checkbox>
+                                )
+                            }
+                        </div>
+                        <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
+                            {
+                                getFieldDecorator("car_damage", {
+                                    initialValue: false,
+                                })(
+                                    <Checkbox style={{ width: '100%' }}>车损</Checkbox>
+                                )
+                            }
+                        </div>
+                        <div className="lyf-col-2 lyf-center">
+                            <Item label="具体位置">
                                 {
-                                    getFieldDecorator("filter_options", {
-                                        initialValue: "",
+                                    getFieldDecorator("accident_specific_location", {
+                                        initialValue: '1',
+                                        rules: [
+                                        ]
                                     })(
-                                        <Input size="small"/>
+                                        <TreeSelect
+                                            showSearch
+                                            style={{ width: '100%' }}
+                                            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                                            placeholder="请选择"
+                                            size="small"
+                                            allowClear
+                                            treeDefaultExpandAll
+                                        >
+                                            <TreeNode value="路口" title="路口" disabled>
+                                                <TreeNode value="1" title="路口中央" />
+                                                <TreeNode value="2" title="路口进口处" />
+                                                <TreeNode value="3" title="路口出口处" />
+                                                <TreeNode value="4" title="右转弯处" />
+                                            </TreeNode>
+                                            <TreeNode value="路段" title="路段" disabled>
+                                                <TreeNode value="5" title="机动车道处" />
+                                                <TreeNode value="6" title="非机动车道处" />
+                                                <TreeNode value="7" title="人行道处" />
+                                                <TreeNode value="8" title="单位小区或小支路开口处" />
+                                                <TreeNode value="9" title="道路渐变段（100米内车道增加或较少）" />
+                                                <TreeNode value="10" title="中央分隔带" />
+                                                <TreeNode value="11" title="机非隔离带" />
+                                            </TreeNode>
+                                            <TreeNode value="其它位置" title="其它位置" disabled>
+                                                <TreeNode value="12" title="单位小区内部道路" />
+                                                <TreeNode value="13" title="停车场内部" />
+                                                <TreeNode value="14" title="村道乡道" />
+                                                <TreeNode value="15" title="其他位置" />
+                                            </TreeNode>
+                                        </TreeSelect>
                                     )
                                 }
-                            </LyfItem>
-                            </div>
-                        <div style={{ width: '30%' }}>
-                            <LyfItem label="事故主体">
+                            </Item>
+                        </div>
+                        <div className="lyf-col-3 lyf-center">
+                            <Item label="违法行为" name="illegal_behavior">
                                 {
-                                    getFieldDecorator("filter_options", {
-                                        initialValue: "",
+                                    getFieldDecorator("illegal_behavior", {
+                                        initialValue: '1',
+                                        rules: []
                                     })(
-                                        <Input size="small"/>
+                                        <TreeSelect 
+                                            treeData = { illegal_behavior }
+                                            treeCheckable = {true}
+                                        />
                                     )
                                 }
-                            </LyfItem>
+                            </Item>
                         </div>
-                        <div style={{ width: '20%' }}>
-                            <LyfItem label="事故地点">
-                                {
-                                    getFieldDecorator("filter_options", {
-                                        initialValue: "",
-                                    })(
-                                        <Input size="small"/>
-                                    )
-                                }
-                            </LyfItem>
+                        <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
+                            <Button size="small" htmlType="submit" >查询事故</Button>
                         </div>
-                        <div style = {{ width: '5%', textAlign: 'center', alignItems: 'center' }}>
-                            <Button htmlType="submit" size="small" style={{ marginTop: 10 }}> 查询 </Button>
+                        <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
+                            <Button size="small" onClick={ () => this.props.history.push("/accidents/add") }>添加事故</Button>
                         </div>
-                        <div style = {{ width: '10%', textAlign: 'center', alignItems: 'center' }}>
-                            <Button htmlType="submit" size="small" style={{ marginTop: 10 }}
-                                onClick = { () => this.props.history.push("/accidents/add") }
-                            > 添加事故 </Button>
+                        <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
+                            <Button size="small" onClick={ () => this.props.history.push("/accidents/eliminate") }>隐患点整治</Button>
                         </div>
                     </div>
-                
                 </Form>
-                <div style={{ height: "80%", display: 'flex' }}>
+                <div style={{ height: "calc(100% - 122px)", display: 'flex' }}>
                     <div style={{ width: "60%", height: '100%', minWidth: 400, minHeight: 400 }} id="map">
-
                     </div>
                     <div style={{ width: "40%", height: '100%' }}>
                         <Table

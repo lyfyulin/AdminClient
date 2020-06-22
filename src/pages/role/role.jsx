@@ -11,7 +11,7 @@ import AuthForm from './auth-form'
 import { reqRoles, reqAddRole, reqUpdateRole } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import { BASE_MENU } from '../../utils/ConstantUtils'
-import { getTimeString } from '../../utils/dateUtils'
+import { getDateTimeString, getNowDateTimeString } from '../../utils/dateUtils'
 import LinkButton from '../../components/link-button'
 
 export default class Role extends Component {
@@ -34,11 +34,11 @@ export default class Role extends Component {
         },{
             title: '创建时间',
             dataIndex: 'create_time',
-            render: getTimeString,
+            render: getDateTimeString,
         },{
             title: '授权时间',
             dataIndex: 'auth_time',
-            render: getTimeString,
+            render: getDateTimeString,
         },{
             title: '授权人',
             dataIndex: 'auth_name',
@@ -72,10 +72,10 @@ export default class Role extends Component {
         this.form.validateFields( async ( error, values ) => {
             if(!error){
                 this.setState({ isShowAdd: false })
-                const result = await reqAddRole( { name: values.role_name, auth_name: memoryUtils.user.username, menus : BASE_MENU } )
-        
+                const result = await reqAddRole( { role_name: values.role_name, auth_name: memoryUtils.user.username, menu : BASE_MENU } )
                 if( result.code === 1 ){
                     message.success( "角色添加成功！" )
+                    this.getRoles()
                 }else{
                     message.error("角色添加失败！")
                 }
@@ -92,7 +92,7 @@ export default class Role extends Component {
         let {role } = this
         role.menu = this.authRef.current.getMenus().join(";")
         role.auth_name = memoryUtils.user.username
-        role.auth_time = getTimeString(new Date().getTime())
+        role.auth_time = getDateTimeString(new Date().getTime())
 
         const result = await reqUpdateRole( role )
         if(result.code === 1){
@@ -106,6 +106,12 @@ export default class Role extends Component {
     componentDidMount() {
         this.initColumns()
         this.getRoles()
+    }
+
+    componentWillUnmount = () => {
+        this.setState = (state, callback) => {
+            return
+        }
     }
 
     render() {

@@ -35,7 +35,7 @@ export default class User extends Component {
         },{
             title: '操作',
             render: user => <span><Button type = "default" onClick = { () => { this.updateUser(user) } } >修改</Button>&nbsp;&nbsp;
-                                <Button type = "default" onClick = { () => this.deleteUser(user) }>删除</Button></span>
+                <Button type = "default" onClick = { () => this.deleteUser(user) }>删除</Button></span>
         }]
     }
 
@@ -118,6 +118,12 @@ export default class User extends Component {
     }
     componentDidMount() {
         this.getUsers()
+    }
+
+    componentWillUnmount = () => {
+        this.setState = (state, callback) => {
+            return
+        }
     }
 
     render() {

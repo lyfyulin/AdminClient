@@ -6,7 +6,12 @@ const user = storageUtils.getUser()
 export default {
     user,           // 用来存储登录用户信息
     product: {},    // 存放商品信息
-    node: {},
     accident: {},
+    node: {},
+    link: {},
+    area: {},
+    line: {},
+    device: {},
+    node_schema: {},
 }
 

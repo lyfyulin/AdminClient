@@ -6,23 +6,6 @@ const menuList = [
         public: true,
     },
     {
-        title: '数据中心',
-        key: '/products',
-        icon: 'database',
-        children: [
-            {
-                title: '路网数据',
-                key: '/category',
-                icon: 'table',
-            },
-            {
-                title: '结构化数据',
-                key: '/product',
-                icon: 'video-camera',
-            },
-        ]
-    },
-    {
         title: '用户管理',
         key: '/user',
         icon: 'user'
@@ -33,30 +16,8 @@ const menuList = [
         icon: 'team'
     },
     {
-        title: '堵点治理',
-        key: '/charts',
-        icon: 'alert',
-        children: [
-            {
-                title: '拥堵交叉口',
-                key: '/charts/interstate',
-                icon: 'plus',
-            },
-            {
-                title: '拥堵路段',
-                key: '/charts/roadstate',
-                icon: 'pause',
-            },
-            {
-                title: '拥堵区域',
-                key: '/charts/areastate',
-                icon: 'number',
-            }
-        ]
-    },
-    {
-        title: '交叉口管理',
-        key: '/intersection',
+        title: '路口管理',
+        key: '/node',
         icon: 'area-chart'
     },
     {
@@ -65,29 +26,44 @@ const menuList = [
         icon: 'area-chart'
     },
     {
-        title: '流量管理',
-        key: '/flow-info',
+        title: '干线管理',
+        key: '/line',
+        icon: 'area-chart'
+    },
+    {
+        title: '区域管理',
+        key: '/area',
         icon: 'area-chart'
     },
     {
         title: '设备管理',
-        key: '/device-info',
+        key: '/device',
         icon: 'area-chart'
     },
     {
-        title: '信号管理',
-        key: '/signal-info',
+        title: '单点控制',
+        key: '/node-signal',
         icon: 'area-chart'
     },
     {
-        title: '事故处理',
+        title: '数据检索',
+        key: '/search',
+        icon: 'area-chart'
+    },
+    {
+        title: '事故分析',
         key: '/accidents',
         icon: 'area-chart'
     },
     {
-        title: '设置',
-        key: '/settings',
+        title: '数据平台',
+        key: '/platform',
         icon: 'area-chart'
+    },
+    {
+        title: '车辆轨迹',
+        key: '/trajectory',
+        icon: 'alert',
     },
 ]
 

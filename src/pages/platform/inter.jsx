@@ -25,9 +25,9 @@ export default class Inter extends Component {
 
         let div11_data = result11.data
 
-        let data22_1 = result22_1.data.map( e => e.ALL_NUM )
-        let data22_2 = result22_2.data.map( e => e.ALL_NUM )
-        let div22_option = BiLineOption( TIME_POINT, data22_1, data22_2 )
+        let data22_1 = result22_1.data.map( e => e.all_num )
+        let data22_2 = result22_2.data.map( e => e.all_num )
+        let div22_option = BiLineOption( TIME_POINT, data22_2, data22_1 )
 
         this.setState({
             div11_data, div22_option, firstRender: true 

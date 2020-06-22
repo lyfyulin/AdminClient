@@ -9,9 +9,10 @@ export default class Link extends Component {
         return (
             <Switch>
                 <Route path="/link" exact component = { LinkInfo }/>
-                <Route path="/link/detail" component = { LinkDetail }/>
+                <Route path="/link/detail/:id" component = { LinkDetail }/>
+                <Route path="/link/add" component = { LinkDetail }/>
                 <Route path="/link/param" component = { LinkParam }/>
-                <Redirect to="/link"/>
+                {/* <Redirect to="/link"/> */}
             </Switch>
         )
     }

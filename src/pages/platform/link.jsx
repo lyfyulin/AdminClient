@@ -6,6 +6,7 @@ import { reqLastRdnetState, reqCurrentLinkState, reqTodayRdnetState } from '../.
 import LvqiMap from '../../components/map'
 import { TIME_POINT } from '../../utils/ConstantUtils'
 import LvqiTable from '../../components/table'
+import { message } from 'antd'
 
 
 export default class Link extends Component {
@@ -19,16 +20,30 @@ export default class Link extends Component {
     load_data = async() => {
 
         const result11 = await reqCurrentLinkState()
-
         const result21 = await reqTodayRdnetState()
         const result32_1 = await reqLastRdnetState()
 
-        let data21 = result21.data.map( e => e.SPEED )
+        let data21
+        if(result21.code === 1){
+            data21 = result21.data.map( e => e.speed )
+        }else{
+            message.error(result21.message)
+        }
         
-        let data32_1 = result32_1.data.map( e => e.SPEED )
-        let div22_option = BiLineOption( TIME_POINT, data21, data32_1 )
+        let div22_option
+        if(result32_1.code === 1){
+            let data32_1 = result32_1.data.map( e => e.speed )
+            div22_option = BiLineOption( TIME_POINT, data32_1, data21 )
+        }else{
+            message.error(result32_1.message)
+        }
 
-        let div11_data = result11.data
+        let div11_data
+        if(result11.code === 1){
+            div11_data = result11.data
+        }else{
+            message.error(result11.message)
+        }
 
         this.setState({
             div11_data, data21, div22_option, firstRender: true 

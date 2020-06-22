@@ -79,8 +79,8 @@ export default class LvqiTable extends Component {
                             data.length>0 && data[0]?(data.map( (e, i) => (
                                 <List.Item key={ i } style={{ height: itemHeight }} >
                                     <div className="full lyf-center">
-                                        <div className="lyf-col-6 lyf-center lyf-font-1"> { LINK_NAME[e.LINK_ID - 1] } </div>
-                                        <div className="lyf-col-4 lyf-center lyf-font-2"> { e.SPEED } km/h </div>
+                                        <div className="lyf-col-6 lyf-center lyf-font-1"> { LINK_NAME[e.link_id - 1] } </div>
+                                        <div className="lyf-col-4 lyf-center lyf-font-2"> { e.speed } km/h </div>
                                     </div>
                                 </List.Item>
                             ))):(<></>)
@@ -88,8 +88,8 @@ export default class LvqiTable extends Component {
                             data.length>0 && data[0]?(data.map( (e, i) => (
                                 <List.Item key={ i } style={{ height: itemHeight }} >
                                     <div className="full lyf-center">
-                                        <div className="lyf-col-6 lyf-center lyf-font-1"> { INTER_INFO[e.INTER_ID - 1][1] } </div>
-                                        <div className="lyf-col-4 lyf-center lyf-font-2"> { e.AVG_DELAY } s </div>
+                                        <div className="lyf-col-6 lyf-center lyf-font-1"> { INTER_INFO[e.inter_id - 1][1] } </div>
+                                        <div className="lyf-col-4 lyf-center lyf-font-2"> { e.avg_delay } s </div>
                                     </div>
                                 </List.Item>
                             ))):(<></>)

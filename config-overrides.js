@@ -9,6 +9,6 @@ module.exports = override(
   }),
   addLessLoader({
     javascriptEnabled: true,
-    modifyVars: {'@primary-color': '#f00'},   // 可以自定义变量，修改了 primary 主题的颜色
+    modifyVars: {'@primary-color': '#1DA57A'},   // 可以自定义变量，修改了 primary 主题的颜色
   }),
 );

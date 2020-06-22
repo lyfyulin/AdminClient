@@ -4,7 +4,7 @@ export default class LyfTable extends Component {
     render() {
         return (
             <div>
-                
+                lyf - table
             </div>
         )
     }

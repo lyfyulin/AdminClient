@@ -1,0 +1,165 @@
+import React, { Component } from 'react'
+import { Table, message, Icon } from 'antd'
+import L from 'leaflet'
+import LinkButton from '../../components/link-button'
+import { TMS, MAP_CENTER, AREA_CONFIG } from '../../utils/baoshan'
+import { reqAreas } from '../../api'
+import memoryUtils from '../../utils/memoryUtils'
+import '../../utils/leaflet/LeafletLegend'
+import _ from 'lodash'
+
+import './area.less'
+
+
+export default class AreaInfo extends Component {
+
+    state = {
+        loading: false,
+        areas: [],
+    }
+
+    // 初始化区域列
+    initColumns = () => {
+        return [{
+            title: '区域编号',
+            width: 200,
+            dataIndex: 'area_id',
+        },{
+            title: '区域名称',
+            width: 200,
+            // dataIndex: 'area_name',
+            render: area => <a 
+                onClick ={ () => { this.areaBlink(area) } }
+            >
+                { area.area_name }
+            </a>
+        },{
+            title: '区域详情',
+            width: 100,
+            render: area => (<span>
+                <LinkButton onClick = { () => {
+                    memoryUtils.area = area
+                    this.props.history.replace('/area/detail/' + area.area_id)
+                } }>查看区域</LinkButton>
+            </span>)
+        },{
+            title: '区域参数',
+            width: 100,
+            render: area => (<span>
+                <LinkButton onClick = { () => {
+                } }>查看参数</LinkButton>
+            </span>)
+        },]
+    }
+
+    // 初始化地图
+    initMap = () => {
+        if(!this.map){
+            this.map = L.map('map', {
+                center: MAP_CENTER,
+                zoom: 14,
+                zoomControl: false,
+                attributionControl: false,
+            })
+            L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
+            this.map._onResize()
+        }
+    }
+
+    // 加载区域列表数据
+    loadAreas = async () => {
+        const result = await reqAreas()
+        if(result.code === 1){
+            const areas = result.data.map( (e, index) => ({ index: index, ...e }) )
+            this.setArea(areas)
+            this.setState({ 
+                areas
+            })
+        }else{
+            message.error(result.message)
+        }
+    }
+
+    // 将区域添加到地图
+    setArea = (areas) => {
+        this.area = []
+        areas.forEach( area => {
+            const area_pts_string = area.area_sequence.trim().split(";")
+            let area_pts = []
+            area_pts_string.forEach( pt_string => {
+                let lat = parseFloat(pt_string.split(',')[1])
+                let lng = parseFloat(pt_string.split(',')[0])
+                area_pts.push([lat, lng])
+            } )
+            let area_polygon = L.polygon(area_pts, { ...AREA_CONFIG }).bindPopup(area.area_name)
+            this.area.push(area_polygon)
+        })
+        L.layerGroup(this.area).addTo(this.map)
+    }
+
+    
+    areaBlink = (area) => {
+        this.map.fitBounds(this.area[area.index].getBounds())
+        this.area[area.index].setStyle({ color: AREA_CONFIG.blink })
+        setTimeout( () => {
+            this.area[area.index].setStyle({  ...AREA_CONFIG  })
+        }, 1000 )
+    }
+
+    onWindowResize = _.throttle(() => {
+        this.setState({ tableBodyHeight: window.innerHeight * 0.9 - 166  })
+    }, 800)
+
+    componentWillMount() {
+        this.columns = this.initColumns()
+        this.loadAreas()
+    }
+
+    componentDidMount() {
+        this.initMap()
+        window.addEventListener('resize', this.onWindowResize)
+    }
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.onWindowResize)
+        this.setState = (state, callback) => {
+            return
+        }
+    }
+    render() {
+        const { loading, areas } = this.state
+
+        return (
+            <div className = "lvqi-row1-col2">
+                <div className = "lvqi-col-2">
+                    <div className="lvqi-card-title">
+                        区域地图
+                    </div>
+                    <div className="lvqi-card-content" id="map">
+                    </div>
+                </div>
+                <div className = "lvqi-col-2">
+                    <div className="lvqi-card-title">
+                        区域列表
+                        <Icon type="plus" style={{ float:'right' }} onClick={ () => {
+                            memoryUtils.area = {}
+                            this.props.history.push({ pathname: "/area/add" })
+                        } }></Icon>
+                    </div>
+                    <div className="lvqi-card-content" id="table">
+                        <Table 
+                            style={{ wordBreak: 'break-all' }}
+                            bordered = { true }
+                            rowKey = "area_id"
+                            columns = { this.columns }
+                            dataSource = { areas }
+                            loading = { loading }
+                            pagination = { false }
+                            scroll={{ y: window.innerHeight * 0.9 - 166 }}
+                        >
+                        </Table>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}

@@ -6,8 +6,9 @@ import LyfItem from '../../components/item/item'
 import LinkButton from '../../components/link-button'
 import { TMS, MAP_CENTER } from '../../utils/baoshan'
 import memoryUtils from '../../utils/memoryUtils'
-import { getNowTimeString } from '../../utils/dateUtils'
+import { getNowDateTimeString } from '../../utils/dateUtils'
 import { reqInsertAccident } from '../../api'
+import { connect } from 'react-redux'
 
 const Item = Form.Item
 const Option = Select.Option
@@ -97,11 +98,13 @@ class AddAccidents extends Component {
 
     initMap = () => {
         const { setFieldsValue }  = this.props.form
-        window.onload = () => {
+        // window.onload = () => {
             if(!this.map){
                 this.map = L.map('accident_map', {
                     center: MAP_CENTER,
-                    zoom: 14
+                    zoom: 14,
+                    zoomControl: false,
+                    attributionControl: false,
                 })
                 L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
                 this.node_location = L.circle([25.12, 99.175], {radius:20}).addTo(this.map)
@@ -111,7 +114,7 @@ class AddAccidents extends Component {
                 })
                 this.map._onResize()
             }
-        }
+        // }
     }
 
     addObject = () => {
@@ -156,19 +159,19 @@ class AddAccidents extends Component {
     }
 
     showLocation = () => {
-        this.setState({
-            accident_location_visible: true
-        })
-        if(this.map){
-            setTimeout(() => {this.map._onResize()}, 1000)
+        this.setState({ accident_location_visible: true })
+        !this.map||this.map === null ?this.initMap():this.map._onResize()
+    }
+
+    componentWillUnmount() {
+        this.setState = (state, callback) => {
+            return
         }
     }
 
-    componentDidMount() {
-        this.initMap()
-    }
-
     render() {
+
+        const user = this.props.user
 
         const { getFieldDecorator }  = this.props.form
 
@@ -186,21 +189,21 @@ class AddAccidents extends Component {
                         <Icon type="arrow-left"></Icon>
                     </LinkButton>
                     &nbsp;&nbsp;
-                    <span>事故处理</span>
+                    <span>事故分析</span>
                 </div>
                 <div className="lyf-card-content">
                     <Form 
-                        { ...formLayout } 
+                        { ...formLayout }
                         onSubmit = { this.handleSubmit }
                         style = {{ width: '100%', height: '100%' }}
                     >
-
                         <div className="full" style={{ height: '90%', display: "flex", flexWrap: 'nowrap' }}>
-                            <div className="lyf-3-col">
+                            <div className="lyf-col-5">
+                            <div className="lyf-row-5">
                                 <Item label="负责民警">
                                     {
                                         getFieldDecorator("police_name", {
-                                            initialValue: memoryUtils.user.username,
+                                            initialValue: user.username,
                                             rules: []
                                         })(<Input disabled />)
                                     }
@@ -208,7 +211,7 @@ class AddAccidents extends Component {
                                 <Item label="事故时间">
                                     {
                                         getFieldDecorator("accident_time", {
-                                            initialValue: getNowTimeString(),
+                                            initialValue: getNowDateTimeString(),
                                             rules: []
                                         })(
                                             <Input />
@@ -236,10 +239,13 @@ class AddAccidents extends Component {
                                     }
                                     <Modal
                                         title="选择经纬度"
+                                        okText = { "确定" }
+                                        cancelText = { "取消" }
+                                        centered = { true }
+                                        forceRender = { true }
                                         visible={ accident_location_visible }
                                         onOk={ () => this.setState({ accident_location_visible: false }) }
                                         onCancel={ () => this.setState({ accident_location_visible: false }) }
-                                        forceRender = { true }
                                     >
                                         <div id="accident_map" style = {{width: '100%', height: 300}}></div>
                                     </Modal>
@@ -285,7 +291,7 @@ class AddAccidents extends Component {
                                     }
                                 </Item>
                             </div>
-                            <div className="lyf-3-col">
+                            <div className="lyf-row-5">
                                 <Item label="天气">
                                     {
                                         getFieldDecorator("climate", {
@@ -421,7 +427,8 @@ class AddAccidents extends Component {
                                     }
                                 </Item>
                             </div>
-                            <div className="lyf-3-col">
+                            </div>
+                            <div className="lyf-col-5">
                                 <Button onClick={ this.addObject }>添加当事人</Button>
                                 <Tabs 
                                     activeKey={activeKey}
@@ -592,4 +599,11 @@ class AddAccidents extends Component {
     }
 }
 
-export default Form.create()( AddAccidents )
+// export default Form.create()( AddAccidents )
+
+const AccidentsForm = Form.create()( AddAccidents )
+
+export default connect(
+    state => ({ user: state.user }),
+    {}
+)(AccidentsForm)

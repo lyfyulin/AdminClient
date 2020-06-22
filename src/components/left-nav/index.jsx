@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link, withRouter } from 'react-router-dom'
-import { Menu, Icon } from 'antd'
+import { Menu, Icon, message } from 'antd'
 import { connect } from 'react-redux'
 import { setHeaderTitle } from '../../redux/actions'
 import menuList from '../../config/menuConfig'
@@ -28,6 +28,12 @@ class LeftNav extends Component {
     // 得到当前用户所有权限
     const user = this.props.user
     const menu = user.menu.split(";")
+    const path = this.props.location.pathname
+
+    if(user.menu.indexOf(path) === -1){
+      this.props.history.push("/")
+    }
+    
     // 1.管理员用户 全部访问
     // 2.item.public为true  则任何人都可以访问
     // 3.当前用户有此item的权限
@@ -101,14 +107,22 @@ class LeftNav extends Component {
     this.menuNodes = this.getMenuNodes(menuList)
   }
 
+  componentWillUnmount = () => {
+    this.setState = (state,callback)=>{
+      return ;
+    }
+  }
+  
+
   render() {
-    let selectKey = '/' + this.props.location.pathname.split('/').slice(1).join("/")
+    let selectKey = '/' + this.props.location.pathname.split('/').slice(1)[0]
+    
     const { collapsed }  = this.state
     return (
       <div className="left-nav">
         <Link className="left-nav-link" to="/home">
             <img src={logo} alt="logo"/>
-            <h1>绿启信控</h1>
+            <h1>保山平台</h1>
         </Link>
         <Menu
           selectedKeys={[selectKey]}

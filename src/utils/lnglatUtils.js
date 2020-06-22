@@ -160,3 +160,8 @@ export function wgs84tobd09(lng, lat) {
 function out_of_china(lng, lat) {
     return (lng < 72.004 || lng > 137.8347) || ((lat < 0.8293 || lat > 55.8271) || false);
 }
+
+
+export function Str2LatLng(str){
+    return parseFloat(str.trim().split(',')[0])<50?str.trim().split(";").map( e => [parseFloat(e.split(",")[0]), parseFloat(e.split(",")[1])] ):str.trim().split(";").map( e => [parseFloat(e.split(",")[1]), parseFloat(e.split(",")[0])] )
+}

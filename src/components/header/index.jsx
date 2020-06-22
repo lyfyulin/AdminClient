@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 
-import { Modal } from 'antd'
+import { Modal, Carousel } from 'antd'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { logout } from '../../redux/actions'
 import { reqWeather } from '../../api'
 
 
-import { getTimeString } from '../../utils/dateUtils'
+import { getDateTimeString } from '../../utils/dateUtils'
 import LinkButton from '../link-button'
 import './index.less'
 
@@ -35,10 +35,12 @@ class Header extends Component {
         })
     }
 
+    // 获取页头
     getTitle = () => {
         return this.props.headerTitle
     }
 
+    // 获取天气
     getWeather = async () => {
         const { dayPictureUrl, weather } = await reqWeather("杭州")
         this.setState({
@@ -53,7 +55,7 @@ class Header extends Component {
                 currentTime: Date.now()
             })
         }, 1000)
-        this.getWeather()
+        // this.getWeather()
     }
 
     componentWillUnmount = () => {
@@ -65,7 +67,7 @@ class Header extends Component {
         // const user = memoryUtils.user
         const user = this.props.user
         const title = this.getTitle()
-        const time = getTimeString(this.state.currentTime)
+        const time = getDateTimeString(this.state.currentTime)
         const { dayPictureUrl, weather } = this.state
 
         return (
@@ -78,8 +80,8 @@ class Header extends Component {
                     <div className = "header-bottom-left">{title}</div>
                     <div className = "header-bottom-right">
                         <span>{time}</span>
-                        <img src = {dayPictureUrl} alt = "tips" />
-                        <span>{ weather }</span>
+                        {/* <img src = {dayPictureUrl} alt = "天气" /> */}
+                        {/* <span>{ weather }</span> */}
                     </div>
                 </div>
             </div>

@@ -41,7 +41,6 @@ export default class AuthForm extends Component {
     }
 
 
-
     render() {
         const { role } = this.props
         const { checkedKeys } = this.state

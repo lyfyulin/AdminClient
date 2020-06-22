@@ -27,6 +27,10 @@
 }
 
 
+.lyf-col-1{
+    width: 10%;
+    height: 100%;
+}
 .lyf-col-2{
     width: 20%;
     height: 100%;
@@ -84,13 +88,17 @@
     width: 100%;
     height: 80%;
 }
+.lyf-row-9{
+    width: 100%;
+    height: 90%;
+}
 
 
 .lyf-2-3-col{
     height: 100%;
     width: 66.66%;
 }
-.lyf-1-4-col{
+.lyf-4-col{
     height: 100%;
     width: 25%;
 }
@@ -108,7 +116,7 @@
     width: 100%;
     height: 66.66%;
 }
-.lyf-1-4-row{
+.lyf-4-row{
     width: 100%;
     height: 25%;
 }
@@ -163,4 +171,3 @@
     font-weight: bold;
     font-size: 1.2em;
 }
-

@@ -1,8 +1,16 @@
 import React, { Component } from 'react'
 import './home.less'
-import { Icon } from 'antd'
+import { Icon, notification, Popconfirm } from 'antd'
 
 export default class Home extends Component {
+
+
+    state = {
+        pop: false,
+    }
+
+
+
     render() {
         return (
             <div className="home">

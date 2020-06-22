@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import L from 'leaflet'
+import '../../utils/leaflet/LeafletLegend'
 import PropTypes from 'prop-types'
 import { LINK_INFO, LINK_COLOR, INTER_INFO, TMS, MAP_CENTER } from '../../utils/baoshan'
 import { bd09togcj02 } from '../../utils/lnglatUtils'
@@ -23,6 +24,8 @@ export default class LvqiMap extends Component {
             this.link.push(line)
         }
         L.layerGroup(this.link).addTo(this.map)
+        // 添加图例
+        L.control.linkLegend({position: 'topright'}).addTo(this.map)
     }
 
     initInter = () => {
@@ -37,20 +40,20 @@ export default class LvqiMap extends Component {
 
     setLink = (link_state) => {
         link_state.forEach( (e, i) => {
-            this.link[i].setStyle({ color: LINK_COLOR[parseInt(e.STATEINDEX / 2)] })
+            this.link[i].setStyle({ color: LINK_COLOR[parseInt(e.stateindex / 2)] })
         })
     }
 
     setInter = (inter_state) => {
 
         inter_state.forEach( (e, i) => {
-            if( e.AVG_DELAY > 120 ){
+            if( e.avg_delay > 120 ){
                 this.inter[i].setStyle({ color: LINK_COLOR[4] })
-            }else if( e.AVG_DELAY > 90 ){
+            }else if( e.avg_delay > 90 ){
                 this.inter[i].setStyle({ color: LINK_COLOR[3] })
-            }else if( e.AVG_DELAY > 60 ){
+            }else if( e.avg_delay > 60 ){
                 this.inter[i].setStyle({ color: LINK_COLOR[2] })
-            }else if( e.AVG_DELAY > 30 ){
+            }else if( e.avg_delay > 30 ){
                 this.inter[i].setStyle({ color: LINK_COLOR[1] })
             }else{
                 this.inter[i].setStyle({ color: LINK_COLOR[0] })

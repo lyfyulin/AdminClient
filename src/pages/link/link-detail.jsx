@@ -1,12 +1,17 @@
 import React, { Component } from 'react'
-import { Card, Icon, List, Button, Modal } from 'antd'
+import { Card, Icon, Input, Select, Button, Modal, message, Form } from 'antd'
 import LinkButton from '../../components/link-button'
 import L from 'leaflet'
-import { TMS, MAP_CENTER } from '../../utils/baoshan'
+import '../../utils/leaflet/LeafletEditable'
+import { TMS, MAP_CENTER, LINK_TYPE } from '../../utils/baoshan'
+import memoryUtils from '../../utils/memoryUtils'
+import { reqLinkById, reqNodes, reqUpdateLink, reqInsertLink } from '../../api'
+import { Str2LatLng } from '../../utils/lnglatUtils'
 
-const Item = List.Item
+const Item = Form.Item
+const Option = Select.Option
 
-export default class LinkDetail extends Component {
+class LinkDetail extends Component {
 
     constructor(props) {
         super(props)
@@ -14,46 +19,122 @@ export default class LinkDetail extends Component {
     }
 
     state = {
-        map_visible: false
-    }
-
-    componentDidMount() {
-
-        window.onload = () => {
-            if(!this.map){
-                this.map = L.map('map', {
-                    center: MAP_CENTER,
-                    zoom: 14
-                })
-                L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
-                this.node_location = L.circle([25.12, 99.175], {radius:20}).addTo(this.map)
-                this.map.on("click", (e) => {
-                    console.log("clicked:", e)
-                })
-                this.map._onResize()
-            }
-        }
-    }
-
-    location = () => {
-        this.setState({ map_visible: true })
-        if(!this.map){
-            this.map = L.map('map', {
-                center: [25.12, 99.175],
-                zoom: 14,
-            })
-            L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
-            this.node_location = L.circle([25.12, 99.175], {radius:20}).addTo(this.map)
-            this.map.on("click", (e) => {
-                console.log("clicked:", e)
-            })
-            this.map._onResize()
-        }
+        link: memoryUtils.link||{},
+        map_visible: false,
+        isUpdate: false,
+        nodes: [],
+        value: undefined,
     }
     
+    // 根据ID获取路段详情
+    loadLink = async (link_id) => {
+        const result = await reqLinkById(link_id)
+        if(result.code === 1){
+            const link = result.data
+            this.setState({
+                link,
+            })
+        }else{
+            message.error(result.message)
+        }
+    }
+
+    // 加载点位
+    loadNodes = async () => {
+        const result = await reqNodes()
+        if(result.code === 1){
+            let nodes = result.data
+            this.setState({ nodes })            
+        }
+    }
+
+    // 初始化地图 包括加载link
+    initMap = () => {
+        const { link } = this.state
+        if(!this.map){
+            this.map = L.map('map', {
+                editable: true,
+                center: MAP_CENTER,
+                zoom: 14,
+                zoomControl: false,
+                attributionControl: false,
+            })
+            L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
+            this.map._onResize()
+            this.setLink()
+        }
+    }
+
+    // 将link映射到地图上
+    setLink = () => {
+        const { link } = this.state
+        this.polyline = L.polyline(Str2LatLng(link.link_sequence||"99.175,25.12;99.175,25.122"), {color:'#f00'}).addTo(this.map)
+        this.polyline.enableEdit()
+        this.polyline.on('editable:vertex:dragend', (e) => {
+            let link_lnglats = e.vertex.latlngs.map( e=> [e.lng.toFixed(7), e.lat.toFixed(7)])
+            link.link_sequence = link_lnglats.map( e=> e.join(",")).join(";")
+            this.setState({ link })
+        })
+        this.map.fitBounds(this.polyline.getBounds())
+        this.map.setZoom(15)
+    }
+    
+    // link 修改
+    linkLocation = () => {
+        this.setState({ map_visible: true })
+        this.initMap()
+    }
+
+    // 表单点位过滤
+    handleFilter = (inputValue, option) => {
+        if(!/[a-zA-Z]/.test(inputValue)){
+            return option.props.children.indexOf(inputValue) === -1?false:true
+        }
+    }
+
+    // 点位选择
+    handleChange = value => {
+        this.setState({ value })
+    }
+    
+    // 提交修改
+    handleSubmit = ( event ) => {
+        event.preventDefault()
+        const {isUpdate} = this.state
+        this.props.form.validateFields( async (error, values) => {
+            if( !error ){
+                let { link } = this.state
+                const result = isUpdate?await reqUpdateLink({ ...link, ...values }):await reqInsertLink({ ...link, ...values })
+                if(result.code === 1){
+                    message.success(isUpdate?"更新路段成功！":"添加路段成功！")
+                    this.props.history.replace("/link")
+                }else{
+                    message.error(result.message)
+                }
+            }
+        } )
+    }
+
+    componentWillMount() {
+        let { link } = this.state
+        this.loadNodes()
+        if( link.link_id ){
+            this.setState({ isUpdate: true })
+            this.loadLink(link.link_id)
+        }
+    }
+
+    componentWillUnmount() {
+        this.setState = (state, callback) => {
+            return
+        }
+    }
+
     render() {
 
-        const { map_visible } = this.state
+        const { getFieldDecorator }  = this.props.form
+
+        const { map_visible, link, nodes } = this.state
 
         const title = (
             <span>
@@ -65,13 +146,52 @@ export default class LinkDetail extends Component {
             </span>
         )
 
+        // 表单行样式
+        const layout = {
+            labelCol: { span: 8 },
+            wrapperCol: { span: 8 },
+        }
+
+        const tailLayout = {
+            wrapperCol: { offset: 10, span: 12 },
+        }
+
+        const options = nodes.map(node => <Option key={node.node_id} value={node.node_id}>{node.node_name}</Option>)
+
         return (
-            <Card title={title} >
-                <List>
-                    <Item>
-                        <Button onClick={ this.location }> 定位 </Button>
+            <Card className="full" title={title} >
+                <Form
+                    { ...layout }
+                    onSubmit = { this.handleSubmit }
+                >
+                    <Item label="路段名称">
+                        {
+                            getFieldDecorator("link_name", {
+                                initialValue: link.link_name || '',
+                            })(
+                                <Input />
+                            )
+                        }
+                    </Item>
+                    <Item label="路段类型">
+                        {
+                            getFieldDecorator("link_type", {
+                                initialValue: link.link_type || 1,
+                            })(
+                                <Select>
+                                    {
+                                        LINK_TYPE.map( (opt, index) => (
+                                            <Option key={ index } value={ index + 1 }>{ opt }</Option>
+                                        ) )
+                                    }
+                                </Select>
+                            )
+                        }
+                    </Item>
+                    <Item label="路段形状">
+                        <Button onClick={ this.linkLocation }> 修改 </Button>
                         <Modal
-                            title = { "定位" }
+                            title = { "修改路段" }
                             onOk = {()=>this.setState({ map_visible: false })}
                             onCancel = {()=>this.setState({ map_visible: false })}
                             visible = { map_visible }
@@ -80,11 +200,49 @@ export default class LinkDetail extends Component {
                             <div style = {{ width: '100%', height: 300 }} id="map">  </div>
                         </Modal>
                     </Item>
-                    <Item>
-
+                    <Item label="路段长度">
+                        {
+                            getFieldDecorator("link_length", {
+                                initialValue: link.link_length || '',
+                            })(
+                                <Input suffix="米"/>
+                            )
+                        }
                     </Item>
-                </List>
+                    <Item label="起始点位">
+                        {
+                            getFieldDecorator("start_node", {
+                                initialValue: link.start_node || '',
+                            })(
+                                <Select showSearch filterOption={ this.handleFilter } style={{ width: '100%' }} onChange={this.handleChange}>
+                                    {
+                                        options
+                                    }
+                                </Select>
+                            )
+                        }
+                    </Item>
+                    <Item label="结束点位">
+                        {
+                            getFieldDecorator("end_node", {
+                                initialValue: link.end_node || '',
+                            })(
+                                <Select showSearch filterOption={ this.handleFilter } style={{ width: '100%' }} onChange={this.handleChange}>
+                                    {
+                                        options
+                                    }
+                                </Select>
+                            )
+                        }
+                    </Item>
+
+                    <Item { ...tailLayout }>
+                        <Button htmlType="submit"> 提交 </Button>
+                    </Item>
+                </Form>
             </Card>
         )
     }
 }
+
+export default Form.create()(LinkDetail)

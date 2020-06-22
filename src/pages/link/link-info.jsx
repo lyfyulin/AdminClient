@@ -1,9 +1,13 @@
 import React, { Component } from 'react'
-import { Table } from 'antd'
+import { Table, message, Icon } from 'antd'
 import L from 'leaflet'
-import './link-info.less'
 import LinkButton from '../../components/link-button'
 import { TMS, MAP_CENTER } from '../../utils/baoshan'
+import { reqLinks } from '../../api'
+import memoryUtils from '../../utils/memoryUtils'
+import '../../utils/leaflet/LeafletLegend'
+import _ from 'lodash'
+import './link.less'
 
 export default class LinkInfo extends Component {
 
@@ -12,20 +16,25 @@ export default class LinkInfo extends Component {
         links: [],
     }
 
+    // 初始化路段列
     initColumns = () => {
         return [{
             title: '路段名称',
-            dataIndex: 'name'
+            width: 200,
+            dataIndex: 'link_name',
         },{
             title: '路段详情',
-            render: intersection => (<span>
+            width: 100,
+            render: link => (<span>
                 <LinkButton onClick = { () => {
-                    this.props.history.push("/link/detail")
+                    memoryUtils.link = link
+                    this.props.history.push({ pathname: "/link/detail/" + link.link_id })
                 } }>查看路段</LinkButton>
             </span>)
         },{
             title: '交通参数',
-            render: intersection => (<span>
+            width: 100,
+            render: link => (<span>
                 <LinkButton onClick = { () => {
                     this.props.history.push("/link/param")
                 } }>查看参数</LinkButton>
@@ -33,63 +42,74 @@ export default class LinkInfo extends Component {
         },]
     }
 
-    initLinks = () => {
-        const links = [{
-            id: 1,
-            name: "正阳路-保岫路路段",
-        },{
-            id: 2,
-            name: "正阳路-龙泉路路段",
-        },{
-            id: 3,
-            name: "正阳路-玉泉路路段",
-        },{
-            id: 4,
-            name: "正阳路-升阳路路段",
-        },{
-            id: 5,
-            name: "正阳路-人民路路段",
-        },{
-            id: 6,
-            name: "太保路-龙泉路路段",
-        },{
-            id: 7,
-            name: "太保路-玉泉路路段",
-        },{
-            id: 8,
-            name: "太保路-升阳路路段",
-        },{
-            id: 9,
-            name: "太保路-人民路路段",
-        },{
-            id: 10,
-            name: "太保路-人民路路段",
-        }]
-        this.setState({ 
-            links,
-        })
-    }
-
-    componentWillMount() {
-        this.columns = this.initColumns()
-        this.initLinks()
-    }
-
-    componentDidMount() {
-
+    // 初始化地图
+    initMap = () => {
         if(!this.map){
             this.map = L.map('map', {
                 center: MAP_CENTER,
-                zoom: 14
+                zoom: 14,
+                zoomControl: false,
+                attributionControl: false,
             })
-            L.tileLayer(TMS, {}).addTo(this.map)
+            L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
             this.map._onResize()
         }
+    }
 
+    // 加载路段列表数据
+    loadLinks = async () => {
+        const result = await reqLinks()
+        if(result.code === 1){
+            this.setLink(result.data)
+            this.setState({ 
+                links: result.data
+            })
+        }else{
+            message.error(result.message)
+        }
+    }
+
+    // 将路段添加到地图
+    setLink = (links) => {
+        this.link = []
+        links.forEach( link => {
+            const link_pts_string = link.link_sequence.trim().split(";")
+            let link_pts = []
+            link_pts_string.forEach( pt_string => {
+                let lat = parseFloat(pt_string.split(',')[1])
+                let lng = parseFloat(pt_string.split(',')[0])
+                link_pts.push([lat, lng])
+            } )
+            let link_polyline = L.polyline(link_pts, {color: 'grey'}).bindPopup(link.link_name)
+            this.link.push(link_polyline)
+        })
+        L.layerGroup(this.link).addTo(this.map)
+    }
+
+    onWindowResize = _.throttle(() => {
+        this.setState({ tableBodyHeight: window.innerHeight * 0.9 - 166  })
+    }, 800)
+
+    componentWillMount() {
+        this.columns = this.initColumns()
+        this.loadLinks()
+    }
+
+    componentDidMount() {
+        this.initMap()
+        window.addEventListener('resize', this.onWindowResize)
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.onWindowResize)
+        this.setState = (state, callback) => {
+            return
+        }
     }
 
     render() {
         const { loading, links } = this.state
+
         return (
             <div className = "lvqi-row1-col2">
                 <div className = "lvqi-col-2">
@@ -101,19 +121,23 @@ export default class LinkInfo extends Component {
                 </div>
                 <div className = "lvqi-col-2">
                     <div className="lvqi-card-title">
-                        路段列表
+                        路段列表        
+                        <Icon type="plus" style={{ float:'right' }} onClick={ () => {
+                            memoryUtils.link = {}
+                            this.props.history.push({ pathname: "/link/add" })
+                        } }></Icon>
                     </div>
                     <div className="lvqi-card-content" id="table">
                         <Table 
+                            style={{ wordBreak: 'break-all' }}
                             bordered = { true }
-                            rowKey = "id"
+                            rowKey = "link_id"
                             columns = { this.columns }
                             dataSource = { links }
                             loading = { loading }
                             pagination = { false }
-                            scroll={{ y: 480 }}
+                            scroll={{ y: window.innerHeight * 0.9 - 166 }}
                         >
-
                         </Table>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Redirect, Switch, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Icon, Dropdown, Menu } from 'antd'
+import { Icon, Dropdown, Menu, notification } from 'antd'
 
 import Home from './home'
 import Link from './link'
@@ -26,6 +26,38 @@ class Platform extends Component {
             { path: "/platform/device", name: "设备" },
         ]
     }
+
+    // 警告函数
+    openNotification = (type, message, description, goTo) => {
+        notification[type]({
+            message: message,
+            description: description,
+            placement: 'topRight',
+            duration: 3,
+            rtl: true,
+            onClick: () => {
+                this.props.history.replace(goTo)
+            },
+        })
+    }
+
+    componentDidMount() {
+        /*
+        setTimeout( () => {
+            this.openNotification('warning', '数据传输失效', '数据传输中断！', "/home")
+        }, 0)
+        setTimeout( () => {
+            this.openNotification('warning', '设备质量问题', '设备正阳路-保岫路北口、永昌路-保岫路南口设备识别率低，识别率为20.8%！', "/platform/device")
+        }, 2000)
+        setTimeout( () => {
+            this.openNotification('warning', '道路车均速度', '路网车均速度小于12.8%！', "/platform/link")
+        }, 4000)
+        setTimeout( () => {
+            this.openNotification('warning', '事故黑点', '永昌路-沙河路口事故数量较多，可作优化！', "/accidents")
+        }, 6000)
+        */
+    }
+    
 
     render() {
         const user = this.props.user
@@ -60,7 +92,7 @@ class Platform extends Component {
                             <Route path="/platform/tongqin" component={ Tongqin }></Route>
                         </Switch>
                     </div>
-                    <div className="footer">Copyright ©2019年 杭州绿启交通科技有限公司. 版权所有</div>
+                    <div className="footer">Copyright ©2020年 保山交警支队. 版权所有</div>
                 </div>
             )
         }
