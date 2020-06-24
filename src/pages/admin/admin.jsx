@@ -7,7 +7,6 @@ import LeftNav from '../../components/left-nav'
 import Header from '../../components/header'
 import Home from '../home/home'
 import Category from '../category/category'
-import Product from '../product/product'
 import Role from '../role/role'
 import User from '../user/user'
 import RoadState from '../charts/roadstate'
@@ -18,11 +17,11 @@ import Accidents from '../accidents/accidents'
 import Area from '../area/area'
 import Device from '../device/device'
 import SearchData from '../search/search-data'
-import NodeInfo from '../node/node-info'
 import Node from '../node/node'
 import Trajectory from '../trajectory/trajectory'
 import NodeSignal from '../node-signal/node-signal'
 import Line from '../line/line'
+import Strategy from '../strategy/strategy'
 
 const { Content, Footer, Sider } = Layout
 
@@ -49,7 +48,7 @@ class Admin extends Component {
                         <Switch>
                             <Route path="/home" component={ Home }></Route>
                             <Route path="/category" component={ Category }></Route>
-                            <Route path="/product" component={ Product }></Route>
+                            <Route path="/strategy" component={ Strategy }></Route>
                             <Route path="/role" component={ Role }></Route>
                             <Route path="/user" component={ User }></Route>
                             {/* <Route path="/charts/roadstate" component={ RoadState }></Route> */}

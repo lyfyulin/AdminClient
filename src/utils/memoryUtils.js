@@ -13,5 +13,6 @@ export default {
     line: {},
     device: {},
     node_schema: {},
+    strategy: {},
 }
 

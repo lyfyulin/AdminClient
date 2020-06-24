@@ -66,6 +66,8 @@ export default class PictureWall extends Component {
             }
         } else if ( file.status === "removed" ){
             const result = await reqDeleteImage( file.name )
+            console.log(result);
+            
             if( result.code === 1 ){
                 message.success(" 删除图片成功！ ")
             } else {
@@ -101,7 +103,7 @@ export default class PictureWall extends Component {
         return (
             <div className="clearfix">
                 <Upload
-                    action = "/image/upload"              // 上传 url
+                    action = "/upload/image"              // 上传 url
                     name = "image"                  // 图片文件 的参数名
                     listType="picture-card"              // 显示风格   picture    picture-card
                     fileList={fileList}             // 文件信息对象的数组

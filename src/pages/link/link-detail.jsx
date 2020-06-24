@@ -3,7 +3,7 @@ import { Card, Icon, Input, Select, Button, Modal, message, Form } from 'antd'
 import LinkButton from '../../components/link-button'
 import L from 'leaflet'
 import '../../utils/leaflet/LeafletEditable'
-import { TMS, MAP_CENTER, LINK_TYPE } from '../../utils/baoshan'
+import { TMS, MAP_CENTER, LINK_TYPE, LINK_CONFIG } from '../../utils/baoshan'
 import memoryUtils from '../../utils/memoryUtils'
 import { reqLinkById, reqNodes, reqUpdateLink, reqInsertLink } from '../../api'
 import { Str2LatLng } from '../../utils/lnglatUtils'
@@ -68,10 +68,11 @@ class LinkDetail extends Component {
     // 将link映射到地图上
     setLink = () => {
         const { link } = this.state
-        this.polyline = L.polyline(Str2LatLng(link.link_sequence||"99.175,25.12;99.175,25.122"), {color:'#f00'}).addTo(this.map)
+        link.link_sequence = link.link_sequence?link.link_sequence:"25.122,99.175;25.12,99.175"
+        this.polyline = L.polyline(Str2LatLng(link.link_sequence), {...LINK_CONFIG}).addTo(this.map)
         this.polyline.enableEdit()
         this.polyline.on('editable:vertex:dragend', (e) => {
-            let link_lnglats = e.vertex.latlngs.map( e=> [e.lng.toFixed(7), e.lat.toFixed(7)])
+            let link_lnglats = e.vertex.latlngs.map( e=> [e.lat.toFixed(7), e.lng.toFixed(7)])
             link.link_sequence = link_lnglats.map( e=> e.join(",")).join(";")
             this.setState({ link })
         })
@@ -104,13 +105,20 @@ class LinkDetail extends Component {
         this.props.form.validateFields( async (error, values) => {
             if( !error ){
                 let { link } = this.state
-                const result = isUpdate?await reqUpdateLink({ ...link, ...values }):await reqInsertLink({ ...link, ...values })
-                if(result.code === 1){
-                    message.success(isUpdate?"更新路段成功！":"添加路段成功！")
-                    this.props.history.replace("/link")
+                if(isUpdate || link.link_sequence){
+                    console.log(link, values);
+                    
+                    const result = isUpdate?await reqUpdateLink({ ...link, ...values }):await reqInsertLink({ ...link, ...values })
+                    if(result.code === 1){
+                        message.success(isUpdate?"更新路段成功！":"添加路段成功！")
+                        this.props.history.replace("/link")
+                    }else{
+                        message.error(result.message)
+                    }
                 }else{
-                    message.error(result.message)
+                    message.error("请选择路段形状！")
                 }
+
             }
         } )
     }

@@ -110,12 +110,12 @@ export default class DeviceInfo extends Component {
     }
 
     onWindowResize = _.throttle(() => {
-        this.setState({ tableBodyHeight: window.innerHeight * 0.9 - 166  })
+        this.setState({ tableBodyHeight: window.innerHeight - 200  })
     }, 800)
     
     componentDidMount() {
         this.initMap()
-        this.setState({ tableBodyHeight: window.innerHeight * 0.9 - 166 })
+        this.setState({ tableBodyHeight: window.innerHeight - 200 })
         window.addEventListener('resize', this.onWindowResize)
     }
     componentWillUnmount() {

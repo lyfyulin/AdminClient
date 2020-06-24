@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Table, message, Icon } from 'antd'
 import L from 'leaflet'
 import LinkButton from '../../components/link-button'
-import { TMS, MAP_CENTER, AREA_CONFIG } from '../../utils/baoshan'
+import { TMS, MAP_CENTER, AREA_CONFIG, AREA_BLINK_CONFIG } from '../../utils/baoshan'
 import { reqAreas } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import '../../utils/leaflet/LeafletLegend'
@@ -16,6 +16,7 @@ export default class AreaInfo extends Component {
     state = {
         loading: false,
         areas: [],
+        tableBodyHeight: 480
     }
 
     // 初始化区域列
@@ -67,7 +68,7 @@ export default class AreaInfo extends Component {
     }
 
     // 加载区域列表数据
-    loadAreas = async () => {
+    load_areas = async () => {
         const result = await reqAreas()
         if(result.code === 1){
             const areas = result.data.map( (e, index) => ({ index: index, ...e }) )
@@ -84,7 +85,7 @@ export default class AreaInfo extends Component {
     setArea = (areas) => {
         this.area = []
         areas.forEach( area => {
-            const area_pts_string = area.area_sequence.trim().split(";")
+            const area_pts_string = area.area_sequence?area.area_sequence.trim().split(";"):"99.175,25.12;99.175,25.122;99.176,25.122".split(";")
             let area_pts = []
             area_pts_string.forEach( pt_string => {
                 let lat = parseFloat(pt_string.split(',')[1])
@@ -100,23 +101,24 @@ export default class AreaInfo extends Component {
     
     areaBlink = (area) => {
         this.map.fitBounds(this.area[area.index].getBounds())
-        this.area[area.index].setStyle({ color: AREA_CONFIG.blink })
+        this.area[area.index].setStyle({ ...AREA_BLINK_CONFIG })
         setTimeout( () => {
             this.area[area.index].setStyle({  ...AREA_CONFIG  })
         }, 1000 )
     }
 
     onWindowResize = _.throttle(() => {
-        this.setState({ tableBodyHeight: window.innerHeight * 0.9 - 166  })
+        this.setState({ tableBodyHeight: window.innerHeight - 200  })
     }, 800)
 
     componentWillMount() {
         this.columns = this.initColumns()
-        this.loadAreas()
+        this.load_areas()
     }
 
     componentDidMount() {
         this.initMap()
+        this.setState({ tableBodyHeight: window.innerHeight - 200  })
         window.addEventListener('resize', this.onWindowResize)
     }
     componentWillUnmount() {
@@ -126,7 +128,7 @@ export default class AreaInfo extends Component {
         }
     }
     render() {
-        const { loading, areas } = this.state
+        const { loading, areas, tableBodyHeight } = this.state
 
         return (
             <div className = "lvqi-row1-col2">
@@ -154,7 +156,7 @@ export default class AreaInfo extends Component {
                             dataSource = { areas }
                             loading = { loading }
                             pagination = { false }
-                            scroll={{ y: window.innerHeight * 0.9 - 166 }}
+                            scroll={{ y: tableBodyHeight }}
                         >
                         </Table>
                     </div>

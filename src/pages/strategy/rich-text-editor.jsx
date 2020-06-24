@@ -23,7 +23,7 @@ export default class RichTextEditor extends Component {
         this.setState({
             editorState,
         })
-    }, 500 )
+    }, 100 )
 
     getDetail = () => {
         const { editorState } = this.state
@@ -35,7 +35,7 @@ export default class RichTextEditor extends Component {
         return new Promise(
             (resolve, reject) => {        // 执行器，执行异步任务。
                 const xhr = new XMLHttpRequest()
-                xhr.open('POST', '/upload')
+                xhr.open('POST', '/upload/image')
                 xhr.setRequestHeader('Authorization', 'Client-ID XXXXX')
                 const data = new FormData()
                 data.append('image', file)

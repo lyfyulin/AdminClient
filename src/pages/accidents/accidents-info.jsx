@@ -21,6 +21,7 @@ class AccidentsInfo extends Component {
     state = {
         accidents: [],
         loading: false,
+        tableBodyHeight: 480,
         illegal_behavior: [{
             title: '无违法行为',
             value: '1',
@@ -171,6 +172,10 @@ class AccidentsInfo extends Component {
         } )
     }
 
+    onWindowResize = _.throttle(() => {
+        this.setState({ tableBodyHeight: window.innerHeight - 200  })
+    }, 800)
+
     componentWillMount() {
         this.initColumns()
     }
@@ -178,11 +183,18 @@ class AccidentsInfo extends Component {
     componentDidMount() {
         this.initMap()
         this.loadAccidents()
+        this.setState({ tableBodyHeight: window.innerHeight - 200  })
+        window.addEventListener('resize', this.onWindowResize)
     }
-
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.onWindowResize)
+        this.setState = (state, callback) => {
+            return
+        }
+    }
     render() {
 
-        const { accidents, loading, illegal_behavior } = this.state
+        const { accidents, loading, illegal_behavior, tableBodyHeight } = this.state
 
         const { getFieldDecorator } = this.props.form
 
@@ -427,6 +439,7 @@ class AccidentsInfo extends Component {
                             columns = { this.columns }
                             dataSource = { accidents }
                             loading = { loading }
+                            scroll={{ y: tableBodyHeight }}
                         >
                         </Table>
                     </div>

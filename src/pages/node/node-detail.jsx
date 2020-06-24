@@ -96,8 +96,6 @@ class NodeDetail extends Component {
         this.props.form.validateFields( async (err, values) => {
             if( !err ){
                 let node_info = this.convertData(values)
-                console.log(node_info);
-                
                 const result = isUpdate?await reqUpdateNode(node_info):await reqInsertNode(node_info)
                 if(result.code === 1){
                     message.success(isUpdate?"更新点位成功！":"添加点位成功！")
@@ -126,15 +124,24 @@ class NodeDetail extends Component {
     loadNodeById = async(node_id) => {
         const result = await reqNodeById(node_id)
         if(result.code === 1){
-            let direction_list = result.data.directions.map( e => e.direction + '' )
-            let direction_lane_dir = result.data.directions.map( e => e.entry_main_num )
-            let node = result.data
-            this.setState({
-                node,
-                direction_list,
-                direction_lane_dir
-            })
-            this.node_depict.draw(node)
+            if(result.data.directions.length > 1){
+                let direction_list = result.data.directions.map( e => e.direction + '' )
+                let direction_lane_dir = result.data.directions.map( e => e.entry_main_num )
+                let node = result.data
+                this.setState({
+                    node,
+                    direction_list,
+                    direction_lane_dir
+                })
+                this.node_depict.draw(node)
+            }else{
+                let node = result.data
+                node.directions = this.state.direction_list.map( item => ({title: DIRECTION_LIST[item - 1], key: item, value: item, direction: item}))
+                this.setState({
+                    node
+                })
+            }
+
         }else{
             message.error(result.message)
         }
@@ -169,8 +176,7 @@ class NodeDetail extends Component {
             node_directions = direction_list.map( (item, key) => ({title: DIRECTION_LIST[item - 1], key: item, value: item, ...node.directions[item - 1]}))
         }
 
-        console.log(node_directions)
-        
+        // console.log(node_directions)
 
         const formLayout = {
             labelCol : { span: 11 } ,

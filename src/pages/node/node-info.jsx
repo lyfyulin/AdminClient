@@ -3,26 +3,31 @@ import { Table, message, Icon } from 'antd'
 import L from 'leaflet'
 import LinkButton from '../../components/link-button'
 import { reqNodes } from '../../api'
-import { TMS, MAP_CENTER } from '../../utils/baoshan'
+import { TMS, MAP_CENTER, NODE_CONFIG } from '../../utils/baoshan'
 import memoryUtils from '../../utils/memoryUtils'
+import _ from 'lodash'
 
 import './node-info.less'
 import 'leaflet/dist/leaflet.css'
+import { bd09togcj02 } from '../../utils/lnglatUtils'
 
 export default class NodeInfo extends Component {
 
     state = {
         loading: false,
         nodes: [],
+        tableBodyHeight: 480,
     }
 
     // 初始化表格列
     initColumns = () => {
         return [{
             title: '交叉口名称',
-            dataIndex: 'node_name'
+            dataIndex: 'node_name',
+            width: 200,
         },{
             title: '几何布局',
+            width: 100,
             render: node => (
                 <LinkButton onClick = { () => {
                     memoryUtils.node = node
@@ -31,6 +36,7 @@ export default class NodeInfo extends Component {
             )
         },{
             title: '流量信息',
+            width: 100,
             render: node => (
                 <LinkButton onClick = { async () => {
                     memoryUtils.node = node
@@ -58,9 +64,14 @@ export default class NodeInfo extends Component {
     setNode = (nodes) => {
         this.node = []
         nodes.forEach( e => {
-            let lat = parseFloat(e.node_lng_lat.split(',')[1])
-            let lng = parseFloat(e.node_lng_lat.split(',')[0])
-            this.node.push( L.circle([lat, lng], {color: 'red', fillOpacity: 1, radius: 30}).bindPopup(e.node_name) )
+
+            let tmp_lat = parseFloat(e.node_lng_lat.split(',')[1])
+            let tmp_lng = parseFloat(e.node_lng_lat.split(',')[0])
+
+            let lat = bd09togcj02(tmp_lng, tmp_lat)[1]
+            let lng = bd09togcj02(tmp_lng, tmp_lat)[0]
+
+            this.node.push( L.circle([lat, lng], {...NODE_CONFIG}).bindPopup(e.node_name) )
         })
         L.layerGroup(this.node).addTo(this.map)
     }
@@ -83,12 +94,19 @@ export default class NodeInfo extends Component {
         this.columns = this.initColumns()
         this.loadNodes()
     }
+
+    onWindowResize = _.throttle(() => {
+        this.setState({ tableBodyHeight: window.innerHeight - 200  })
+    }, 800)
     
     componentDidMount() {
         this.initMap()
+        this.setState({ tableBodyHeight: window.innerHeight - 200 })
+        window.addEventListener('resize', this.onWindowResize)
     }
 
     componentWillUnmount = () => {
+        window.removeEventListener('resize', this.onWindowResize)
         this.setState = (state, callback) => {
             return
         }
@@ -96,7 +114,7 @@ export default class NodeInfo extends Component {
     
 
     render() {
-        const { loading, nodes } = this.state
+        const { loading, nodes, tableBodyHeight } = this.state
         return (
             <div className = "lvqi-row1-col2">
                 <div className = "lvqi-col-2">
@@ -122,7 +140,7 @@ export default class NodeInfo extends Component {
                             dataSource = { nodes }
                             loading = { loading }
                             pagination = { false }
-                            scroll={{ y: 480 }}
+                            scroll={{ y: tableBodyHeight }}
                         >
                         </Table>
                     </div>

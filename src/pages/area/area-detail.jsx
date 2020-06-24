@@ -3,7 +3,7 @@ import { Card, Icon, Input, Select, Button, Modal, message, Form, TreeSelect } f
 import LinkButton from '../../components/link-button'
 import L from 'leaflet'
 import { reqAreaById, reqNodes, reqUpdateArea, reqLinks, reqInsertArea } from '../../api'
-import { TMS, MAP_CENTER, LINK_TYPE } from '../../utils/baoshan'
+import { TMS, MAP_CENTER, LINK_TYPE, AREA_CONFIG } from '../../utils/baoshan'
 import '../../utils/leaflet/LeafletEditable'
 import memoryUtils from '../../utils/memoryUtils'
 import { Str2LatLng } from '../../utils/lnglatUtils'
@@ -72,7 +72,6 @@ class AreaDetail extends Component {
             })
             L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
             this.map._onResize()
-            
             this.setAreaPts()
         }
     }
@@ -80,7 +79,9 @@ class AreaDetail extends Component {
     // 将area映射到地图上
     setAreaPts = () => {
         const { area } = this.state
-        this.polygon = L.polygon(Str2LatLng(area.area_sequence||"99.175,25.12;99.175,25.122;99.176,25.122"), {color:'#f00'}).addTo(this.map)
+        area.area_sequence = area.area_sequence?area.area_sequence:"99.175,25.12;99.175,25.122;99.176,25.122"
+        this.setState({ area })
+        this.polygon = L.polygon(Str2LatLng(area.area_sequence), {...AREA_CONFIG}).addTo(this.map)
         this.polygon.enableEdit()
         this.polygon.on('editable:vertex:dragend', (e) => {
             let area_lnglats = e.vertex.latlngs.map( e=> [e.lng.toFixed(7), e.lat.toFixed(7)])
@@ -124,12 +125,17 @@ class AreaDetail extends Component {
         this.props.form.validateFields( async (error, values) => {
             if( !error ){
                 let { area } = this.state
-                const result = isUpdate?await reqUpdateArea({ ...area, ...values }):await reqInsertArea({ ...area, ...values })
-                if(result.code === 1){
-                    message.success(isUpdate?"更新区域成功！":"添加区域成功！")&&this.props.history.replace("/area")
+                if(isUpdate || area.area_sequence){
+                    const result = isUpdate?await reqUpdateArea({ ...area, ...values }):await reqInsertArea({ ...area, ...values })
+                    if(result.code === 1){
+                        message.success(isUpdate?"更新区域成功！":"添加区域成功！")&&this.props.history.replace("/area")
+                    }else{
+                        message.error(result.message)
+                    }
                 }else{
-                    message.error(result.message)
+                    message.error("请选择区域形状!")
                 }
+
             }
         } )
     }

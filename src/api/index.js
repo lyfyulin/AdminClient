@@ -57,7 +57,7 @@ export const reqCategory = (categoryId) => ajax( base + "/product/info", {
     }
 } )
 
-export const reqDeleteImage = ( image ) => ajax.post( base + '/image/delete', { image } )
+export const reqDeleteImage = ( image_name ) => ajax.post( base + '/delete/image', { image_name } )
 
 export const reqAddUpdateProduct = (product) => ajax.post(
      base + (product.id?'/update/good':'/insert/good'),
@@ -443,6 +443,30 @@ export const reqDeleteAccidentParty = (party_id) => ajax.post( base + "/delete/a
 export const reqDeleteAllAccidentParty = (accident_id) => ajax.post( base + "/delete/accident/parties", {accident_id} )
 
 
+export const reqStrategies = () => ajax( base + "/strategy/list" )	
+export const reqStrategyById = ( strategy_id ) => ajax( base + "/strategy/info", {
+    params: {
+        strategy_id
+    }
+} )	
+export const reqInsertStrategy = ( strategy ) => ajax.post( base + "/insert/strategy",
+    JSON.stringify(strategy),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)
+export const  reqUpdateStrategy = ( strategy ) => ajax.post( base + "/update/strategy",
+    JSON.stringify(strategy),
+    {
+        headers: {
+            "Content-Type": 'application/json'
+        },
+    }
+)
+export const reqDeleteStrategy = ( strategy_id ) => ajax.post( base + "/delete/strategy", { strategy_id } )
+
 // state
 export const reqTodayRdnetState = () => ajax( base + "/rdnet/today/avg_speed")
 
@@ -648,11 +672,7 @@ export const  reqUpdateArea = ( area ) => ajax.post( base + "/update/area",
     }
 )
 
-export const reqDeleteArea = ( area_id ) => ajax.post( base + "/delete/area", {
-    params: {
-        area_id
-    }
-} )
+export const reqDeleteArea = ( area_id ) => ajax.post( base + "/delete/area", { area_id } )
 
 
 
@@ -717,8 +737,6 @@ export const reqLineSchemaDisorderRateSearch = ( start_time , end_time , line_sc
 
 
 // schema
-
-
 export const reqNodeSchemas = ( node_id ) => ajax( base + "/node/schema/list", {
     params: {
         node_id
@@ -866,7 +884,8 @@ export const reqSearchData = ( search_keys ) => ajax( base + "/search/data", {
 } )
 
 
-
+// warning
+export const reqWarning = () => ajax( base + "/warning" )
 
 
 

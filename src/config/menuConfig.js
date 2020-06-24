@@ -56,6 +56,11 @@ const menuList = [
         icon: 'area-chart'
     },
     {
+        title: '安全策略',
+        key: '/strategy',
+        icon: 'area-chart'
+    },
+    {
         title: '数据平台',
         key: '/platform',
         icon: 'area-chart'

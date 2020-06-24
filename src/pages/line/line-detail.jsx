@@ -3,7 +3,7 @@ import { Card, Icon, Input, Select, Button, Modal, message, Form, TreeSelect } f
 import LinkButton from '../../components/link-button'
 import L from 'leaflet'
 import { reqLineById, reqNodes, reqUpdateLine, reqLinks, reqInsertLine } from '../../api'
-import { TMS, MAP_CENTER, LINK_TYPE, LINE_DIR } from '../../utils/baoshan'
+import { TMS, MAP_CENTER, LINK_TYPE, LINE_DIR, LINK_CONFIG } from '../../utils/baoshan'
 import '../../utils/leaflet/LeafletEditable'
 import memoryUtils from '../../utils/memoryUtils'
 import { Str2LatLng } from '../../utils/lnglatUtils'
@@ -68,7 +68,9 @@ class LineDetail extends Component {
     // 将line映射到地图上
     setLinePts = () => {
         const { line } = this.state
-        this.polyline = L.polyline(Str2LatLng(line.line_sequence|| "99.175,25.12;99.175,25.122"), {color:'#f00'}).addTo(this.map)
+        line.line_sequence = line.line_sequence?line.line_sequence:"99.175,25.12;99.175,25.122"
+        this.setState({ line })
+        this.polyline = L.polyline(Str2LatLng(line.line_sequence), {...LINK_CONFIG}).addTo(this.map)
         this.polyline.enableEdit()
         this.polyline.on('editable:vertex:dragend', (e) => {
             let line_lnglats = e.vertex.latlngs.map( e=> [e.lng.toFixed(7), e.lat.toFixed(7)])
@@ -107,12 +109,16 @@ class LineDetail extends Component {
         this.props.form.validateFields( async (error, values) => {
             if( !error ){
                 let { line } = this.state
-                const result = isUpdate?await reqUpdateLine({ ...line, ...values }):await reqInsertLine({ ...line, ...values })
-                if(result.code === 1){
-                    message.success(isUpdate?"更新干线成功！":"添加干线成功！")
-                    this.props.history.replace("/line")
+                if(isUpdate || line.line_sequence){
+                    const result = isUpdate?await reqUpdateLine({ ...line, ...values }):await reqInsertLine({ ...line, ...values })
+                    if(result.code === 1){
+                        message.success(isUpdate?"更新干线成功！":"添加干线成功！")
+                        this.props.history.replace("/line")
+                    }else{
+                        message.error(result.message)
+                    }
                 }else{
-                    message.error(result.message)
+                    message.error("请选择干线形状！")
                 }
             }
         } )

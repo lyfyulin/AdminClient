@@ -12,6 +12,7 @@ import Nonlocal from './nonlocal'
 import Od from './od'
 import './platform.less'
 import Tongqin from './tongqin'
+import { reqWarning } from '../../api'
 
 class Platform extends Component {
 
@@ -41,24 +42,31 @@ class Platform extends Component {
         })
     }
 
+    // 加载警告信息
+    load_warning = async() => {
+        const result = await reqWarning()
+        const warning = []
+
+        const {data_transfer, dev_school_time, not_miss_rate, link_state, rdnet_speed} = result
+
+        data_transfer.code === 1?warning.push(["数据传输！", "请检查数据传输模块！", "/platform/device"]):console.log("")        
+        dev_school_time.code === 1?warning.push(["设备校时", "请查看校时问题设备: " + dev_school_time.data.slice(0, 2).map( e => e.dev_name ).join(",") + " 等。", "/platform/device"]):console.log("")
+        link_state.code === 1?warning.push(["路段状态", "请查看状态较差路段: " + link_state.data.slice(0, 2).map( e => e.link_name ).join(",") + " 等。", "/platform/link"]):console.log("")
+        not_miss_rate.code === 1?warning.push(["设备传输", "请查看无数据回传设备: " + not_miss_rate.data.slice(0, 2).map( e => e.dev_name ).join(",") + " 等。", "/platform/device"]):console.log("")
+        rdnet_speed.code === 1?warning.push(["路网速度", "路网运行速度较低，为 " + rdnet_speed.data.toFixed(0, 2) + " km/h。", "/platform/link"]):console.log("")
+        
+        warning.map( (e,i) => {
+            setTimeout( () => {
+                this.openNotification('warning', e[0], e[1], e[2])
+            }, i * 2000 + 2000)
+        })
+        
+    }
+
     componentDidMount() {
-        /*
-        setTimeout( () => {
-            this.openNotification('warning', '数据传输失效', '数据传输中断！', "/home")
-        }, 0)
-        setTimeout( () => {
-            this.openNotification('warning', '设备质量问题', '设备正阳路-保岫路北口、永昌路-保岫路南口设备识别率低，识别率为20.8%！', "/platform/device")
-        }, 2000)
-        setTimeout( () => {
-            this.openNotification('warning', '道路车均速度', '路网车均速度小于12.8%！', "/platform/link")
-        }, 4000)
-        setTimeout( () => {
-            this.openNotification('warning', '事故黑点', '永昌路-沙河路口事故数量较多，可作优化！', "/accidents")
-        }, 6000)
-        */
+        this.load_warning()
     }
     
-
     render() {
         const user = this.props.user
         if(!user.user_id){

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Table, message, Icon } from 'antd'
 import L from 'leaflet'
 import LinkButton from '../../components/link-button'
-import { TMS, MAP_CENTER } from '../../utils/baoshan'
+import { TMS, MAP_CENTER, LINK_CONFIG } from '../../utils/baoshan'
 import { reqLinks } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import '../../utils/leaflet/LeafletLegend'
@@ -14,6 +14,7 @@ export default class LinkInfo extends Component {
     state = {
         loading: false,
         links: [],
+        tableBodyHeight: 480,
     }
 
     // 初始化路段列
@@ -73,21 +74,21 @@ export default class LinkInfo extends Component {
     setLink = (links) => {
         this.link = []
         links.forEach( link => {
-            const link_pts_string = link.link_sequence.trim().split(";")
+            const link_pts_string = link.link_sequence?link.link_sequence.trim().split(";"):"25.12,99.175;25.122,99.175".split(";")
             let link_pts = []
             link_pts_string.forEach( pt_string => {
-                let lat = parseFloat(pt_string.split(',')[1])
-                let lng = parseFloat(pt_string.split(',')[0])
+                let lat = parseFloat(pt_string.split(',')[0])
+                let lng = parseFloat(pt_string.split(',')[1])
                 link_pts.push([lat, lng])
             } )
-            let link_polyline = L.polyline(link_pts, {color: 'grey'}).bindPopup(link.link_name)
+            let link_polyline = L.polyline(link_pts, {...LINK_CONFIG}).bindPopup(link.link_name)
             this.link.push(link_polyline)
         })
         L.layerGroup(this.link).addTo(this.map)
     }
 
     onWindowResize = _.throttle(() => {
-        this.setState({ tableBodyHeight: window.innerHeight * 0.9 - 166  })
+        this.setState({ tableBodyHeight: window.innerHeight - 200  })
     }, 800)
 
     componentWillMount() {
@@ -97,6 +98,7 @@ export default class LinkInfo extends Component {
 
     componentDidMount() {
         this.initMap()
+        this.setState({ tableBodyHeight: window.innerHeight - 200  })
         window.addEventListener('resize', this.onWindowResize)
     }
 
@@ -108,7 +110,7 @@ export default class LinkInfo extends Component {
     }
 
     render() {
-        const { loading, links } = this.state
+        const { loading, links, tableBodyHeight } = this.state
 
         return (
             <div className = "lvqi-row1-col2">
@@ -136,7 +138,7 @@ export default class LinkInfo extends Component {
                             dataSource = { links }
                             loading = { loading }
                             pagination = { false }
-                            scroll={{ y: window.innerHeight * 0.9 - 166 }}
+                            scroll={{ y: tableBodyHeight }}
                         >
                         </Table>
                     </div>

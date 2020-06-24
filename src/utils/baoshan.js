@@ -14,13 +14,31 @@ export const TMS = "http://192.122.2.196:8080/map/{z}/{x}/{y}.png"
 export const LINK_COLOR = ['#35843e', '#87cc26', '#edee20', '#f58522', '#eb222c'];
 export const DEVICE_CONFIG = {
     radius: 10,
-    color: '#f00',
+    color: '#1DA57A',
     fillOpacity: 1,
     blink: '#0ff',      // 特显颜色
 }
 export const AREA_CONFIG = {
-    color: '#f00',
-    blink: '#0ff',
+    color: '#1DA57A',
+    strokeColor: '#1DA57A',
+    fillOpacity: 0.5,
+    strokeOpacity: 1,
+    opacity: 0.5,
+}
+export const AREA_BLINK_CONFIG = {
+    color: '#0f0',
+    strokeColor: '#0f0',
+    fillOpacity: 1,
+    strokeOpacity: 1,
+    opacity: 1,
+}
+
+export const NODE_CONFIG = {
+    color: '#1DA57A', fillOpacity: 1, radius: 30
+}
+
+export const LINK_CONFIG = {
+    color:'#1DA57A'
 }
 
 export const NODE_INFO = [[1, "白塔路与永昌路交叉口", 99.20772, 25.148551],
@@ -323,6 +341,11 @@ export const SEARCH_TIPS = {
     'device/rcg_rate': "设备识别率（15分钟）",
     'device/not_miss_rate': "设备传输率（15分钟）",
 }
+
+// strategy
+export const STRATEGY_TYPE = [
+    '人', '车', '路', '环境'
+]
 
 // device
 export const DEVICE_CAP_DIR = [
