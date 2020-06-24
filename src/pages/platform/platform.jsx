@@ -9,7 +9,6 @@ import Inter from './inter'
 import './platform.less'
 import Device from './device'
 import Nonlocal from './nonlocal'
-import Od from './od'
 import './platform.less'
 import Tongqin from './tongqin'
 import { reqWarning } from '../../api'
@@ -23,7 +22,6 @@ class Platform extends Component {
             { path: "/platform/link", name: "路段" },
             { path: "/platform/nonlocal", name: "外地车" },
             { path: "/platform/tongqin", name: "通勤车" },
-            { path: "/platform/od", name: "出行" },
             { path: "/platform/device", name: "设备" },
         ]
     }
@@ -96,7 +94,6 @@ class Platform extends Component {
                             <Route path="/platform/inter" component={ Inter }></Route>
                             <Route path="/platform/device" component={ Device }></Route>
                             <Route path="/platform/nonlocal" component={ Nonlocal }></Route>
-                            <Route path="/platform/od" component={ Od }></Route>
                             <Route path="/platform/tongqin" component={ Tongqin }></Route>
                         </Switch>
                     </div>

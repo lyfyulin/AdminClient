@@ -58,7 +58,7 @@ export default class StrategyDetail extends Component {
                         <span className = "detail-item-right">{strategy.create_time}</span>
                     </Item>
                     <Item>
-                        <span className = "detail-item-left">商品图片：</span>
+                        <span className = "detail-item-left">策略图片：</span>
                         <span className = "detail-item-right">
                         {
                             strategy.strategy_images_url?strategy.strategy_images_url.split(';').map( (image_url, index) => 

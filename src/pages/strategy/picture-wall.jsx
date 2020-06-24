@@ -103,7 +103,7 @@ export default class PictureWall extends Component {
         return (
             <div className="clearfix">
                 <Upload
-                    action = "/upload/image"              // 上传 url
+                    action = "http://192.122.2.196:3005/upload/image"              // 上传 url
                     name = "image"                  // 图片文件 的参数名
                     listType="picture-card"              // 显示风格   picture    picture-card
                     fileList={fileList}             // 文件信息对象的数组

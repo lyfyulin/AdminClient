@@ -93,7 +93,16 @@ export default class LvqiTable extends Component {
                                     </div>
                                 </List.Item>
                             ))):(<></>)
-                        ):<></>
+                        ):(
+                            data.length>0 && data[0]?(data.map( (e, i) => (
+                                <List.Item key={ i } style={{ height: itemHeight }} >
+                                    <div className="full lyf-center">
+                                        <div className="lyf-col-6 lyf-center lyf-font-1"> { e.name } </div>
+                                        <div className="lyf-col-4 lyf-center lyf-font-2"> { e.value } </div>
+                                    </div>
+                                </List.Item>
+                            ))):(<></>) 
+                        )
                     }
                 </List>
             </div>

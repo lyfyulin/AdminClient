@@ -4,8 +4,8 @@
 import ajax from './ajax'
 import jsonp from 'jsonp'
 import { message } from 'antd'
-// const base = 'http://192.122.2.196:3005'
-const base = 'http://192.122.1.246:3005'
+const base = 'http://192.122.2.196:3005'
+// const base = 'http://192.122.1.246:3005'
 export const reqLogin = (username, password) => ajax.post( base + "/login_verify", {username, password} )
 
 // jsonp 只能解决 GET 类型的 ajax 请求跨域问题

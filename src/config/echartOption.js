@@ -1,7 +1,8 @@
 import echarts from 'echarts'
 import 'echarts-liquidfill'
 
-export const BiAreaOption = ( x_data = [], y_data1 = [], y_data2 = [] ) => ({
+// 双面积图
+export const BiAreaOption = ( x_data = [], y_data1 = [], y_data2 = [], name1 = '出租车', name2 = '网约车' ) => ({
     tooltip : {
         trigger: 'axis',
         axisPointer: {
@@ -16,7 +17,7 @@ export const BiAreaOption = ( x_data = [], y_data1 = [], y_data2 = [] ) => ({
         },
     },
     legend: {
-        data:['出租车','网约车'],
+        data:[name1,name2],
         textStyle:{
             color: '#fff'
         },
@@ -78,14 +79,14 @@ export const BiAreaOption = ( x_data = [], y_data1 = [], y_data2 = [] ) => ({
     ],
     series : [
         {
-            name:'出租车',
+            name:name1,
             type:'line',
             stack: '车公里数',
             areaStyle: {},
             data: y_data1
         },
         {
-            name:'网约车',
+            name:name2,
             type:'line',
             stack: '车公里数',
             areaStyle: {},
@@ -94,6 +95,8 @@ export const BiAreaOption = ( x_data = [], y_data1 = [], y_data2 = [] ) => ({
     ]
 })
 
+
+// 面积图
 export const AreaOption = (  x_data = [], y_data = [], tip = "" ) => ({
     tooltip: {
         trigger: 'axis',
@@ -191,6 +194,7 @@ export const AreaOption = (  x_data = [], y_data = [], tip = "" ) => ({
     ]
 })
 
+// 日历图
 export const CalendarOption = ( x_data = ["2020-04-10"], y_data = [0] ) => ({
     tooltip : {
         trigger: 'item',
@@ -264,6 +268,7 @@ export const CalendarOption = ( x_data = ["2020-04-10"], y_data = [0] ) => ({
     ]
 })
 
+// 日历图2
 export const CalendarOption2 = ( x_data = ["2020-04-01"], y_data = [0] ) => ({
     visualMap: {
         show: false,
@@ -287,6 +292,7 @@ export const CalendarOption2 = ( x_data = ["2020-04-01"], y_data = [0] ) => ({
     }
 })
 
+// 指示器图
 export const GaugeOption = ( data = 0 ) => ({
     tooltip: {
         formatter: '{a} <br/>{b} : {c}km/h'
@@ -307,6 +313,7 @@ export const GaugeOption = ( data = 0 ) => ({
     ]
 })
 
+// 指示器图2
 export const GaugeOption2 = ( data = 0, color = { color: '#468EFD' } ) => ({
     // backgroundColor: '#0E1327',
     tooltip:{
@@ -452,6 +459,7 @@ export const GaugeOption2 = ( data = 0, color = { color: '#468EFD' } ) => ({
     ]
 })
 
+// 指示器图3
 export const GaugeOption3 = ( data = 0, color = { color: '#468EFD' }, name = "路网平均速度" ) => ({
     // backgroundColor:'#000',
     tooltip: {
@@ -591,6 +599,7 @@ export const GaugeOption3 = ( data = 0, color = { color: '#468EFD' }, name = "�
     }]
 })
 
+// 指示器图4
 export const GaugeOption4 = (data = 0) => ({
     series: [{
             name: '刻度',
@@ -752,6 +761,7 @@ export const GaugeOption4 = (data = 0) => ({
     ]
 })
 
+// 指示器图5
 export const GaugeOption5 = ( data1 = 0, data2 = 0, data3 = 0 ) => {
     let dataStyle = {
         normal: {
@@ -938,6 +948,7 @@ export const GaugeOption5 = ( data1 = 0, data2 = 0, data3 = 0 ) => {
     }
 }
 
+// 折线图
 export const LineOption = ( x_data = [], y_data = [] ) => ({
     grid: {
         top: '8%',
@@ -1007,6 +1018,7 @@ export const LineOption = ( x_data = [], y_data = [] ) => ({
     }]
 })
 
+// 双折线图
 export const BiLineOption = (x_data = [], y_data1 = [], y_data2 = []) => ({
     grid: {
         bottom: '15%',
@@ -1137,6 +1149,111 @@ export const BiLineOption = (x_data = [], y_data1 = [], y_data2 = []) => ({
     }]
 })
 
+// 双折线图
+export const BiLineOption2 = (x_data = [], y_data1 = [], y_data2 = [], name1 = "", name2 = "") => ({
+    legend: {
+        show: true,
+        icon: "rect",
+        itemHeight: 3,
+        inactiveColor: '#ccc', //图例关闭颜色
+        top: "2%",
+        orient: "horizontal",
+        textStyle:{
+            color:'#fff',
+        },
+        data: [name1, name2],
+        
+    },
+    title: {
+        show:false,
+        left: 'center',
+    },
+    grid:{
+        left: 50,
+        bottom: 40,
+        right: 10,
+        top: 10,
+    },
+    tooltip: {
+        trigger: 'axis',
+        backgroundColor: '#0ff',
+        textStyle:{
+            color: '#000',
+        },
+    },
+    xAxis: {
+        data: x_data,
+        axisLabel: {
+            textStyle: {
+                color: '#fff'
+            }
+        },
+        axisTick:{
+            inside:true,
+            lineStyle:{
+                color:'#fff'
+            }
+        },
+        axisLine:{
+            lineStyle:{
+                color:'#fff'
+            }
+        },
+    },
+    yAxis: {
+        splitLine: {show: false},
+        axisLabel: {
+            textStyle: {
+                color: '#fff'
+            }
+        },
+        axisTick:{
+            inside:true,
+            lineStyle:{
+                color:'#fff'
+            }
+        },
+        axisLine:{
+            lineStyle:{
+                color:'#fff'
+            }
+        },
+    },
+    series: [{
+        name: name1,
+        type: 'line',
+        showSymbol: false,
+        data: y_data1,
+        lineStyle:{
+            width: 2,
+            color: '#D962C7',
+            // type: 'dashed',
+        },
+        itemStyle: {
+            normal: {
+                color: "#D962C7",
+            },
+        },
+
+    }, {
+        name: name2,
+        type: 'line',
+        showSymbol: false,
+        data: y_data2,
+        lineStyle:{
+            width: 3,
+            color: '#0ff',
+            // type: 'dashed',
+        },
+        itemStyle: {
+            normal: {
+                color: "#0ff",
+                
+            },
+        },
+    }]
+})
+
 
 function BallDataFormat(v = {
 	value: '0,0',
@@ -1202,7 +1319,7 @@ function BallChildrenFun(str = '') {
 		}
 	}]
 }
-
+// 球图
 export const BallOption = (data = [
     {text: '浙A', value: '', color: '#5dd054'}, 
     {text: '非浙A', value: '', color: '#ff6804'}, 
@@ -1302,7 +1419,7 @@ export const BallOption = (data = [
         ]
     }
 })
-
+// 水球图
 export const BallOption3 = (value = 0, title = "") => ({
     title: {
         text: (value * 100).toFixed(0) + '{a|%}',
@@ -1412,7 +1529,7 @@ export const BallOption3 = (value = 0, title = "") => ({
         }
     }]
 })
-
+// 柱状图
 export const BarOption = ( x_data = [], y_data = [], color = ['#9DC8C8', '#58C9B9', '#519D9E', '#D1B6E1'] ) => ({
     tooltip : {
         trigger: 'item',
@@ -1485,7 +1602,7 @@ export const BarOption = ( x_data = [], y_data = [], color = ['#9DC8C8', '#58C9B
         }
     }]
 })
-
+// 柱状图
 export const BarOption2 = (x_data = [], y_data = [], name = "") => ({
     color: ['#d0570e'],
     grid: {
@@ -1562,7 +1679,7 @@ export const BarOption2 = (x_data = [], y_data = [], name = "") => ({
         }
     ]
 })
-
+// 水平柱状图
 export const HorizontalBarOption = ( x_data = [], y_data = [] ) => ({
     tooltip: {
         trigger: 'axis',
@@ -1659,7 +1776,7 @@ export const HorizontalBarOption = ( x_data = [], y_data = [] ) => ({
         }]
         
 })
-
+// 水球图
 export const BallOption2 = (titleText = ['', '', '', ''], data = [0, 0, 0, 0]) => ({
     // backgroundColor: '#0c1B2E',
     title: [{
@@ -1839,7 +1956,7 @@ export const BallOption2 = (titleText = ['', '', '', ''], data = [0, 0, 0, 0]) =
     }]
 })
 
-
+// 雷达图1
 export const RadarOption = (y_data1 = [], y_data2 = []) => ({
     normal: {
         top: 200,
@@ -2035,7 +2152,7 @@ export const RadarOption = (y_data1 = [], y_data2 = []) => ({
         data: y_data2,
     }]
 })
-
+// 雷达图2
 export const RadarOption2 = (x_data = [], y_data = [], tooltipPosition = "right") => ({
     tooltip:{
         show: true,
@@ -2081,7 +2198,7 @@ export const RadarOption2 = (x_data = [], y_data = [], tooltipPosition = "right"
         data: ['发生量']
     }
 })
-
+// 饼图
 export const PieOption = ( x_data = [], y_data = [], colorList = ['#47A2FF ', '#53C8D1', '#59CB74', '#FBD444', '#7F6AAD', '#585247'] ) => ({
     title: {
         show: false,
@@ -2135,5 +2252,126 @@ export const PieOption = ( x_data = [], y_data = [], colorList = ['#47A2FF ', '#
         }
     ]
 })
+
+// 
+
+// 坐标热力图
+export const HeatmapOption = (x_data, y_data, data, names) => {
+    
+    return {
+        tooltip : {
+            trigger: 'item',
+	        backgroundColor: '#0ff',
+	        textStyle:{
+	        	color: '#000',
+            },
+            formatter: (e) => {
+                 return `<div>
+                    <p>时间：${e.data[0]} <p>
+                    <p>设备名称：${names[e.data[1].replace("'", "").replace("'", "")]} <p>
+                    <p>传输完整率：${(e.data[2]*100).toFixed(0)}% <p>
+                <div>`
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '3%',
+            top: '8%',
+            bottom: '10%',
+        },
+        xAxis: {
+            type: 'category',
+            data: x_data,
+            axisTick: {
+                alignWithLabel: true
+            },
+            axisLabel:{
+                color: "#fff",
+            },
+            axisLine:{
+                lineStyle:{
+                    color: "#fff",
+                }
+            },
+            axisTick: {
+                inside: 'inner',
+            }
+        },
+        yAxis: {
+            type: 'category',
+            data: y_data,
+            axisLabel:{
+            	show: false,
+                color: "#fff",
+            },
+            axisLine:{
+                lineStyle:{
+                    color: "#fff",
+                },
+            },
+            splitLine: {
+                show: false,
+                color: "#fff",
+            },
+            axisTick: {
+                inside: 'inner',
+            },
+        },
+        visualMap: {
+            show:false,
+            min: 0,
+            max: 1,
+            calculable: true,
+            realtime: false,
+            inRange: {
+                color: ['#ffffbf','#ffffbf', '#313695', '#00f']
+            }
+        },
+        series: [{
+            name: '设备质量',
+            type: 'heatmap',
+            data: data,
+            itemStyle: {
+                emphasis: {
+                    borderColor: '#333',
+                    borderWidth: 1
+                }
+            },
+            progressive: 1000,
+            animation: false
+            
+        }]
+    }
+}
+
+/*
+function setOption_div31(option, data){
+	var xdata = [];
+	var ydata = [];
+	var datas = [];
+	for(var i = 0; i < data.length; i++){
+		if(xdata.indexOf(data[i][0]) == -1){
+			xdata.push(data[i][0]);
+		}
+		if(ydata.indexOf("'" + data[i][1] + "'") == -1){
+			ydata.push("'" + data[i][1] + "'");
+		}
+		datas.push([data[i][0], "'" + data[i][1] + "'", data[i][2]])
+	}
+	
+    option['xAxis']['data'] = xdata;
+    option['yAxis']['data'] = ydata;
+    option['series'][0]['data'] = datas;
+    option['tooltip']['formatter'] =  (e)=>{
+        return `<div>
+            <p>时间：${e.data[0]} <p>
+            <p>设备名称：${dev_desc[parseInt(e.data[1].replace("'", ""))].name} <p>
+            <p>传输完整率：${(e.data[2]*100).toFixed(0)}% <p>
+        <div>`;
+    } 
+
+    return option;
+}*/
+
 
 
