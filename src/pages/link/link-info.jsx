@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import { Table, message, Icon } from 'antd'
+import { Table, message, Icon, Popconfirm } from 'antd'
 import L from 'leaflet'
 import LinkButton from '../../components/link-button'
 import { TMS, MAP_CENTER, LINK_CONFIG } from '../../utils/baoshan'
-import { reqLinks } from '../../api'
+import { reqLinks, reqDeleteLink } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import '../../utils/leaflet/LeafletLegend'
 import _ from 'lodash'
@@ -24,13 +24,24 @@ export default class LinkInfo extends Component {
             width: 200,
             dataIndex: 'link_name',
         },{
-            title: '路段详情',
+            title: '操作',
             width: 100,
             render: link => (<span>
                 <LinkButton onClick = { () => {
                     memoryUtils.link = link
                     this.props.history.push({ pathname: "/link/detail/" + link.link_id })
-                } }>查看路段</LinkButton>
+                } }>修改</LinkButton>
+                <Popconfirm 
+                    title="是否删除?" 
+                    onConfirm={async() => {
+                        let link_id = link.link_id
+                        const result = await reqDeleteLink(link_id)
+                        result.code === 1?message.success("删除路段成功！"):message.error(result.message)
+                        this.load_links()
+                    } }
+                >
+                    <LinkButton>删除</LinkButton>
+                </Popconfirm>
             </span>)
         },{
             title: '交通参数',
@@ -58,7 +69,7 @@ export default class LinkInfo extends Component {
     }
 
     // 加载路段列表数据
-    loadLinks = async () => {
+    load_links = async () => {
         const result = await reqLinks()
         if(result.code === 1){
             this.setLink(result.data)
@@ -93,7 +104,7 @@ export default class LinkInfo extends Component {
 
     componentWillMount() {
         this.columns = this.initColumns()
-        this.loadLinks()
+        this.load_links()
     }
 
     componentDidMount() {

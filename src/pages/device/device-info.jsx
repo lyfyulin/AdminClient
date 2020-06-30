@@ -31,27 +31,25 @@ export default class DeviceInfo extends Component {
                 } }> { device.dev_name } </LinkButton>
             )
         },{
-            title: '设备信息',
-            width: 300,
-            render: device => (<LinkButton onClick = { () => {
-                    memoryUtils.device = device
-                    this.props.history.push({ pathname: "/device/detail/" + device.dev_id })
-                } }>详情</LinkButton>
-            )
-        },{
             title: '操作',
             width: 300,
-            render: device => <Popconfirm 
-                title="是否删除?" 
-                onConfirm={async() => {
-                    console.log(device.dev_id)
-                    const result = await reqDeleteDevice(device.dev_id)
-                    result.code === 1? message.success("删除点位成功！"):message.error(result.message)
-                    this.loadDevices()
-                } }
-            >
-                <a href="#">删除</a>
-            </Popconfirm>
+            render: device => <span>
+                <LinkButton onClick = { () => {
+                    memoryUtils.device = device
+                    this.props.history.push({ pathname: "/device/detail/" + device.dev_id })
+                } }>修改</LinkButton>
+                <Popconfirm 
+                    title="是否删除?" 
+                    onConfirm={async() => {
+                        let dev_id = device.dev_id
+                        const result = await reqDeleteDevice(dev_id)
+                        result.code === 1?message.success("删除设备成功！"):message.error(result.message)
+                        this.load_devices()
+                    } }
+                >
+                    <LinkButton>删除</LinkButton>
+                </Popconfirm>
+            </span>
         }]
     }
 
@@ -64,7 +62,7 @@ export default class DeviceInfo extends Component {
     }
 
     // 加载点位列表
-    loadDevices = async () => {
+    load_devices = async () => {
         const result = await reqDevices()
         if(result.code === 1){
             const devices = result.data.map( (e, index) => ({ key: index, ...e }) )
@@ -106,7 +104,7 @@ export default class DeviceInfo extends Component {
 
     componentWillMount() {
         this.columns = this.initColumns()
-        this.loadDevices()
+        this.load_devices()
     }
 
     onWindowResize = _.throttle(() => {

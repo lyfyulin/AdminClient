@@ -4,7 +4,7 @@ import { Card, Button, Table, message, Modal } from 'antd'
 import {getTimeString} from '../../utils/dateUtils'
 import { reqUsers, reqRoles, reqAddUser, reqUpdateUser, reqDeleteUser } from '../../api'
 import AddUpdateUser from './add-update'
-import { PAGE_SIZE } from '../../utils/ConstantUtils'
+import _ from 'lodash'
 
 export default class User extends Component {
 
@@ -12,30 +12,37 @@ export default class User extends Component {
         users: [],
         roles: [],
         showOrAddOrUpdate: 0,
+        tableBodyHeight: 480,
     }
 
     initColumns = () => {
         this.columns = [{
             title: '用户名',
             dataIndex: 'username',
+            width: 100,
         },{
             title: '创建时间',
             dataIndex: 'create_time',
             render: getTimeString,
+            width: 100,
         },{
             title: '电话号',
             dataIndex: 'phone_number',
+            width: 100,
         },{
             title: '所属角色',
             dataIndex: 'role_id',
             render: role_id => this.roleNames[role_id],
+            width: 100,
         },{
             title: '描述',
             dataIndex: 'info',
+            width: 100,
         },{
             title: '操作',
             render: user => <span><Button type = "default" onClick = { () => { this.updateUser(user) } } >修改</Button>&nbsp;&nbsp;
-                <Button type = "default" onClick = { () => this.deleteUser(user) }>删除</Button></span>
+                <Button type = "default" onClick = { () => this.deleteUser(user) }>删除</Button></span>,
+            width: 100,
         }]
     }
 
@@ -88,7 +95,7 @@ export default class User extends Component {
     }
     
     addOrUpdateUser = () => {
-        const {showOrAddOrUpdate} = this.state
+        const { showOrAddOrUpdate } = this.state
         this.form.validateFields( async (error, values) => {
             if(!error){
                 const user = values
@@ -119,8 +126,18 @@ export default class User extends Component {
     componentDidMount() {
         this.getUsers()
     }
+    componentDidMount() {
+        this.getUsers()
+        this.setState({ tableBodyHeight: window.innerHeight - 260 })
+        window.addEventListener('resize', this.onWindowResize)
+    }
+
+    onWindowResize = _.throttle(() => {
+        this.setState({ tableBodyHeight: window.innerHeight - 260  })
+    }, 800)
 
     componentWillUnmount = () => {
+        window.removeEventListener('resize', this.onWindowResize)
         this.setState = (state, callback) => {
             return
         }
@@ -128,7 +145,7 @@ export default class User extends Component {
 
     render() {
 
-        const { users, roles, showOrAddOrUpdate } = this.state
+        const { users, roles, showOrAddOrUpdate, tableBodyHeight } = this.state
         const title = (
             <Button type = "primary" onClick = { this.addUser } >创建用户</Button>
         )
@@ -138,7 +155,8 @@ export default class User extends Component {
                     columns = { this.columns }
                     dataSource = { users }
                     rowKey = "user_id"
-                    pagination = {{ pageSize: PAGE_SIZE }}
+                    pagination = { false }
+                    scroll={{ y: tableBodyHeight }}
                 >
                 </Table>
                 <Modal 
@@ -147,7 +165,7 @@ export default class User extends Component {
                     onCancel = { () => { this.setState({ showOrAddOrUpdate: 0 }) } }
                     onOk = { this.addOrUpdateUser }
                 >
-                    <AddUpdateUser user = { showOrAddOrUpdate === 1 ? {} : this.user } roles = {roles} setForm = { form => {this.form = form} } />
+                    <AddUpdateUser user = { showOrAddOrUpdate === 1 ? {} : this.user } roles = {roles.filter(e => e.role_name != '超级管理员')} setForm = { form => {this.form = form} } />
                 </Modal>
             </Card>
         )

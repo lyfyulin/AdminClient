@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Input, Button, Select, Tabs, TreeSelect, Radio, Modal, Icon, message } from 'antd'
+import { Form, Input, Button, Select, Tabs, TreeSelect, Radio, Modal, Icon, message, Tooltip } from 'antd'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import LyfItem from '../../components/item/item'
@@ -176,6 +176,14 @@ class AddAccidents extends Component {
         const { getFieldDecorator }  = this.props.form
 
         const { panes, activeKey, illegal_behavior, accident_location_visible } = this.state
+
+        const accident_type_tooltip_imgs = <span>
+            <img src={require("../../assets/images/accident_type1.jpg")} alt="事故类型1"/>
+            <img src={require("../../assets/images/accident_type2.jpg")} alt="事故类型2"/>
+            <img src={require("../../assets/images/accident_type3.jpg")} alt="事故类型3"/>
+            <img src={require("../../assets/images/accident_type4.jpg")} alt="事故类型4"/>
+            <img src={require("../../assets/images/accident_type5.jpg")} alt="事故类型5"/>
+        </span>
 
         const formLayout = {
             labelCol : { span: 6 } ,
@@ -398,7 +406,11 @@ class AddAccidents extends Component {
                                             </TreeSelect>
                                         )
                                     }
+                                    <Tooltip color="red" title={ accident_type_tooltip_imgs }>
+                                        &nbsp;&nbsp;<Button>事故类型图示</Button>&nbsp;&nbsp;
+                                    </Tooltip>
                                 </Item>
+
                                 <Item label="照明条件">
                                     {
                                         getFieldDecorator("light_condition", {

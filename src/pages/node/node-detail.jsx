@@ -62,7 +62,8 @@ class NodeDetail extends Component {
 
     // 绘制svg
     draw2 = () => {
-        this.node_depict.draw(this.state.node)
+        let node_info = this.get_data()
+        node_info.directions.length > 0 && node_info.directions[0].lane_dir ? this.node_depict.draw(node_info) : message.error("未配置各方向")
     }
 
     // 将 表单数据格式 转化为 插入格式
@@ -89,22 +90,29 @@ class NodeDetail extends Component {
         return node_info
     }
 
-    // 提交修改
-    handleSubmit = ( e ) => {
-        e.preventDefault()
-        const { isUpdate } = this.state
-        this.props.form.validateFields( async (err, values) => {
+    get_data = () => {
+        let node_info = undefined
+        this.props.form.validateFields( (err, values) => {
             if( !err ){
-                let node_info = this.convertData(values)
-                const result = isUpdate?await reqUpdateNode(node_info):await reqInsertNode(node_info)
-                if(result.code === 1){
-                    message.success(isUpdate?"更新点位成功！":"添加点位成功！")
-                    this.props.history.replace("/node")
-                }else{
-                    message.error(result.msg)
-                }
+                node_info = this.convertData(values)
+                this.setState({ node: node_info })
             }
         } )
+        return node_info
+    }
+
+    // 提交修改
+    handleSubmit = async ( e ) => {
+        e.preventDefault()
+        const { isUpdate } = this.state
+        let node_info = this.get_data()
+        const result = isUpdate?await reqUpdateNode(node_info):await reqInsertNode(node_info)
+        if(result.code === 1){
+            message.success(isUpdate?"更新点位成功！":"添加点位成功！")
+            this.props.history.replace("/node")
+        }else{
+            message.error(result.msg)
+        }
     }
 
     // 切换 东西南北 方向框
@@ -128,10 +136,12 @@ class NodeDetail extends Component {
                 let direction_list = result.data.directions.map( e => e.direction + '' )
                 let direction_lane_dir = result.data.directions.map( e => e.entry_main_num )
                 let node = result.data
+                
                 this.setState({
                     node,
                     direction_list,
-                    direction_lane_dir
+                    direction_lane_dir,
+                    activeDirection: node.directions[0].direction + ''
                 })
                 this.node_depict.draw(node)
             }else{
@@ -151,7 +161,7 @@ class NodeDetail extends Component {
         let { node } = this.state
         if(node.node_id){
             this.setState({ isUpdate: true })
-            this.node_depict = new NodeDepict("geometry", 250, 320)
+            this.node_depict = new NodeDepict("geometry", 250, 320, 2.5)
             this.loadNodeById(node.node_id)
         }
     }
@@ -175,8 +185,6 @@ class NodeDetail extends Component {
         if(node.directions){
             node_directions = direction_list.map( (item, key) => ({title: DIRECTION_LIST[item - 1], key: item, value: item, ...node.directions[item - 1]}))
         }
-
-        // console.log(node_directions)
 
         const formLayout = {
             labelCol : { span: 11 } ,
@@ -258,7 +266,6 @@ class NodeDetail extends Component {
                                         </Modal>
                                         </div>
                                     </div>
-
                                     <div style = {{ width: '100%', display: 'flex', alignItems: 'center', marginBottom: 20, marginTop: 10 }}>
                                         <div style = {{ width: '30%', textAlign: 'right' }}>交叉口方向：&nbsp;</div>
                                         <div style = {{ width: '60%' }}>
@@ -270,6 +277,22 @@ class NodeDetail extends Component {
                                                         <Radio.Button value="1">行人过街</Radio.Button>
                                                         <Radio.Button value="2">天桥</Radio.Button>
                                                         <Radio.Button value="3">地下通道</Radio.Button>
+                                                    </Radio.Group>
+                                                )
+                                            }
+                                        </div>
+                                    </div>
+                                    <div style = {{ width: '100%', display: 'flex', alignItems: 'center', marginBottom: 20, marginTop: 10 }}>
+                                        <div style = {{ width: '30%', textAlign: 'right' }}>点位设备：&nbsp;</div>
+                                        <div style = {{ width: '60%' }}>
+                                            {
+                                                getFieldDecorator("node_dev_location", {
+                                                    initialValue: node.node_dev_location + '' || '1',
+                                                })(
+                                                    <Radio.Group size="small">
+                                                        <Radio.Button value="0">无</Radio.Button>
+                                                        <Radio.Button value="1">进口道</Radio.Button>
+                                                        <Radio.Button value="2">出口道</Radio.Button>
                                                     </Radio.Group>
                                                 )
                                             }
@@ -358,6 +381,16 @@ class NodeDetail extends Component {
                                                                             initialValue: item.entry_sub === 1?true:false,
                                                                         })(
                                                                             <Checkbox>进口辅道</Checkbox>
+                                                                        )
+                                                                    }
+                                                                </div>
+                                                                <div style = {{ width: '50%', textAlign: 'center' }}>
+                                                                    {
+                                                                        getFieldDecorator("dir" + item.direction + "_median_line_offset", {
+                                                                            valuePropName: 'checked',
+                                                                            initialValue: item.median_line_offset === 1?true:false,
+                                                                        })(
+                                                                            <Checkbox>中心线偏移</Checkbox>
                                                                         )
                                                                     }
                                                                 </div>
@@ -470,10 +503,10 @@ class NodeDetail extends Component {
                                 </div>
                             </div>
                         </Form>
-                        <Button onClick = { this.draw2 }>绘制</Button>
-                        <Button onClick = { this.clear }>清除</Button>
+                        {/* <Button onClick = { this.draw2 }>绘制</Button> */}
+                        {/* <Button onClick = { this.clear }>清除</Button> */}
                         <div style={{ display: 'inline', width: '50%'}}>
-                            <div style={{width: '100%', height: '100%', backgroundColor: 'gray'}} id="geometry">
+                            <div style={{width: '100%', height: '100%', backgroundColor: '#ccc'}} id="geometry">
                             </div>
                         </div>
                     </div>

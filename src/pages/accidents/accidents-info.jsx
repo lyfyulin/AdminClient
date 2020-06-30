@@ -111,11 +111,14 @@ class AccidentsInfo extends Component {
         this.columns = [{
             title: '序号',
             dataIndex: 'accident_id',
+            width: 100,
         },{
             title: '时间',
             dataIndex: 'accident_time',
+            width: 200,
         },{
             title: '查看详情',
+            width: 200,
             render: accident => (
                 <LinkButton onClick = {() => {
                     memoryUtils.accident = accident
@@ -124,6 +127,7 @@ class AccidentsInfo extends Component {
             )
         },{
             title: '删除',
+            width: 100,
             render: accident => <Popconfirm 
                 title="是否删除?" 
                 onConfirm={async() => {

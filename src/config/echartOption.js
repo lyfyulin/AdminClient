@@ -1679,6 +1679,8 @@ export const BarOption2 = (x_data = [], y_data = [], name = "") => ({
         }
     ]
 })
+
+
 // 水平柱状图
 export const HorizontalBarOption = ( x_data = [], y_data = [] ) => ({
     tooltip: {
@@ -2344,34 +2346,175 @@ export const HeatmapOption = (x_data, y_data, data, names) => {
     }
 }
 
-/*
-function setOption_div31(option, data){
-	var xdata = [];
-	var ydata = [];
-	var datas = [];
-	for(var i = 0; i < data.length; i++){
-		if(xdata.indexOf(data[i][0]) == -1){
-			xdata.push(data[i][0]);
-		}
-		if(ydata.indexOf("'" + data[i][1] + "'") == -1){
-			ydata.push("'" + data[i][1] + "'");
-		}
-		datas.push([data[i][0], "'" + data[i][1] + "'", data[i][2]])
-	}
-	
-    option['xAxis']['data'] = xdata;
-    option['yAxis']['data'] = ydata;
-    option['series'][0]['data'] = datas;
-    option['tooltip']['formatter'] =  (e)=>{
-        return `<div>
-            <p>时间：${e.data[0]} <p>
-            <p>设备名称：${dev_desc[parseInt(e.data[1].replace("'", ""))].name} <p>
-            <p>传输完整率：${(e.data[2]*100).toFixed(0)}% <p>
-        <div>`;
-    } 
+// 自定义柱状图
+export const BarConfigOption = (x_data = [], y_data = [], color, backgroundColor, chart_title, show_title, chart_bar_width ) => ({
+    backgroundColor: backgroundColor,
+    title: {
+        show: show_title,
+        text: chart_title,
+        left: "center",
+        top: '5%',
+        textStyle: {
+            fontSize: 16,
+            color: '#000',
+            lineHeight: 20
+        },
+    },
+    grid: {
+        top: '8%',
+        bottom: '10%',
+    },
+    toolbox: {
+        feature: {
+            saveAsImage: {}
+        }
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    xAxis: [{
+        type : 'category',
+        data : x_data,
+        axisLabel: {
+            show: true,
+            textStyle: {
+                color: '#000'
+            },
+            rotate:40,
+        },
+        axisTick:{
+            inside:true,
+            lineStyle:{
+                color:'#000'
+            }
+        },
+        axisLine:{
+            symbol:['none','arrow'],
+            symbolSize:6,
+            lineStyle:{
+                color:'#000'
+            }
+        },
+    }],
+    yAxis: [{
+        type : 'value',
+        axisLabel: {
+            textStyle: {
+                color: '#000'
+            }
+        },
+        axisTick:{
+            inside:true,
+            lineStyle:{
+                color:'#000'
+            }
+        },
+        axisLine:{
+            symbol:['none','arrow'],
+            symbolSize: 6,
+            lineStyle:{
+                color:'#000'
+            }
+        },
+        splitLine:{
+            show:false,
+        }
+    }],
+    series: [{
+        name: chart_title,
+        type: 'bar',
+        barWidth: chart_bar_width + '%',
+        data: y_data,
+        itemStyle:{
+            normal:{
+                color: color,
+            }
+        }
+    }],
+})
 
-    return option;
-}*/
+
+// 自定义折线图
+export const LineConfigOption = (x_data = [], y_data = [], color, backgroundColor, chart_title, show_title, chart_bar_width, ) => ({
+    backgroundColor: backgroundColor,
+    title: {
+        show: show_title,
+        text: chart_title,
+        left: "center",
+        top: '5%',
+        textStyle: {
+            fontSize: 16,
+            color: '#000',
+            lineHeight: 20
+        },
+    },
+    grid: {
+        top: '8%',
+        bottom: '10%',
+    },
+    toolbox: {
+        feature: {
+            saveAsImage: {}
+        }
+    },
+    tooltip : {
+        tooltip: {
+            trigger: 'axis'
+        },
+    },
+    xAxis: [{
+        type : 'category',
+        data : x_data,
+        boundaryGap: false,
+        axisTick:{
+            inside:true,
+            lineStyle:{
+                color:'#000'
+            }
+        },
+        axisLine:{
+            symbol:['none','arrow'],
+            symbolSize:6,
+            lineStyle:{
+                color:'#000'
+            }
+        },
+    }],
+    yAxis: [{
+        type : 'value',
+        axisLabel: {
+            textStyle: {
+                color: '#000'
+            }
+        },
+        axisTick:{
+            inside:true,
+            lineStyle:{
+                color:'#000'
+            }
+        },
+        axisLine:{
+            symbol:['none','arrow'],
+            symbolSize: 6,
+            lineStyle:{
+                color:'#000'
+            }
+        },
+        splitLine:{
+            show:false,
+        }
+    }],
+    series: [{
+        name: chart_title,
+        type: 'line',
+        data: y_data,
+        itemStyle:{
+            normal:{
+                color: color,
+            }
+        }
+    }],
+})
 
 
 

@@ -1,30 +1,32 @@
 import React, { Component } from 'react'
-import { Input, DatePicker, Form, TimePicker, Cascader, message, Button, Select, Table, Icon, Tooltip } from 'antd'
+import { Input, DatePicker, Form, TimePicker, Cascader, message, Button, Select, Table, Icon, Tooltip, Tabs } from 'antd'
 
 import { reqNodes, reqLinks, reqDevices, reqExportCsv, reqVnSearch, reqLines, reqAreas, reqSearchData } from '../../api'
-import { SEARCH_TYPE, SEARCH_TIPS } from '../../utils/baoshan'
+import { SEARCH_TYPE, SEARCH_TIPS, ROAD_NAME, PROVINCE } from '../../utils/baoshan'
 import _ from 'lodash'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 
 import './search.less'
 import { getNowDateTimeString, getDateString, getTimeString } from '../../utils/dateUtils'
+import OptionalChart from './optional_chart'
 
 const Item = Form.Item
 const Option = Select.Option
 
 class SearchData extends Component {
 
-
     state = {
         node_list: [],
         link_list: [],
         line_list: [],
         area_list: [],
+        road_list: ROAD_NAME,
         device_list: [],
         changeItem: [],
         search_data: [],
         search_type: "",
+        chart_option: {},
     }
 
     // 定义搜索列表
@@ -73,6 +75,9 @@ class SearchData extends Component {
             value: 'od',
             label: '机动车出行',
             children: [{
+                value: 'trips',
+                label: '出行矩阵',
+            },{
                 value: 'cnts',
                 label: '出行量',
             },{
@@ -131,6 +136,9 @@ class SearchData extends Component {
             },{
                 value: 'link',
                 label: '路段状态',
+            },{
+                value: 'road',
+                label: '道路状态',
             },{
                 value: 'intersection',
                 label: '路口状态',
@@ -197,10 +205,12 @@ class SearchData extends Component {
 
                     // 数据请求
                     const result = await reqSearchData(search_keys)
+
+                    // 数据包装
                     if(result.code === 1){
                         const search_data = result.data.map( (e, key) => ({key: key + 1, ...e}) )
                         let keys = Object.keys(search_data[0])
-                        this.columns = keys.map( e => ({ title: e, dataIndex: e }))
+                        this.columns = keys.map( e => ({ title: e, dataIndex: e, width: 100 }))
                         this.setState({ search_data })
                     }else{
                         message.error(result.message)
@@ -240,7 +250,7 @@ class SearchData extends Component {
     }
 
     onWindowResize = _.throttle(() => {
-        this.setState({ tableBodyHeight: window.innerHeight * 0.9 - 166  })
+        this.setState({ tableBodyHeight: window.innerHeight -206  })
     }, 800)
 
     componentWillMount() {
@@ -261,7 +271,7 @@ class SearchData extends Component {
 
     render() {
         
-        const { changeItem, node_list, link_list, device_list, line_list, area_list, search_data, search_type } = this.state
+        const { changeItem, node_list, link_list, road_list, device_list, line_list, area_list, search_data, search_type } = this.state
 
         const { getFieldDecorator } = this.props.form
 
@@ -313,11 +323,13 @@ class SearchData extends Component {
                                                     filterOption={ this.handleFilter } 
                                                 >
                                                     {
-                                                        item.name === "node_id"? node_list.map( e=> <Option key={e.node_id} value={e.node_id}>{ e.node_name }</Option>):
-                                                        item.name === "dev_id"? device_list.map( e=> <Option key={e.dev_id} value={e.dev_id}>{ e.dev_name }</Option>):
-                                                        item.name === "link_id"? link_list.map( e=> <Option key={e.link_id} value={e.link_id}>{ e.link_name }</Option>):
-                                                        item.name === "line_id"? line_list.map( e=> <Option key={e.line_id} value={e.line_id}>{ e.line_name }</Option>):
-                                                        item.name === "area_id"? area_list.map( e=> <Option key={e.area_list} value={e.area_id}>{ e.area_name }</Option>):(<></>)
+                                                        item.name === "node_id"? node_list.map( e => <Option key={e.node_id} value={e.node_id}>{ e.node_name }</Option>):
+                                                        item.name === "dev_id"? device_list.map( e => <Option key={e.dev_id} value={e.dev_id}>{ e.dev_name }</Option>):
+                                                        item.name === "link_id"? link_list.map( e => <Option key={e.link_id} value={e.link_id}>{ e.link_name }</Option>):
+                                                        item.name === "road_name"? road_list.map( (e,i) => <Option key={ i } value={ e }>{ e }</Option>):
+                                                        item.name === "line_id"? line_list.map( e => <Option key={e.line_id} value={e.line_id}>{ e.line_name }</Option>):
+                                                        item.name === "province"? PROVINCE.map( (e,i) => <Option key={ i } value={ e }>{ e }</Option>):
+                                                        item.name === "area_id"? area_list.map( e => <Option key={e.area_list} value={e.area_id}>{ e.area_name }</Option>):(<></>)
                                                     }
                                                 </Select>
                                             )
@@ -403,14 +415,21 @@ class SearchData extends Component {
                     </div>
                 </Form>
                 <div style={{ backgroundColor:'#fff', height: 'calc(100% - 82px)' }}>
-                    <Table
-                        style={{ wordBreak: 'break-all' }}
-                        rowKey = "key"
-                        columns = { this.columns }
-                        dataSource = { search_data }
-                        pagination = { false }
-                        scroll={{ y: window.innerHeight * 0.9 - 176 }}
-                    />
+                    <Tabs defaultActiveKey="1" className="full">
+                        <Tabs.TabPane tab="列表" key="1" style={{ height: window.innerHeight - 216 }}>
+                            <Table
+                                style={{ wordBreak: 'break-all' }}
+                                rowKey = "key"
+                                columns = { this.columns }
+                                dataSource = { search_data }
+                                pagination = { false }
+                                scroll={{ y: window.innerHeight - 280 }}
+                            />
+                        </Tabs.TabPane>
+                        <Tabs.TabPane tab="图表" key="2">
+                            <OptionalChart data = { search_data } search_type={ search_type }/>
+                        </Tabs.TabPane>
+                    </Tabs>
                 </div>
             </div>
         )

@@ -8,6 +8,7 @@ export default class SignalSchema extends Component {
     
     static props = {
         data : PropTypes.array.isRequired,
+        inter_type: PropTypes.number.isRequired,
     }
 
     render() {
@@ -63,7 +64,7 @@ export default class SignalSchema extends Component {
         return (
             <div className="full lyf-center">
                 <div className="lyf-row-2 lyf-font-3 lyf-center">
-                    信号相位
+                    信号阶段
                 </div>
                 <div className="lyf-row-8">
                     <div className={rowClass[0]}>
@@ -71,7 +72,7 @@ export default class SignalSchema extends Component {
                             phase_data[0].length > 0? phase_data[0].map( (item, index) =>(
                                 <div key={index} className="flex-item">
                                     <div className="flex-item-content lyf-center">
-                                        <img className="phase-img" src={require(`../../assets/images/phase-${item.phase_schema}.png`)} alt={ PHASE_SCHEMA[item.phase_schema] }/>
+                                        <img className="phase-img" src={require(`../../assets/images/${this.props.inter_type}/phase-${item.phase_schema}.png`)} alt={ PHASE_SCHEMA[item.phase_schema] }/>
                                     </div>
                                     <div className="flex-item-title">
                                         <div className="lyf-row-5 lyf-center">{ '相位' + item.phase_index }</div>
@@ -86,7 +87,7 @@ export default class SignalSchema extends Component {
                             phase_data[1].length > 0? phase_data[1].map( (item, index) =>(
                                 <div key={index} className="flex-item">
                                     <div className="flex-item-content lyf-center">
-                                        <img className="phase-img" src={require(`../../assets/images/phase-${item.phase_schema}.png`)} alt={ PHASE_SCHEMA[item.phase_schema] }/>
+                                        <img className="phase-img" src={require(`../../assets/images/${this.props.inter_type}/phase-${item.phase_schema}.png`)} alt={ PHASE_SCHEMA[item.phase_schema] }/>
                                     </div>
                                     <div className="flex-item-title lyf-center">
                                         <div className="lyf-row-5 lyf-center">{ '相位' + item.phase_index }</div>

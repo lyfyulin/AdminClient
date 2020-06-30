@@ -65,12 +65,12 @@ export default class NodeInfo extends Component {
         this.node = []
         nodes.forEach( e => {
 
-            let tmp_lat = parseFloat(e.node_lng_lat.split(',')[1])
-            let tmp_lng = parseFloat(e.node_lng_lat.split(',')[0])
+            let lat = parseFloat(e.node_lng_lat.split(',')[1])
+            let lng = parseFloat(e.node_lng_lat.split(',')[0])
 
-            let lat = bd09togcj02(tmp_lng, tmp_lat)[1]
-            let lng = bd09togcj02(tmp_lng, tmp_lat)[0]
-
+            // let lat = bd09togcj02(tmp_lng, tmp_lat)[1]
+            // let lng = bd09togcj02(tmp_lng, tmp_lat)[0]
+            
             this.node.push( L.circle([lat, lng], {...NODE_CONFIG}).bindPopup(e.node_name) )
         })
         L.layerGroup(this.node).addTo(this.map)

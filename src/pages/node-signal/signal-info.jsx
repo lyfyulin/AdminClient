@@ -22,6 +22,7 @@ class SignalInfo extends Component {
         nodes: [],
         value: undefined,
         flow: [],
+        inter_type: 0,
     }
 
 
@@ -155,7 +156,7 @@ class SignalInfo extends Component {
             labelCol : { span: 11 } ,
             wrapperCol : { span: 11 },
         }
-        const { activeTab, flow, nodes, node_schema } = this.state
+        const { activeTab, flow, nodes, node_schema, inter_type } = this.state
 
         const options = nodes.map(node => <Option key={node.node_id} value={node.node_id}>{node.node_name}</Option>)
 
@@ -244,7 +245,7 @@ class SignalInfo extends Component {
                         </Form>
                     </div>
                     <div className="lyf-col-5 lyf-center">
-                        <SignalSchema data = { node_schema }/>
+                        <SignalSchema data = { node_schema } inter_type={ inter_type } />
                     </div>
                 </div>
                 <div className="lyf-row-5" style={{ display: "flex" }}>

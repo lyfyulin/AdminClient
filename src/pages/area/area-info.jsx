@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import { Table, message, Icon } from 'antd'
+import { Table, message, Icon, Popconfirm } from 'antd'
 import L from 'leaflet'
 import LinkButton from '../../components/link-button'
 import { TMS, MAP_CENTER, AREA_CONFIG, AREA_BLINK_CONFIG } from '../../utils/baoshan'
-import { reqAreas } from '../../api'
+import { reqAreas, reqDeleteArea } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import '../../utils/leaflet/LeafletLegend'
 import _ from 'lodash'
@@ -35,13 +35,24 @@ export default class AreaInfo extends Component {
                 { area.area_name }
             </a>
         },{
-            title: '区域详情',
+            title: '操作',
             width: 100,
             render: area => (<span>
                 <LinkButton onClick = { () => {
                     memoryUtils.area = area
-                    this.props.history.replace('/area/detail/' + area.area_id)
-                } }>查看区域</LinkButton>
+                    this.props.history.push({ pathname: "/area/detail/" + area.area_id })
+                } }>修改</LinkButton>
+                <Popconfirm 
+                    title="是否删除?" 
+                    onConfirm={async() => {
+                        let area_id = area.area_id
+                        const result = await reqDeleteArea(area_id)
+                        result.code === 1?message.success("删除区域成功！"):message.error(result.message)
+                        this.load_areas()
+                    } }
+                >
+                    <LinkButton>删除</LinkButton>
+                </Popconfirm>
             </span>)
         },{
             title: '区域参数',

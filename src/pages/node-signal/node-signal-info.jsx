@@ -4,7 +4,7 @@ import moment from 'moment'
 import 'moment/locale/zh-cn'
 import { Table, message, Select, Button, Form, DatePicker, TimePicker, Radio, Checkbox } from 'antd'
 
-import { reqNodeSchemas, reqNodes, reqNodeSchemaById, reqDeleteNodeSchema, reqNodeSchemaExecSearch } from '../../api'
+import { reqNodeSchemas, reqNodes, reqNodeSchemaById, reqDeleteNodeSchema, reqNodeSchemaExecSearch, reqNodeById } from '../../api'
 import { DIRECTION_LIST } from '../../utils/ConstantUtils'
 import { PHASE_SCHEMA } from '../../utils/ConstantUtils'
 import SignalSchema from './signal-schema'
@@ -12,6 +12,7 @@ import { vector } from '../../utils/ArrayCal'
 import memoryUtils from '../../utils/memoryUtils'
 import LinkButton from '../../components/link-button'
 import { getDateString, getTimeString } from '../../utils/dateUtils'
+import _ from 'lodash'
 
 const Option = Select.Option
 const Item = Form.Item
@@ -22,6 +23,8 @@ class NodeSignalInfo extends Component {
         schema_list: [],
         node_id: undefined,
         schema_phases: [],
+        tableBodyHeight: 480,
+        inter_type: 0,
     }
 
     initColumns = () => {
@@ -29,42 +32,51 @@ class NodeSignalInfo extends Component {
             title: '方案编号',
             dataIndex: "node_schema_id",
             align: 'center',
+            width: 100,
             render: node_schema_id => <Button onClick={ () => this.loadNodeSchemaById(node_schema_id) }>{node_schema_id}</Button>
         },{
             title: '执行日期',
             align: 'center',
+            width: 100,
             render: schema => schema.start_date + ' 至 ' + schema.end_date,
         },{
             title: '执行时间',
             align: 'center',
+            width: 100,
             render: schema => schema.start_time.substr(11, 5) + '至' + schema.end_time.substr(11, 5)
         },{
             title: '是否执行',
             dataIndex: "execution",
             align: 'center',
+            width: 100,
             render: execution => execution===1?"正在执行":"未执行"
         },{
             title: '周期',
             dataIndex: "schema_cycle",
+            width: 100,
             align: 'center',
         },{
             title: '描述',
             dataIndex: "description",
+            width: 100,
             align: 'center',
         },{
             title: '操作',
+            width: 100,
             align: 'center',
             render: node_schema => <LinkButton
                 onClick = { () => {
-                    this.loadNodeSchemaById(node_schema.node_schema_id)
+                    memoryUtils.node_schema = node_schema
                     this.props.history.push("/node-signal/update")
                 } }
             >修改</LinkButton>
         },{
             title: '删除',
+            width: 100,
             align: 'center',
             render: node_schema => <LinkButton
                 onClick = { async () => {
+                    memoryUtils.node_schema = {}
                     const result = await reqDeleteNodeSchema(node_schema.node_schema_id)
                     if(result.code === 1){
                         this.props.history.push("/node-signal/browse")
@@ -115,6 +127,7 @@ class NodeSignalInfo extends Component {
     handleChange = (node_id) => {
         this.setState({ node_id })
         memoryUtils.node = this.state.nodes.filter( node => node.node_id === node_id*1 )[0]
+        this.loadNodeById(node_id)
     }
 
     // 加载全部方案
@@ -123,6 +136,7 @@ class NodeSignalInfo extends Component {
         if(result.code === 1){
             this.setState({ schema_list: result.data })
         } else {
+            this.setState({ schema_list: [] })
             message.error(result.message)
         }
     }
@@ -139,7 +153,28 @@ class NodeSignalInfo extends Component {
         } else {
             message.error(result.message)
         }
-        
+    }
+
+    loadNodeById = async (node_id) => {
+        let inter_type = 0
+        if(node_id){
+            const result = await reqNodeById(node_id)
+            if(result.code === 1){
+                let directions = result.data.directions.map( e => e.direction )
+                if(directions.length === 4){
+                    inter_type = 0
+                }else if(directions.length === 3 && directions[0] === 2){
+                    inter_type = 1
+                }else if(directions.length === 3 && directions[1] === 3){
+                    inter_type = 2
+                }else if(directions.length === 3 && directions[2] === 4){
+                    inter_type = 3
+                }else if(directions.length === 3){
+                    inter_type = 4
+                }
+            }
+        }
+        this.setState({ inter_type })
     }
 
     // 表单点位过滤
@@ -167,7 +202,17 @@ class NodeSignalInfo extends Component {
         this.initColumns()
     }
 
-    componentWillUnmount() {
+    onWindowResize = _.throttle(() => {
+        this.setState({ tableBodyHeight: window.innerHeight - 200  })
+    }, 800)
+    
+    componentDidMount() {
+        this.setState({ tableBodyHeight: window.innerHeight - 200 })
+        window.addEventListener('resize', this.onWindowResize)
+    }
+
+    componentWillUnmount = () => {
+        window.removeEventListener('resize', this.onWindowResize)
         this.setState = (state, callback) => {
             return
         }
@@ -177,7 +222,7 @@ class NodeSignalInfo extends Component {
 
         const { getFieldDecorator } = this.props.form
 
-        const { nodes, schema_list, schema_phases } = this.state
+        const { nodes, schema_list, schema_phases, tableBodyHeight, inter_type } = this.state
 
         const formLayout = {
             labelCol: { span: 7 },
@@ -198,7 +243,7 @@ class NodeSignalInfo extends Component {
                             <Item label="路口名称">
                                 {
                                     getFieldDecorator("node_id", {
-                                        initialValue: nodes.length>0?nodes[0].node_id:"",
+                                        initialValue: memoryUtils.node.node_id?memoryUtils.node.node_id:"",
                                     })(
                                         <Select 
                                             showSearch 
@@ -275,12 +320,13 @@ class NodeSignalInfo extends Component {
                             columns = { this.schema_columns }
                             dataSource = { schema_list }
                             pagination = { false }
+                            scroll={{ y: tableBodyHeight }}
                             align="center"
                         />
                     </div>
                     <div className="lyf-col-5">
                         <div className="lyf-row-5 lyf-center">
-                            <SignalSchema data = { schema_phases }/>
+                            <SignalSchema data = { schema_phases } inter_type = {inter_type}/>
                         </div>
                         <div className="lyf-row-5 lyf-center">
                             <Table

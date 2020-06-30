@@ -7,7 +7,7 @@ import memoryUtils from '../../utils/memoryUtils';
 import { PHASE_SCHEMA, PHASE_SCHEMA_FLOW } from '../../utils/ConstantUtils';
 import SignalSchema from './signal-schema'
 import { getTimeString, getTodayDateString, getFutureDateString } from '../../utils/dateUtils'
-import { reqInsertNodeSchema, reqNodeSchemaById } from '../../api'
+import { reqInsertNodeSchema, reqNodeSchemaById, reqNodeById } from '../../api'
 import { vector } from '../../utils/ArrayCal'
 
 const Item = Form.Item
@@ -15,12 +15,12 @@ const Option = Select.Option
 
 class AddSchema extends Component {
 
-
     state = {
         phase_number: 2,
         phase_schemas: ['0', '0'],
         phase_times: [10, 10],
         phases: [],
+        inter_type: 0,
     }
 
 
@@ -86,6 +86,7 @@ class AddSchema extends Component {
         e.preventDefault()
         let signal_schema = this.getValues()
         const result = await reqInsertNodeSchema(signal_schema)
+        result.code === 1?message.success("插入信号方案成功！")&&this.props.history.replace("/node-signal"):message.error(result.message)
     }
 
     loadNodeSchemaById = async (node_schema_id) => {
@@ -102,6 +103,32 @@ class AddSchema extends Component {
         
     }
 
+    loadNodeById = async () => {
+        let node = memoryUtils.node
+        if(node.node_id){
+            const result = await reqNodeById(node.node_id)
+            if(result.code === 1){
+                let directions = result.data.directions.map( e => e.direction )
+                if(directions.length === 4){
+                    this.setState({ inter_type: 0 })
+                }else if(directions.length === 3 && directions[0] === 2){
+                    this.setState({ inter_type: 1 })
+                }else if(directions.length === 3 && directions[1] === 3){
+                    this.setState({ inter_type: 2 })
+                }else if(directions.length === 3 && directions[2] === 4){
+                    this.setState({ inter_type: 3 })
+                }else if(directions.length === 3){
+                    this.setState({ inter_type: 4 })
+                }
+            }
+        }
+    }
+
+    componentDidMount() {
+        this.loadNodeById()
+    }
+    
+
     componentWillUnmount() {
         this.setState = (state, callback) => {
           return
@@ -112,7 +139,7 @@ class AddSchema extends Component {
 
         const node = memoryUtils.node
 
-        const { phase_schemas, phase_times, phases } = this.state
+        const { phase_schemas, phase_times, phases, inter_type } = this.state
 
         const { getFieldDecorator } = this.props.form
         
@@ -133,11 +160,12 @@ class AddSchema extends Component {
 
         return (
             <Card className="full" title={title} style={{ margin: 0, padding: 0,  }}>
-                <div className="full" style={{ display: 'flex', flexWrap: 'nowrap' }}>
+                <div className="full" style={{ display: 'flex', flexWrap: 'nowrap', overflow: 'auto' }}>
                     <Form
                         className="lyf-col-5"
                         { ...formLayout }
                         onSubmit = { this.handleSubmit }
+                        style={{ overflow: 'auto' }}
                     >
                         <div className="lyf-row-8 lyf-center">
                             <Item label="交叉口名称">
@@ -261,10 +289,7 @@ class AddSchema extends Component {
                     </Form>
                     <div className="lyf-col-5">
                         <div style={{ height: 300 }}>
-                            <SignalSchema data={ phases }/>
-                        </div>
-                        <div style={{ height: 300 }}>
-                            phase image
+                            <SignalSchema data={ phases } inter_type={ inter_type }/>
                         </div>
                     </div>
                 </div>

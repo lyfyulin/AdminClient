@@ -496,6 +496,14 @@ export const reqLinkStateSearch = (start_date,  end_date,  link_id) => ajax( bas
     }
 } )	
 
+export const reqCurrentRoadState = () => ajax( base + "/road/current/state")
+
+export const reqRoadStateSearch = (start_date,  end_date, start_time, end_time, road_name) => ajax( base + "/search/road/state", {
+    params: {
+        start_date,  end_date, start_time, end_time, road_name
+    }
+} )	
+
 export const reqWeekLinkSpeed = (link_id) => ajax( base + "/link/week/speed", {
     params: {
         link_id
