@@ -36,7 +36,7 @@ export default class AreaInfo extends Component {
             </a>
         },{
             title: '操作',
-            width: 100,
+            width: 200,
             render: area => (<span>
                 <LinkButton onClick = { () => {
                     memoryUtils.area = area
@@ -54,14 +54,7 @@ export default class AreaInfo extends Component {
                     <LinkButton>删除</LinkButton>
                 </Popconfirm>
             </span>)
-        },{
-            title: '区域参数',
-            width: 100,
-            render: area => (<span>
-                <LinkButton onClick = { () => {
-                } }>查看参数</LinkButton>
-            </span>)
-        },]
+        }]
     }
 
     // 初始化地图

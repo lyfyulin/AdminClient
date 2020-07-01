@@ -6,7 +6,6 @@ import { connect } from 'react-redux'
 import LeftNav from '../../components/left-nav'
 import Header from '../../components/header'
 import Home from '../home/home'
-import Category from '../category/category'
 import Role from '../role/role'
 import User from '../user/user'
 import RoadState from '../charts/roadstate'
@@ -47,7 +46,6 @@ class Admin extends Component {
                     >
                         <Switch>
                             <Route path="/home" component={ Home }></Route>
-                            <Route path="/category" component={ Category }></Route>
                             <Route path="/strategy" component={ Strategy }></Route>
                             <Route path="/role" component={ Role }></Route>
                             <Route path="/user" component={ User }></Route>

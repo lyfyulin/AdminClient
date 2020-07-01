@@ -194,6 +194,9 @@ export const reqNonlocalVnSearch = (start_date, end_date) => ajax( base + "/sear
 	
 // device
 export const reqDevices = () => ajax( base + "/device/list")
+export const reqUrbanDevices = () => ajax( base + "/device/urban/list")
+export const reqHighwayDevices = () => ajax( base + "/device/highway/list")
+export const reqDJDevices = () => ajax( base + "/device/dj/list")
 
 export const reqDeviceById = (dev_id) => ajax( base + "/device/info", {
     params: {
@@ -496,6 +499,14 @@ export const reqLinkStateSearch = (start_date,  end_date,  link_id) => ajax( bas
     }
 } )	
 
+export const reqCurrentAreaState = () => ajax( base + "/area/current/state")
+
+export const reqAreaStateSearch = (start_date,  end_date, start_time, end_time,  area_id) => ajax( base + "/search/area/state", {
+    params: {
+        start_date,  end_date, start_time, end_time, area_id
+    }
+} )
+
 export const reqCurrentRoadState = () => ajax( base + "/road/current/state")
 
 export const reqRoadStateSearch = (start_date,  end_date, start_time, end_time, road_name) => ajax( base + "/search/road/state", {
@@ -531,6 +542,9 @@ export const reqWeekInterDelay = (inter_id) => ajax( base + "/inter/delay/week",
 // rdnet
 
 export const reqNodes = () => ajax( base + "/node/list" )	
+export const reqUrbanNodes = () => ajax( base + "/node/urban/list" )	
+export const reqHighwayNodes = () => ajax( base + "/node/highway/list" )	
+export const reqDJNodes = () => ajax( base + "/node/dj/list" )	
 
 export const  reqNodeById = ( node_id ) => ajax( base + "/node/info", {
     params: {

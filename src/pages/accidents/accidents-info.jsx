@@ -102,7 +102,7 @@ class AccidentsInfo extends Component {
             attributionControl: false,
         })
         this.heat = heatlayer([[0.1, 0.1, 1]])
-        L.tileLayer(TMS, {}).addTo(this.map)
+        L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
         this.map._onResize()
     }
 

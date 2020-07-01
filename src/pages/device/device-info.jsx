@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import { Table, message, Icon, Popconfirm } from 'antd'
+import { Table, message, Icon, Popconfirm, Button, Radio } from 'antd'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import '../node/node-info.less'
 import LinkButton from '../../components/link-button'
 import { TMS, MAP_CENTER, DEVICE_CONFIG } from '../../utils/baoshan'
-import { reqDevices, reqDeleteDevice } from '../../api'
+import { reqDevices, reqDeleteDevice, reqUrbanDevices, reqHighwayDevices, reqDJDevices } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import { bd09togcj02 } from '../../utils/lnglatUtils'
 import _ from 'lodash'
@@ -15,6 +15,7 @@ export default class DeviceInfo extends Component {
     state = {
         devices: [],
         tableBodyHeight: 480,
+        dev_location: '1',
     }
 
     // 初始化表格列
@@ -62,8 +63,11 @@ export default class DeviceInfo extends Component {
     }
 
     // 加载点位列表
-    load_devices = async () => {
-        const result = await reqDevices()
+    load_devices = async (dev_location) => {
+        // 1-全部;2-城区;3-高速;4-电警
+        console.log();
+        
+        const result = dev_location === '1'? await reqDevices(): dev_location === '2'? await reqUrbanDevices(): dev_location === '3'? await reqHighwayDevices(): await reqDJDevices()
         if(result.code === 1){
             const devices = result.data.map( (e, index) => ({ key: index, ...e }) )
             this.setDevice(devices)
@@ -95,7 +99,7 @@ export default class DeviceInfo extends Component {
                 zoomControl: false,
                 attributionControl: false,
             })
-            L.tileLayer(TMS, {}).addTo(this.map)
+            L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
             this.map._onResize()
             this.devices_circle = L.layerGroup()
             // L.Control({position:'topright'}).addTo(this.map)
@@ -104,7 +108,7 @@ export default class DeviceInfo extends Component {
 
     componentWillMount() {
         this.columns = this.initColumns()
-        this.load_devices()
+        this.load_devices(this.state.dev_location)
     }
 
     onWindowResize = _.throttle(() => {
@@ -124,7 +128,7 @@ export default class DeviceInfo extends Component {
     }
     
     render() {
-        const { devices, tableBodyHeight } = this.state
+        const { devices, tableBodyHeight, dev_location } = this.state
         return (
             <div className = "lvqi-row1-col2">
                 <div className = "lvqi-col-2">
@@ -137,10 +141,18 @@ export default class DeviceInfo extends Component {
                 <div className = "lvqi-col-2">
                     <div className="lvqi-card-title">
                         设备列表
+                        &nbsp;&nbsp;
                         <Icon type="plus" style={{ float:'right' }} onClick={ () => {
                             memoryUtils.device = {}
                             this.props.history.push({ pathname: "/device/add" })
                         } }></Icon>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <Radio.Group size="small" defaultValue={ dev_location } onChange={ (event) => {this.load_devices(event.target.value);this.setState({ dev_location: event.target.value })} }>
+                            <Radio.Button value="1">全部</Radio.Button>
+                            <Radio.Button value="2">城区</Radio.Button>
+                            <Radio.Button value="3">高速</Radio.Button>
+                            <Radio.Button value="4">电警</Radio.Button>
+                        </Radio.Group>
                     </div>
                     <div className="lvqi-card-content" id="table">
                         <Table 

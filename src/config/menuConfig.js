@@ -21,7 +21,7 @@ const menuList = [
         icon: 'area-chart'
     },
     {
-        title: '路口管理',
+        title: '点位管理',
         key: '/node',
         icon: 'area-chart'
     },

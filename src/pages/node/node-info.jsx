@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import { Table, message, Icon } from 'antd'
+import { Table, message, Icon, Radio } from 'antd'
 import L from 'leaflet'
 import LinkButton from '../../components/link-button'
-import { reqNodes } from '../../api'
+import { reqNodes, reqUrbanNodes, reqHighwayNodes, reqDJNodes } from '../../api'
 import { TMS, MAP_CENTER, NODE_CONFIG } from '../../utils/baoshan'
 import memoryUtils from '../../utils/memoryUtils'
 import _ from 'lodash'
@@ -17,6 +17,7 @@ export default class NodeInfo extends Component {
         loading: false,
         nodes: [],
         tableBodyHeight: 480,
+        node_location: '2',
     }
 
     // 初始化表格列
@@ -47,8 +48,9 @@ export default class NodeInfo extends Component {
     }
 
     // 加载点位列表
-    loadNodes = async () => {
-        const result = await reqNodes()
+    loadNodes = async (node_location) => {
+        const result = node_location === '1'? await reqNodes():node_location === '2'? await reqUrbanNodes(): node_location === '3'? await reqHighwayNodes(): await reqDJNodes()
+
         if(result.code === 1){
             this.setNode(result.data)
             this.setState({ 
@@ -73,7 +75,9 @@ export default class NodeInfo extends Component {
             
             this.node.push( L.circle([lat, lng], {...NODE_CONFIG}).bindPopup(e.node_name) )
         })
-        L.layerGroup(this.node).addTo(this.map)
+        this.node_layer? this.map.removeLayer(this.node_layer):console.log()
+        this.node_layer = L.layerGroup(this.node)
+        this.node_layer.addTo(this.map)
     }
 
     // 初始化地图
@@ -85,14 +89,14 @@ export default class NodeInfo extends Component {
                 zoomControl: false,
                 attributionControl: false,
             })
-            L.tileLayer(TMS, {}).addTo(this.map)
+            L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
             this.map._onResize()
         }
     }
 
     componentWillMount() {
         this.columns = this.initColumns()
-        this.loadNodes()
+        this.loadNodes(this.state.node_location)
     }
 
     onWindowResize = _.throttle(() => {
@@ -111,26 +115,33 @@ export default class NodeInfo extends Component {
             return
         }
     }
-    
 
     render() {
-        const { loading, nodes, tableBodyHeight } = this.state
+        const { loading, nodes, tableBodyHeight, node_location } = this.state
         return (
             <div className = "lvqi-row1-col2">
                 <div className = "lvqi-col-2">
                     <div className="lvqi-card-title">
-                        交叉口地图
+                        点位地图
                     </div>
                     <div className="lvqi-card-content" id="map">
                     </div>
                 </div>
                 <div className = "lvqi-col-2">
                     <div className="lvqi-card-title">
-                        路口列表
+                        点位列表
+                        &nbsp;&nbsp;
                         <Icon type="plus" style={{ float:'right' }} onClick={ () => {
                             memoryUtils.node = {}
                             this.props.history.push({ pathname: "/node/add" })
                         } }></Icon>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <Radio.Group size="small" defaultValue={ node_location } onChange={ (event) => {this.loadNodes(event.target.value);this.setState({ node_location: event.target.value })} }>
+                            <Radio.Button value="1">全部</Radio.Button>
+                            <Radio.Button value="2">城区</Radio.Button>
+                            <Radio.Button value="3">高速</Radio.Button>
+                            <Radio.Button value="4">电警</Radio.Button>
+                        </Radio.Group>
                     </div>
                     <div className="lvqi-card-content" id="table">
                         <Table 

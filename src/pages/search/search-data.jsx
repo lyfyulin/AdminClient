@@ -1,15 +1,14 @@
 import React, { Component } from 'react'
 import { Input, DatePicker, Form, TimePicker, Cascader, message, Button, Select, Table, Icon, Tooltip, Tabs } from 'antd'
-
 import { reqNodes, reqLinks, reqDevices, reqExportCsv, reqVnSearch, reqLines, reqAreas, reqSearchData } from '../../api'
 import { SEARCH_TYPE, SEARCH_TIPS, ROAD_NAME, PROVINCE } from '../../utils/baoshan'
+
+import { getNowDateTimeString, getDateString, getTimeString } from '../../utils/dateUtils'
+import OptionalChart from './optional_chart'
 import _ from 'lodash'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
-
 import './search.less'
-import { getNowDateTimeString, getDateString, getTimeString } from '../../utils/dateUtils'
-import OptionalChart from './optional_chart'
 
 const Item = Form.Item
 const Option = Select.Option
@@ -140,6 +139,9 @@ class SearchData extends Component {
                 value: 'road',
                 label: '道路状态',
             },{
+                value: 'area',
+                label: '区域状态',
+            },{
                 value: 'intersection',
                 label: '路口状态',
             }]
@@ -196,13 +198,14 @@ class SearchData extends Component {
                 if( search_type.length < 1 ){
                     message.error("请选择下载数据类型！")
                 }else{
+                    // 数据封装
                     search_type = search_type.join("/")
                     start_date = getDateString(values['start_date'])
                     end_date = getDateString(values['end_date'])
                     start_time = getTimeString(values['start_time'])
                     end_time = getTimeString(values['end_time'])
                     const search_keys = { ...values, search_type, start_date, end_date, start_time, end_time }
-
+                    
                     // 数据请求
                     const result = await reqSearchData(search_keys)
 
@@ -329,7 +332,7 @@ class SearchData extends Component {
                                                         item.name === "road_name"? road_list.map( (e,i) => <Option key={ i } value={ e }>{ e }</Option>):
                                                         item.name === "line_id"? line_list.map( e => <Option key={e.line_id} value={e.line_id}>{ e.line_name }</Option>):
                                                         item.name === "province"? PROVINCE.map( (e,i) => <Option key={ i } value={ e }>{ e }</Option>):
-                                                        item.name === "area_id"? area_list.map( e => <Option key={e.area_list} value={e.area_id}>{ e.area_name }</Option>):(<></>)
+                                                        item.name === "area_id"? area_list.map( e => <Option key={e.area_id} value={e.area_id}>{ e.area_name }</Option>):(<></>)
                                                     }
                                                 </Select>
                                             )
