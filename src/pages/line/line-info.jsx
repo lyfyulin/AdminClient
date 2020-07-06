@@ -153,7 +153,7 @@ export default class LineInfo extends Component {
                 </div>
                 <div className = "lvqi-col-2">
                     <div className="lvqi-card-title">
-                        干线列表
+                        干线列表&nbsp;&nbsp;
                         <Icon type="plus" style={{ float:'right' }} onClick={ () => {
                             memoryUtils.line = {}
                             this.props.history.push({ pathname: "/line/add" })

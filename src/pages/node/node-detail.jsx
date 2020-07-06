@@ -356,7 +356,7 @@ class NodeDetail extends Component {
                                                                 <div style = {{ width: '40%', display: 'flex', flexWrap: "wrap" }}>
                                                                     {
                                                                         getFieldDecorator("dir" + item.direction + "_entry_expand_num", {
-                                                                            initialValue: item.entry_expand_num || 1,
+                                                                            initialValue: item.entry_expand_num || 0,
                                                                         })(
                                                                             <Input type="number" size = "small" />
                                                                         )

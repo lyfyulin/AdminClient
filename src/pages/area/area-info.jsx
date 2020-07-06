@@ -145,7 +145,7 @@ export default class AreaInfo extends Component {
                 </div>
                 <div className = "lvqi-col-2">
                     <div className="lvqi-card-title">
-                        区域列表
+                        区域列表&nbsp;&nbsp;
                         <Icon type="plus" style={{ float:'right' }} onClick={ () => {
                             memoryUtils.area = {}
                             this.props.history.push({ pathname: "/area/add" })

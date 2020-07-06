@@ -134,7 +134,7 @@ export default class LinkInfo extends Component {
                 </div>
                 <div className = "lvqi-col-2">
                     <div className="lvqi-card-title">
-                        路段列表        
+                        路段列表&nbsp;&nbsp;
                         <Icon type="plus" style={{ float:'right' }} onClick={ () => {
                             memoryUtils.link = {}
                             this.props.history.push({ pathname: "/link/add" })

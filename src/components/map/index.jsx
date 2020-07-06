@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import L from 'leaflet'
 import '../../utils/leaflet/LeafletLegend'
 import PropTypes from 'prop-types'
-import { LINK_INFO, LINK_COLOR, INTER_INFO, TMS, MAP_CENTER } from '../../utils/baoshan'
+import { LINK_INFO, LINK_COLOR, INTER_INFO, TMS, MAP_CENTER, FIX_TMS } from '../../utils/baoshan'
 import { bd09togcj02 } from '../../utils/lnglatUtils'
 
 export default class LvqiMap extends Component {
@@ -26,6 +26,17 @@ export default class LvqiMap extends Component {
         L.layerGroup(this.link).addTo(this.map)
         // 添加图例
         L.control.linkLegend({position: 'topright'}).addTo(this.map)
+
+        /*
+        // 自定义label
+        let Icon1 = L.divIcon({
+            html: "<div style='color:#f00;transform:rotate(20deg)'>狗子</div>",
+            className: 'my-div-icon',
+            iconSize:30
+        });
+        L.marker(MAP_CENTER, { icon: Icon1 }).addTo(this.map);
+        */
+        
     }
 
     initInter = () => {
@@ -72,7 +83,7 @@ export default class LvqiMap extends Component {
                 zoomControl: false, 
                 attributionControl: false, 
             })
-            L.tileLayer(TMS, { maxZoom: 16 }).addTo(this.map)
+            L.tileLayer(TMS, { maxZoom: 16, minZoom: 9 }).addTo(this.map)
         }
         this.map._onResize()
         

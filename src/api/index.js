@@ -6,6 +6,7 @@ import jsonp from 'jsonp'
 import { message } from 'antd'
 const base = 'http://192.122.2.196:3005'
 // const base = 'http://192.122.1.246:3005'
+// const base = 'http://localhost:3005'
 export const reqLogin = (username, password) => ajax.post( base + "/login_verify", {username, password} )
 
 // jsonp 只能解决 GET 类型的 ajax 请求跨域问题
@@ -550,7 +551,7 @@ export const  reqNodeById = ( node_id ) => ajax( base + "/node/info", {
     params: {
         node_id
     }
-}  )	
+}  )
 
 export const reqInsertNode = (node) => ajax.post( base + "/insert/node",
     JSON.stringify(node),
@@ -559,7 +560,7 @@ export const reqInsertNode = (node) => ajax.post( base + "/insert/node",
             "Content-Type": 'application/json'
         },
     }
-)	
+)
 
 export const reqUpdateNode = (node) => ajax.post( base + "/update/node",
     JSON.stringify(node),
@@ -568,7 +569,7 @@ export const reqUpdateNode = (node) => ajax.post( base + "/update/node",
             "Content-Type": 'application/json'
         },
     }
-)	
+)
 
 export const reqDeleteNode = ( node_id ) => ajax.post( base + "/delete/node", {node_id})	
 
@@ -576,7 +577,7 @@ export const reqDirectionById = ( direction_id ) => ajax( base + "/node/directio
     params: {
         direction_id
     }
-} )	
+} )
 
 export const reqNodeDirections = ( node_id ) => ajax( base + "/node/directions", {
     params: {
@@ -600,7 +601,7 @@ export const reqUpdateNodeDirection = (direction) => ajax.post( base + "/update/
             "Content-Type": 'application/json'
         },
     }
-)	
+)
 
 export const reqDeleteNodeDirection = ( direction_id ) => ajax.post( base + "/delete/node/direction", { direction_id } )	
 
@@ -612,7 +613,7 @@ export const reqLinkById = ( link_id ) => ajax( base + "/link/info", {
     params: {
         link_id
     }
-} )	
+} )
 
 export const reqInsertLink = ( link ) => ajax.post( base + "/insert/link",
     JSON.stringify(link),
@@ -621,7 +622,7 @@ export const reqInsertLink = ( link ) => ajax.post( base + "/insert/link",
             "Content-Type": 'application/json'
         },
     }
-)	
+)
 
 export const reqUpdateLink = ( link ) => ajax.post( base + "/update/link",
     JSON.stringify(link),
@@ -630,17 +631,17 @@ export const reqUpdateLink = ( link ) => ajax.post( base + "/update/link",
             "Content-Type": 'application/json'
         },
     }
-)	
+)
 
-export const reqDeleteLink = ( link_id ) => ajax.post( base + "/delete/link", { link_id } )	
+export const reqDeleteLink = ( link_id ) => ajax.post( base + "/delete/link", { link_id } )
 
-export const reqLines = () => ajax( base + "/line/list" )	
+export const reqLines = () => ajax( base + "/line/list" )
 
 export const reqLineById = ( line_id ) => ajax( base + "/line/info", {
     params: {
         line_id
     }
-} )	
+} )
 
 export const reqInsertLine = ( line ) => ajax.post( base + "/insert/line",
     JSON.stringify(line),
@@ -649,7 +650,7 @@ export const reqInsertLine = ( line ) => ajax.post( base + "/insert/line",
             "Content-Type": 'application/json'
         },
     }
-)	
+)
 
 export const reqUpdateLine = ( line ) => ajax.post( base + "/update/line",
     JSON.stringify(line),
@@ -658,9 +659,9 @@ export const reqUpdateLine = ( line ) => ajax.post( base + "/update/line",
             "Content-Type": 'application/json'
         },
     }
-)	
+)
 
-export const reqDeleteLine = ( line_id ) => ajax.post( base + "/delete/line", { line_id } )	
+export const reqDeleteLine = ( line_id ) => ajax.post( base + "/delete/line", { line_id } )
 
 export const reqNodeFlowByNodeId = ( start_date, end_date, start_time, end_time, node_id ) => ajax( base + "/node/flow", {
     params: {
@@ -668,13 +669,13 @@ export const reqNodeFlowByNodeId = ( start_date, end_date, start_time, end_time,
     }
 } )
 
-export const reqAreas = () => ajax( base + "/area/list" )	
+export const reqAreas = () => ajax( base + "/area/list" )
 
 export const reqAreaById = ( area_id ) => ajax( base + "/area/info", {
     params: {
         area_id
     }
-} )	
+} )
 
 export const reqInsertArea = ( area ) => ajax.post( base + "/insert/area",
     JSON.stringify(area),
@@ -683,7 +684,7 @@ export const reqInsertArea = ( area ) => ajax.post( base + "/insert/area",
             "Content-Type": 'application/json'
         },
     }
-)	
+)
 
 export const  reqUpdateArea = ( area ) => ajax.post( base + "/update/area",
     JSON.stringify(area),

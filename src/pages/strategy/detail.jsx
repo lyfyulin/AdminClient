@@ -76,7 +76,7 @@ export default class StrategyDetail extends Component {
                         </span>
                     </Item>
                     <Item>
-                        <span className = "detail-item-left">商品详情：</span>
+                        <span className = "detail-item-left">策略详情：</span>
                         <span className = "detail-item-right" dangerouslySetInnerHTML={ { __html: strategy.strategy_content } } >
                         </span>
                     </Item>

@@ -3,6 +3,7 @@
 // map
 export const MAP_CENTER = [25.12, 99.175]
 export const TMS = "http://192.122.2.196:8080/map/{z}/{x}/{y}.png"
+export const FIX_TMS = "http://192.122.2.196:8080/fix_map/bg.png"
 //"http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
 // "http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
 // "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}"

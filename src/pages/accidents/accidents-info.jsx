@@ -10,7 +10,7 @@ import { MAP_CENTER, TMS } from '../../utils/baoshan'
 import { reqAccidents, reqDeleteAccident } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import _ from 'lodash'
-import { getTodayDateTimeString } from '../../utils/dateUtils'
+import { getTodayDateTimeString, getNowDateTimeString } from '../../utils/dateUtils'
 
 const Item = Form.Item
 const Option = Select.Option
@@ -235,7 +235,7 @@ class AccidentsInfo extends Component {
                             <Item label="结束时间" name="end_time">
                                 {
                                     getFieldDecorator("end_time", {
-                                        initialValue: moment("2020-01-01 08:00:00"),
+                                        initialValue: moment(getNowDateTimeString()),
                                     })(
                                         <TimePicker 
                                             size="small"

@@ -60,10 +60,10 @@ export default class AccidentsEliminate extends Component {
                     </div>
                     <div className="lyf-col-5">
                         <div className="lyf-row-5">
-                            原因列表
+                            <div className="lyf-row-1 lyf-center lyf-font-4">事故原因</div>
                         </div>
                         <div className="lyf-row-5">
-                            防控策略
+                            <div className="lyf-row-1 lyf-center lyf-font-4">防控策略</div>
                         </div>
                     </div>
                 </div>
