@@ -1,13 +1,14 @@
 
 import { vector, matrix } from "../ArrayCal";
 
-const option = {
+export const node_signal_option = {
     // 配时方案编号
-    phase_schema_group: [1, 6],
+    // "0-东西直左", "1-东西直行+东西左转", "2-东口直左+西口直左", "3-东口直左+东西直行+西口直左", "4-东口直左+东西左转+西口直左", "5-南北直左", "6-南北直行+南北左转", "7-南口直左+北口直左", "8-南口直左+南北直行+北口直左", "9-南口直左+南北左转+北口直左"
+    phase_schema_group: [0, 5],
     // 是否定周期
-    fix_cycle_flag: false,
+    fix_cycle: false,
     // 定周期时长
-    fix_cycle: 160,
+    cycle_time: 120,
     // 损失时间
     loss: 6,
     // 黄灯时间
@@ -35,10 +36,10 @@ const option = {
     CR: 1685
 }
 
-export const cal_control_time = () => {
+export const cal_control_time = (option = node_signal_option) => {
 
     // 配时参数
-    let {phase_schema_group, fix_cycle_flag, fix_cycle, loss, amber, QL, QT, QR, LN, TN, RN, CL, CT, CR} = option
+    let {phase_schema_group, fix_cycle, cycle_time, loss, amber, QL, QT, QR, LN, TN, RN, CL, CT, CR} = option
     
     // 信号方案
     let schema_group_name = ["0-东西直左", "1-东西直行+东西左转", "2-东口直左+西口直左", "3-东口直左+东西直行+西口直左", "4-东口直左+东西左转+西口直左", 
@@ -139,7 +140,7 @@ export const cal_control_time = () => {
     let plan_cal_cycle = loss * phase_num / (1 - schema_Y)
 
     // 计算使用周期时长
-    let cycle = fix_cycle_flag ? fix_cycle : plan_cal_cycle
+    let cycle = fix_cycle ? cycle_time : plan_cal_cycle < 80? 80 : plan_cal_cycle
 
     // 绿信比
     let phase_ratio = phase_schema_group_y.map(group_id => group_id.map(y => y / schema_Y))
@@ -150,8 +151,9 @@ export const cal_control_time = () => {
     // 关键车流绿灯时长
     let phase_key_flow_time = phase_schema_group_y.map(group_id => group_id.map(y => y / schema_Y * (cycle - loss * phase_num) + loss))
 
+
     // 搭接情况   东口直左
-    if(phase_schema_group[0] === 3){
+    if(phase_schema_group[0] * 1 === 3){
         if(schema_group_key_flow_id[3][0] === 0){
             // console.log("东直+西左")
             let tmp = [phase_key_flow_time[0][0]*(flow_y[4]/flow_y[0]>1?1:flow_y[4]/flow_y[0]), phase_key_flow_time[0][0]*((1-flow_y[4]/flow_y[0])<0?0:(1-flow_y[4]/flow_y[0])), phase_key_flow_time[0][1]];
@@ -165,7 +167,7 @@ export const cal_control_time = () => {
     }
 
     // 搭接情况   西口直左
-    if(phase_schema_group[0] === 4){
+    if(phase_schema_group[0] * 1 === 4){
         if(schema_group_key_flow_id[3][0] === 0){
             // console.log("东直+西左")
             let tmp = [phase_key_flow_time[0][0], phase_key_flow_time[0][1]*((1-flow_y[2]/flow_y[6])<0?0:(1-flow_y[2]/flow_y[6])), phase_key_flow_time[0][1]*(flow_y[2]/flow_y[6]>1?1:flow_y[2]/flow_y[6])];
@@ -179,7 +181,7 @@ export const cal_control_time = () => {
     }
 
     // 搭接情况   南口直左
-    if(phase_schema_group[1] === 8){
+    if(phase_schema_group[1] * 1 === 8){
         if(schema_group_key_flow_id[8][0] === 1){
             // console.log("南直+北左")
             let tmp = [phase_key_flow_time[1][0]*(flow_y[5]/flow_y[1]>1?1:flow_y[5]/flow_y[1]), phase_key_flow_time[1][0]*((1-flow_y[5]/flow_y[1])<0?0:(1-flow_y[5]/flow_y[1])), phase_key_flow_time[1][1]];
@@ -193,7 +195,7 @@ export const cal_control_time = () => {
     }
 
     // 搭接情况   北口直左
-    if(phase_schema_group[1] === 9){
+    if(phase_schema_group[1] * 1 === 9){
         if(schema_group_key_flow_id[9][0] === 1){
             // console.log("南直+北左")
             let tmp = [phase_key_flow_time[1][0], phase_key_flow_time[1][1]*((1-flow_y[3]/flow_y[7])<0?0:(1-flow_y[3]/flow_y[7])), phase_key_flow_time[1][1]*(flow_y[3]/flow_y[7]>1?1:flow_y[3]/flow_y[7])];
@@ -209,34 +211,34 @@ export const cal_control_time = () => {
     // 各种配时方案的 流率比
     console.log("各种配时方案的 流率比: ", schema_group_key_flow_qc)
     
-    // 周期时长  
-    console.log("周期时长: " + cycle)
+    // 周期时长
+    // console.log("周期时长: " + cycle)
 
     // 配时方案名称
-    console.log("控制方案: " + phase_schema_group_name.join(","))
+    // console.log("控制方案: " + phase_schema_group_name.join(","))
 
     // 方案车流编号
-    console.log("方案车流编号: " + phase_schema_group_flow)
+    // console.log("方案车流编号: " + phase_schema_group_flow)
 
     // 方案车流名称
-    console.log("方案车流名称: " + phase_schema_group_flow_name)
+    // console.log("方案车流名称: " + phase_schema_group_flow_name)
 
     // 方案相位编号
-    console.log("方案相位编号: " + phase_schema_group_schema_id)
+    // console.log("方案相位编号: " + phase_schema_group_schema_id)
 
     // 方案相位名称
-    console.log("方案相位名称: " + phase_schema_group_schema_name)
+    // console.log("方案相位名称: " + phase_schema_group_schema_name)
 
     // 方案相位时长
-    console.log("方案相位时长: " + phase_key_flow_time)
-    
+    // console.log("方案相位时长: " + phase_key_flow_time)
+
     return [phase_schema_group_schema_name, phase_key_flow_time]
 
 }
 
 export const optimize_control_time = () => {
 
-    // 各股车流延误 (东直/东左, 南直/南左, 西直/西左, 北直/北左 )
+    // 各股车流延误 (东直/东左/东口, 南直/南左/南口, 西直/西左/西口, 北直/北左/北口 )
     let delay = [[], [], [], []]
 
 

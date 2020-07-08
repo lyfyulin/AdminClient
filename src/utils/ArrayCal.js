@@ -175,3 +175,12 @@ export const matrix =  {
     },
 }
 
+export const getStrCount = (src_str, target_str) => { 
+	//src_str 源字符串 target_str 特殊字符
+	var count=0
+	while(src_str.indexOf(target_str) != -1 ) {
+		src_str = src_str.replace(target_str,"")
+		count++    
+	}
+	return count
+}

@@ -7,6 +7,7 @@ import { TMS, MAP_CENTER, DEVICE_CAP_DIR } from '../../utils/baoshan'
 import memoryUtils from '../../utils/memoryUtils'
 import { getTodayDateString } from '../../utils/dateUtils'
 import { reqDeviceById, reqNodes, reqUpdateDevice, reqInsertDevice } from '../../api'
+import { gcj02tobd09 } from '../../utils/lnglatUtils'
 
 const Item = Form.Item
 const Option = Select.Option
@@ -82,11 +83,16 @@ class DeviceDetail extends Component {
                 let device = values
                 let lng = values.dev_lat_lng.split(",")[0]
                 let lat = values.dev_lat_lng.split(",")[1]
+
+                // device.dev_lat = gcj02tobd09(lng, lat)[1]
+                // device.dev_lng = gcj02tobd09(lng, lat)[0]
+
                 device.dev_lat = lat
                 device.dev_lng = lng
+
                 const result = isUpdate?await reqUpdateDevice(device):await reqInsertDevice(device)
                 if(result.code === 1){
-                    message.success(isUpdate?"更新点位成功！":"添加点位成功！")
+                    message.success(isUpdate?"更新设备成功！":"添加设备成功！")
                     this.props.history.replace("/device")
                 }else{
                     message.error(result.msg)

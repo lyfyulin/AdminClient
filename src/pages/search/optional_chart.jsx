@@ -143,11 +143,14 @@ export default class OptionalChart extends Component {
 
         const formLayout = {
             labelCol: { span: 7 },
-            wrapperCol: { span: 17 },
+            wrapperCol: { span: 14 },
         }
 
         return (
             <div className="full" style={{ display: "flex", flexWrap: 'nowrap', backgroundColor: "#ccc" }}>
+                <div className="lyf-col-7" style={{ border: '3px solid #0ff' }}>
+                    <Chart option={ option }/>
+                </div>
                 <div className="lyf-col-3">
                     <Form
                         className="full"
@@ -181,9 +184,7 @@ export default class OptionalChart extends Component {
                         </div>
                     </Form>
                 </div>
-                <div className="lyf-col-7">
-                    <Chart option={ option }/>
-                </div>
+
             </div>
         )
     }

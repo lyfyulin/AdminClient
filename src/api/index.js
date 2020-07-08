@@ -4,8 +4,8 @@
 import ajax from './ajax'
 import jsonp from 'jsonp'
 import { message } from 'antd'
-const base = 'http://192.122.2.196:3005'
-// const base = 'http://192.122.1.246:3005'
+// const base = 'http://192.122.2.196:3005'
+const base = 'http://192.122.1.246:3005'
 // const base = 'http://localhost:3005'
 export const reqLogin = (username, password) => ajax.post( base + "/login_verify", {username, password} )
 
@@ -717,30 +717,6 @@ export const reqCurrentNodeDelay = ( node_id ) => ajax( base + "/current/node/de
 } )
 
 export const reqNodeDelaySearch = ( start_time, end_time, node_id ) => ajax( base + "/search/node/delay", {
-    params: {
-        start_time, end_time, node_id
-    }
-} )
-
-export const reqCurrentNodeDirDelay = ( node_id ) => ajax( base + "/current/node/dir/delay", {
-    params: {
-        node_id
-    }
-} )
-
-export const reqNodeDirDelaySearch = ( start_time, end_time, node_id ) => ajax( base + "/search/node/dir/delay", {
-    params: {
-        start_time, end_time, node_id
-    }
-} )
-
-export const reqCurrentNodeFlowDelay = ( node_id ) => ajax( base + "/current/node/flow/delay", {
-    params: {
-        node_id
-    }
-} )
-
-export const reqNodeFlowDelaySearch = ( start_time, end_time, node_id ) => ajax( base + "/search/node/flow/delay", {
     params: {
         start_time, end_time, node_id
     }

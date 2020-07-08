@@ -83,6 +83,8 @@ export default class DeviceInfo extends Component {
         devices.forEach( e => {
             let lat = bd09togcj02(e.dev_lng, e.dev_lat)[1]
             let lng = bd09togcj02(e.dev_lng, e.dev_lat)[0]
+            // let lat = e.dev_lat
+            // let lng = e.dev_lng
             this.device.push( L.circle([lat, lng], { ...DEVICE_CONFIG }).bindPopup(e.dev_name) )
         })
         this.map.removeLayer(this.devices_circle)

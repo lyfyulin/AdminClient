@@ -75,7 +75,7 @@ export default class SignalSchema extends Component {
                                         <img className="phase-img" src={require(`../../assets/images/${this.props.inter_type}/phase-${item.phase_schema}.png`)} alt={ PHASE_SCHEMA[item.phase_schema] }/>
                                     </div>
                                     <div className="flex-item-title">
-                                        <div className="lyf-row-5 lyf-center">{ '相位' + item.phase_index }</div>
+                                        <div className="lyf-row-5 lyf-center">{ '阶段' + item.phase_index }</div>
                                         <div className="lyf-row-5 lyf-center">{ PHASE_SCHEMA[item.phase_schema] + " : " + item.phase_time + 's' }</div>
                                     </div>
                                 </div>
@@ -90,7 +90,7 @@ export default class SignalSchema extends Component {
                                         <img className="phase-img" src={require(`../../assets/images/${this.props.inter_type}/phase-${item.phase_schema}.png`)} alt={ PHASE_SCHEMA[item.phase_schema] }/>
                                     </div>
                                     <div className="flex-item-title lyf-center">
-                                        <div className="lyf-row-5 lyf-center">{ '相位' + item.phase_index }</div>
+                                        <div className="lyf-row-5 lyf-center">{ '阶段' + item.phase_index }</div>
                                         <div className="lyf-row-5 lyf-center">{ PHASE_SCHEMA[item.phase_schema] + " : " + item.phase_time + 's' }</div>
                                     </div>
                                 </div>

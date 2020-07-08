@@ -186,15 +186,7 @@ class NodeSignalInfo extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault()
-        this.props.form.validateFields( async (error, values) => {
-            if( !error ){
-                let start_date = getDateString(values["start_time"])
-                let end_date = getDateString(values["end_time"])
-                let start_time = getTimeString(values["start_time"])
-                let end_time = getTimeString(values["end_time"])
-                const result = await reqNodeSchemaExecSearch(start_date, end_date, start_time, end_time)
-            }
-        } )
+        
     }
 
     componentWillMount() {
@@ -259,56 +251,18 @@ class NodeSignalInfo extends Component {
                                 }
                             </Item>
                         </div>
-                        <div className="lyf-col-2 lyf-center">
-                            <Item label="起始时间" name="start_time">
-                                {
-                                    getFieldDecorator("start_time", {
-                                        initialValue: moment("2020-01-01 07:00:00"),
-                                    })(
-                                        <TimePicker 
-                                            style={{ width:'100%' }} 
-                                            placeholder="请选择时间" 
-                                            size="small"
-                                            format = "YYYY-MM-DD HH:mm:ss"
-                                        />
-                                    )
-                                }
-                            </Item>
-                        </div>
-                        <div className="lyf-col-2 lyf-center">
-                            <Item label="结束时间" name="end_time">
-                                {
-                                    getFieldDecorator("end_time", {
-                                        initialValue: moment("2020-01-01 08:00:00"),
-                                    })(
-                                        <TimePicker 
-                                            size="small"
-                                            style={{ width:'100%' }} 
-                                            placeholder="请选择时间" 
-                                            size="small"
-                                            format = "YYYY-MM-DD HH:mm:ss"
-                                        />
-                                    )
-                                }
-                            </Item>
-                        </div>
-                        <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
-                            {
-                                getFieldDecorator("execution", {
-                                    initialValue: false,
-                                })(
-                                    <Checkbox style={{ width: '100%' }}>执行</Checkbox>
-                                )
-                            }
-                        </div>
-                        <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
-                            <Button htmlType="submit" size="small">查询</Button>
-                        </div>
+
                         <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
                             <Button size="small" onClick={ () => { this.loadNodeSchemas(this.state.node_id) } }>全部方案</Button>
                         </div>
                         <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
                             <Button size="small" onClick={ () => { this.props.history.push("/node-signal/add") } }>添加方案</Button>
+                        </div>
+                        <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
+                            <Button size="small" onClick={ () => { this.props.history.push("/node-signal/generate") } }>方案生成</Button>
+                        </div>
+                        <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
+                            <Button size="small" onClick={ () => { this.props.history.push("/node-signal/optimize") } }>方案优化</Button>
                         </div>
                     </div>
                 </Form>
