@@ -716,9 +716,9 @@ export const reqCurrentNodeDelay = ( node_id ) => ajax( base + "/current/node/de
     }
 } )
 
-export const reqNodeDelaySearch = ( start_time, end_time, node_id ) => ajax( base + "/search/node/delay", {
+export const reqNodeDelaySearch = ( start_date, end_date, start_time, end_time, node_id ) => ajax( base + "/search/node/delay", {
     params: {
-        start_time, end_time, node_id
+        start_date, end_date, start_time, end_time, node_id
     }
 } )
 

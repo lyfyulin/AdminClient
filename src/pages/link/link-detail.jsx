@@ -3,7 +3,7 @@ import { Card, Icon, Input, Select, Button, Modal, message, Form } from 'antd'
 import LinkButton from '../../components/link-button'
 import L from 'leaflet'
 import '../../utils/leaflet/LeafletEditable'
-import { TMS, MAP_CENTER, LINK_TYPE, LINK_CONFIG } from '../../utils/baoshan'
+import { TMS, MAP_CENTER, LINK_TYPE, LINK_CONFIG, LINK_RANK, LINK_DIR } from '../../utils/baoshan'
 import memoryUtils from '../../utils/memoryUtils'
 import { reqLinkById, reqNodes, reqUpdateLink, reqInsertLink } from '../../api'
 import { Str2LatLng } from '../../utils/lnglatUtils'
@@ -106,8 +106,6 @@ class LinkDetail extends Component {
             if( !error ){
                 let { link } = this.state
                 if(isUpdate || link.link_sequence){
-                    console.log(link, values);
-                    
                     const result = isUpdate?await reqUpdateLink({ ...link, ...values }):await reqInsertLink({ ...link, ...values })
                     if(result.code === 1){
                         message.success(isUpdate?"更新路段成功！":"添加路段成功！")
@@ -183,12 +181,12 @@ class LinkDetail extends Component {
                     </Item>
                     <Item label="路段类型">
                         {
-                            getFieldDecorator("link_type", {
-                                initialValue: link.link_type || 1,
+                            getFieldDecorator("link_rank", {
+                                initialValue: link.link_rank || 1,
                             })(
                                 <Select>
                                     {
-                                        LINK_TYPE.map( (opt, index) => (
+                                        LINK_RANK.map( (opt, index) => (
                                             <Option key={ index } value={ index + 1 }>{ opt }</Option>
                                         ) )
                                     }
@@ -214,6 +212,19 @@ class LinkDetail extends Component {
                                 initialValue: link.link_length || '',
                             })(
                                 <Input suffix="米"/>
+                            )
+                        }
+                    </Item>
+                    <Item label="路段方向">
+                        {
+                            getFieldDecorator("link_dir", {
+                                initialValue: link.link_dir || '',
+                            })(
+                                <Select style={{ width: '100%' }}>
+                                    {
+                                        LINK_DIR.map( (e, i) => <Option key={i} value = {i}>{e}</Option> )
+                                    }
+                                </Select>
                             )
                         }
                     </Item>

@@ -1,431 +1,56 @@
-import {ArrayArgMax, ArrayFindValueIndex, ArrayMax, ArraySum} from '../../../utils/ArrayCal'
+import {ArrayArgMax, ArrayFindValueIndex, ArrayMax, ArraySum, ArrayAccumulate} from '../ArrayCal'
+import { PHASE_SCHEMA } from '../ConstantUtils'
+
 import $ from 'jquery'
 import {d3} from 'd3-node'
-export default class LineSignalCal {
 
-	constructor(line_dir, line_ctrl_type, cross_phase_schema, cross_phase_time, cross_dist, cross_speed, cross_name, flag = false, fix_cycle = 0) {
-        
+
+// 干线配时计算
+export class LineSignalCal {
+
+	constructor(line_cycle, line_link_length, line_speed, line_node_cycle, line_node_green_ratio, line_node_name) {
 
         // 初始化参数
-        this.init_params(line_dir, line_ctrl_type, cross_phase_schema, cross_phase_time, cross_dist, cross_speed, cross_name, flag, fix_cycle);
-
+        this.init_params(line_cycle, line_link_length, line_speed, line_node_cycle, line_node_green_ratio, line_node_name)
 		// 参数及数据
-		this.gap_skip = 10;
-
+		this.gap_skip = 10
 		// 结果集
-		this.green_start_time_arr = [];
-		this.green_end_time_arr = [];
-		this.double_band_width = [];
-		this.relative_offset = [];
-    }
-    
-
-    init_params = (line_dir, line_ctrl_type, cross_phase_schema, cross_phase_time, cross_dist, cross_speed, cross_name, flag = false, fix_cycle = 0) => {
-        // 1.数据输入
-
-        // 2.输入数据预处理
-        // 2.1公共周期确定
-        let cross_cycle = cross_phase_time.map(e=>ArraySum(e));
-        let publicCycle = ArrayMax(cross_cycle);
-        let new_cross_cycle = [];
-    
-        // 是否定周期
-        if(flag){
-            publicCycle = fix_cycle;
-            new_cross_cycle = cross_cycle.map( e => publicCycle);
-        }else{
-            publicCycle = publicCycle % 2 === 0?publicCycle : publicCycle + 1;	//偶数
-            new_cross_cycle = cross_cycle.map( e => {
-                if(e >= publicCycle * 0.6){
-                    return publicCycle;
-                }else{
-                    return publicCycle/2;
-                }
-            })
-        }
-    
-        // 2.2绿信比计算/关键相位获取
-        // 协调相位绿信比
-        let phase_green_ratio = [];
-        // 协调相位在信号方案的序号 index
-        let key_phase_index = [];
-    
-        // 东向西方向
-        if(line_dir === 1){
-            // 双向协调
-            if(line_ctrl_type === 1){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 东西直左
-                    if(element.indexOf(0) !== -1){
-                        let index = element.indexOf(0);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 东西直行
-                    if(ArrayFindValueIndex(element, 1).length !== 0){
-                        let tmp = ArrayFindValueIndex(element, 1).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 1)[ArrayArgMax(tmp)];
-                    }				
-                }
-            }
-            // 东向西正向协调
-            if(line_ctrl_type === 2){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 东西直左
-                    if(element.indexOf(0) !== -1){
-                        let index = element.indexOf(0);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 东西直行
-                    if(ArrayFindValueIndex(element, 1).length !== 0 && ArrayFindValueIndex(element, 3) === -1){
-                        let tmp = ArrayFindValueIndex(element, 1).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 1)[ArrayArgMax(tmp)];
-                    }
-                    // 东西直行+东口直左
-                    if(ArrayFindValueIndex(element, 1).length !== 0 && ArrayFindValueIndex(element, 3) !== -1){
-                        let index1 = element.indexOf(1);
-                        let index2 = element.indexOf(3);
-                        if(Math.abs(index1 - index2) === 1){
-                            key_phase_index[i] = Math.min(index1, index2);
-                            phase_green_ratio[i] = (cross_phase_time[i][index1] + cross_phase_time[i][index2])/cross_cycle[i];
-                        }
-                    }
-                }
-            }
-            // 东向西反向协调
-            if(line_ctrl_type === 3){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 东西直左
-                    if(element.indexOf(0) !== -1){
-                        let index = element.indexOf(0);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 东西直行
-                    if(ArrayFindValueIndex(element, 1).length !== 0 && ArrayFindValueIndex(element, 4) === -1){
-                        let tmp = ArrayFindValueIndex(element, 1).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 1)[ArrayArgMax(tmp)];
-                    }
-                    // 东西直行+西口直左
-                    if(ArrayFindValueIndex(element, 1).length !== 0 && ArrayFindValueIndex(element, 4) !== -1){
-                        let index1 = element.indexOf(1);
-                        let index2 = element.indexOf(4);
-                        if(Math.abs(index1 - index2) === 1){
-                            key_phase_index[i] = Math.min(index1, index2);
-                            phase_green_ratio[i] = (cross_phase_time[i][index1] + cross_phase_time[i][index2])/cross_cycle[i];
-                        }
-                    }
-                }
-            }
-        }
-    
-        // 南向北方向
-        if(line_dir === 2){
-            // 南北双向协调
-            if(line_ctrl_type === 1){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 南北直左
-                    if(element.indexOf(5) !== -1){
-                        let index = element.indexOf(5);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 南北直行
-                    if(ArrayFindValueIndex(element, 6).length !== 0){
-                        let tmp = ArrayFindValueIndex(element, 6).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 6)[ArrayArgMax(tmp)];
-                    }				
-                }
-            }
-            // 南向北正向协调
-            if(line_ctrl_type === 2){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 南北直左
-                    if(element.indexOf(5) !== -1){
-                        let index = element.indexOf(5);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 南北直行
-                    if(ArrayFindValueIndex(element, 6).length !== 0 && ArrayFindValueIndex(element, 8) === -1){
-                        let tmp = ArrayFindValueIndex(element, 6).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 6)[ArrayArgMax(tmp)];
-                    }
-                    // 南北直行+南口直左
-                    if(ArrayFindValueIndex(element, 6).length !== 0 && ArrayFindValueIndex(element, 8) !== -1){
-                        let index1 = element.indexOf(6);
-                        let index2 = element.indexOf(8);
-                        if(Math.abs(index1 - index2) === 1){
-                            key_phase_index[i] = Math.min(index1, index2);
-                            phase_green_ratio[i] = (cross_phase_time[i][index1] + cross_phase_time[i][index2])/cross_cycle[i];
-                        }
-                    }
-                }
-            }
-            // 南向北反向协调
-            if(line_ctrl_type === 3){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 南北直左
-                    if(element.indexOf(5) !== -1){
-                        let index = element.indexOf(5);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 南北直行
-                    if(ArrayFindValueIndex(element, 6).length !== 0 && ArrayFindValueIndex(element, 9) === -1){
-                        let tmp = ArrayFindValueIndex(element, 6).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 6)[ArrayArgMax(tmp)];
-                    }
-                    // 南北直行+北口直左
-                    if(ArrayFindValueIndex(element, 6).length !== 0 && ArrayFindValueIndex(element, 9) !== -1){
-                        let index1 = element.indexOf(6);
-                        let index2 = element.indexOf(9);
-                        if(Math.abs(index1 - index2) === 1){
-                            key_phase_index[i] = Math.min(index1, index2);
-                            phase_green_ratio[i] = (cross_phase_time[i][index1] + cross_phase_time[i][index2])/cross_cycle[i];
-                        }
-                    }
-                }
-            }
-        }
-    
-        // 西向东方向
-        if(line_dir === 3){
-            // 双向协调
-            if(line_ctrl_type === 1){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 东西直左
-                    if(element.indexOf(0) !== -1){
-                        let index = element.indexOf(0);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 东西直行
-                    if(ArrayFindValueIndex(element, 1).length !== 0){
-                        let tmp = ArrayFindValueIndex(element, 1).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 1)[ArrayArgMax(tmp)];
-                    }				
-                }
-            }
-            // 西向东反向协调
-            if(line_ctrl_type === 2){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 东西直左
-                    if(element.indexOf(0) !== -1){
-                        let index = element.indexOf(0);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 东西直行
-                    if(ArrayFindValueIndex(element, 1).length !== 0 && ArrayFindValueIndex(element, 3) === -1){
-                        let tmp = ArrayFindValueIndex(element, 1).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 1)[ArrayArgMax(tmp)];
-                    }
-                    // 东西直行+东口直左
-                    if(ArrayFindValueIndex(element, 1).length !== 0 && ArrayFindValueIndex(element, 3) !== -1){
-                        let index1 = element.indexOf(1);
-                        let index2 = element.indexOf(3);
-                        if(Math.abs(index1 - index2) === 1){
-                            key_phase_index[i] = Math.min(index1, index2);
-                            phase_green_ratio[i] = (cross_phase_time[i][index1] + cross_phase_time[i][index2])/cross_cycle[i];
-                        }
-                    }
-                }
-            }
-            // 西向东正向协调
-            if(line_ctrl_type === 3){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 东西直左
-                    if(element.indexOf(0) !== -1){
-                        let index = element.indexOf(0);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 东西直行
-                    if(ArrayFindValueIndex(element, 1).length !== 0 && ArrayFindValueIndex(element, 4) === -1){
-                        let tmp = ArrayFindValueIndex(element, 1).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 1)[ArrayArgMax(tmp)];
-                    }
-                    // 东西直行+西口直左
-                    if(ArrayFindValueIndex(element, 1).length !== 0 && ArrayFindValueIndex(element, 4) !== -1){
-                        let index1 = element.indexOf(1);
-                        let index2 = element.indexOf(4);
-                        if(Math.abs(index1 - index2) === 1){
-                            key_phase_index[i] = Math.min(index1, index2);
-                            phase_green_ratio[i] = (cross_phase_time[i][index1] + cross_phase_time[i][index2])/cross_cycle[i];
-                        }
-                    }
-                }
-            }
-        }
-    
-        // 北向南方向
-        if(line_dir === 4){
-            // 南北双向协调
-            if(line_ctrl_type === 1){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 南北直左
-                    if(element.indexOf(5) !== -1){
-                        let index = element.indexOf(5);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 南北直行
-                    if(ArrayFindValueIndex(element, 6).length !== 0){
-                        let tmp = ArrayFindValueIndex(element, 6).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 6)[ArrayArgMax(tmp)];
-                    }				
-                }
-            }
-            // 北向南反向协调
-            if(line_ctrl_type === 2){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 南北直左
-                    if(element.indexOf(5) !== -1){
-                        let index = element.indexOf(5);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 南北直行
-                    if(ArrayFindValueIndex(element, 6).length !== 0 && ArrayFindValueIndex(element, 8) === -1){
-                        let tmp = ArrayFindValueIndex(element, 6).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 6)[ArrayArgMax(tmp)];
-                    }
-                    // 南北直行+南口直左
-                    if(ArrayFindValueIndex(element, 6).length !== 0 && ArrayFindValueIndex(element, 8) !== -1){
-                        let index1 = element.indexOf(6);
-                        let index2 = element.indexOf(8);
-                        if(Math.abs(index1 - index2) === 1){
-                            key_phase_index[i] = Math.min(index1, index2);
-                            phase_green_ratio[i] = (cross_phase_time[i][index1] + cross_phase_time[i][index2])/cross_cycle[i];
-                        }
-                    }
-                }
-            }
-            // 北向南正向协调
-            if(line_ctrl_type === 3){
-                for (let i = 0; i < cross_phase_schema.length; i++) {
-                    const element = cross_phase_schema[i];
-                    // 南北直左
-                    if(element.indexOf(5) !== -1){
-                        let index = element.indexOf(5);
-                        key_phase_index[i] = index;
-                        phase_green_ratio[i] = cross_phase_time[i][index]/cross_cycle[i];
-                    }
-                    // 南北直行
-                    if(ArrayFindValueIndex(element, 6).length !== 0 && ArrayFindValueIndex(element, 9) === -1){
-                        let tmp = ArrayFindValueIndex(element, 6).map(e => {
-                            return cross_phase_time[i][e];
-                        })
-                        // let max_phase_time = ArrayMax(tmp)/cross_cycle[i];
-                        key_phase_index[i] = ArrayFindValueIndex(element, 6)[ArrayArgMax(tmp)];
-                    }
-                    // 南北直行+北口直左
-                    if(ArrayFindValueIndex(element, 6).length !== 0 && ArrayFindValueIndex(element, 9) !== -1){
-                        let index1 = element.indexOf(6);
-                        let index2 = element.indexOf(9);
-                        if(Math.abs(index1 - index2) === 1){
-                            key_phase_index[i] = Math.min(index1, index2);
-                            phase_green_ratio[i] = (cross_phase_time[i][index1] + cross_phase_time[i][index2])/cross_cycle[i];
-                        }
-                    }
-                }
-            }
-        }
-    
-        // 距离计算速度
-        // let cross_velocity = [];
-        // for (let index = 0; index < cross_dist.length; index++) {
-        //     if(index !== 0){
-        //         cross_velocity.push(cross_dist[index]/cross_free_time[index]);
-        //     }
-        // }
-		// let velocity = ArrayMin(cross_velocity););
-
-		let velocity = ArrayMax(cross_speed);
-
-		this.publicCycle = publicCycle;
-		this.cross_dist = cross_dist;
-		this.velocity = velocity;
-		this.schema_cycle = new_cross_cycle;
-		this.phase_green_ratio = phase_green_ratio;
-		this.cross_name = cross_name;
-
-		// console.log(this.publicCycle, this.velocity, this.phase_green_ratio, this.schema_cycle, this.cross_dist, this.cross_name);
+		this.green_start_time_arr = []
+		this.green_end_time_arr = []
+		this.double_band_width = []
+		this.relative_offset = []
 
     }
-    
+	
+	init_params = (line_cycle, line_link_length, line_speed, line_node_cycle, line_node_green_ratio, line_node_name) => {
 
+		// 公共周期时长
+		this.line_cycle = line_cycle
+		// 各路口间距
+		this.line_link_length = line_link_length
+		// 干线速度
+		this.line_speed = line_speed
+		// 各路口信号周期
+		this.line_node_cycle = line_node_cycle
+		// 绿信比
+		this.line_node_green_ratio = line_node_green_ratio
+		// 交叉口名称
+		this.line_node_name = line_node_name
 
-	setOption = (line_dir, line_ctrl_type, cross_phase_schema, cross_phase_time, cross_dist, cross_speed, cross_name, flag = false, fix_cycle = 0) => {
-        
-        this.init_params(line_dir, line_ctrl_type, cross_phase_schema, cross_phase_time, cross_dist, cross_speed, cross_name, flag, fix_cycle);
-
-		// 结果集
-		this.green_start_time_arr = [];
-		this.green_end_time_arr = [];
-		this.double_band_width = [];
-		this.relative_offset = [];
-
-		this.calLineControl();
 	}
 
+	setOption = (line_cycle, line_link_length, line_speed, line_node_cycle, line_node_green_ratio, line_node_name) => {
+        
+        this.init_params(line_cycle, line_link_length, line_speed, line_node_cycle, line_node_green_ratio, line_node_name)
 
-	// 数组累计和
-	accumSum = (arr) => {
-		let result = [];
-		let sum = 0;
-		for(let i = 0; i < arr.length; i++)
-		{
-			sum += arr[i];
-			result.push(sum);
-		}
-		return result;
+		// 结果集
+		this.green_start_time_arr = []
+		this.green_end_time_arr = []
+		this.double_band_width = []
+		this.relative_offset = []
+
+		this.calLineControl(line_cycle, line_speed, line_node_green_ratio, line_node_cycle, line_link_length, line_node_name);
+		
 	}
 
 	// 数组排序返回序号
@@ -460,7 +85,7 @@ export default class LineSignalCal {
 	calGreenWave = (arr, v, c, min_actual2dream_gap, max_actual2dream_gap, gap_skip) => {
 
 		let result = [];
-		let coordinate = this.accumSum(arr);
+		let coordinate = ArrayAccumulate(arr);
 		
 		let dream_max_shift_gap = 0;
 		let dream_max_shift_gap_cross = 0;			// 最大挪移的交叉口
@@ -565,7 +190,7 @@ export default class LineSignalCal {
 	}
 	
 	// step 15 计算相对相位差
-	calRelativeOffset = (offset, publicCycle, suppose_cross_index) => {
+	calRelativeOffset = (offset, line_cycle, suppose_cross_index) => {
 		let relative_offset = [];
 		
 		for(let i = 0; i < offset.length; i++)
@@ -577,14 +202,14 @@ export default class LineSignalCal {
 			}
 			else
 			{
-				relative_offset.push(offset[i] - offset[suppose_cross_index] + publicCycle);
+				relative_offset.push(offset[i] - offset[suppose_cross_index] + line_cycle);
 			}
 		}
 		return relative_offset;
 	}
 			
 	// 计算关键相位绿灯启亮时刻
-	calGreenStartTime = (lamda_arr, publicCycle, relative_offset, index) => {
+	calGreenStartTime = (lamda_arr, line_cycle, relative_offset, index) => {
 		let green_start_time_arr = [];
 		for(let i = 0; i < index.length; i++)
 		{
@@ -592,17 +217,17 @@ export default class LineSignalCal {
 			
 			while(true)
 			{
-				if((index[i] * 0.5 - 0.75) * publicCycle <= temp && temp <= (index[i] * 0.5 - 0.25) * publicCycle)
+				if((index[i] * 0.5 - 0.75) * line_cycle <= temp && temp <= (index[i] * 0.5 - 0.25) * line_cycle)
 				{
 					break;
 				}
-				else if((index[i] * 0.5 - 0.75) * publicCycle >= temp)
+				else if((index[i] * 0.5 - 0.75) * line_cycle >= temp)
 				{
-					temp += publicCycle * 0.5;
+					temp += line_cycle * 0.5;
 				}
-				else if((index[i] * 0.5 - 0.25) * publicCycle <= temp)
+				else if((index[i] * 0.5 - 0.25) * line_cycle <= temp)
 				{
-					temp -= publicCycle * 0.5;
+					temp -= line_cycle * 0.5;
 				}
 			}
 			green_start_time_arr.push(temp);
@@ -611,17 +236,17 @@ export default class LineSignalCal {
 	}
 	
 	// 计算关键相位绿灯停止时刻。
-	calGreenEndTime = (lamda_arr, publicCycle, green_start_time_arr) => {
+	calGreenEndTime = (lamda_arr, line_cycle, green_start_time_arr) => {
 		let green_end_time_arr = [];
 		for(let i = 0; i < green_start_time_arr.length; i++)
 		{
-			green_end_time_arr.push(green_start_time_arr[i] + publicCycle * lamda_arr[i]);
+			green_end_time_arr.push(green_start_time_arr[i] + line_cycle * lamda_arr[i]);
 		}
 		return green_end_time_arr;
 	}
 
 	// 计算绿波带宽度
-	calGreenBandWidth = (actual2dreamgap, actual2dreamdirection, actual2dream_index, dream_gap, velocity, green_start_time, green_end_time) => {
+	calGreenBandWidth = (actual2dreamgap, actual2dreamdirection, actual2dream_index, dream_gap, line_speed, green_start_time, green_end_time) => {
 		let relative_left_coor = [];
 		let relative_right_coor = [];
 		for(let i = 0; i < actual2dream_index.length; i++)
@@ -636,18 +261,18 @@ export default class LineSignalCal {
 		}
 		let max_k1 = 0;
 		let min_k2 = 0;
-		max_k1 = green_start_time[0] - relative_left_coor[0] / velocity;
-		min_k2 = green_end_time[0] - relative_left_coor[0] / velocity;
+		max_k1 = green_start_time[0] - relative_left_coor[0] / line_speed;
+		min_k2 = green_end_time[0] - relative_left_coor[0] / line_speed;
 		for(let i = 0; i < green_start_time.length; i++)
 		{
-			if(max_k1 < green_start_time[i] - relative_left_coor[i] / velocity)
+			if(max_k1 < green_start_time[i] - relative_left_coor[i] / line_speed)
 			{
-				max_k1 = green_start_time[i] - relative_left_coor[i] / velocity;
+				max_k1 = green_start_time[i] - relative_left_coor[i] / line_speed;
 			}
 			
-			if(min_k2 > green_end_time[i] - relative_left_coor[i] / velocity)
+			if(min_k2 > green_end_time[i] - relative_left_coor[i] / line_speed)
 			{
-				min_k2 = green_end_time[i] - relative_left_coor[i] / velocity;
+				min_k2 = green_end_time[i] - relative_left_coor[i] / line_speed;
 			}
 		}
 		// 正向绿波带宽度
@@ -655,18 +280,18 @@ export default class LineSignalCal {
 		
 		max_k1 = 0;
 		min_k2 = 0;
-		max_k1 = green_start_time[green_start_time.length - 1] + relative_right_coor[0] / velocity;
-		min_k2 = green_end_time[green_start_time.length - 1] + relative_right_coor[0] / velocity;
+		max_k1 = green_start_time[green_start_time.length - 1] + relative_right_coor[0] / line_speed;
+		min_k2 = green_end_time[green_start_time.length - 1] + relative_right_coor[0] / line_speed;
 		for(let i = 0; i < green_start_time.length; i++)
 		{
-			if(max_k1 < green_start_time[green_start_time.length - 1 - i] + relative_right_coor[i] / velocity)
+			if(max_k1 < green_start_time[green_start_time.length - 1 - i] + relative_right_coor[i] / line_speed)
 			{
-				max_k1 = green_start_time[green_start_time.length - 1 - i] + relative_right_coor[i] / velocity;
+				max_k1 = green_start_time[green_start_time.length - 1 - i] + relative_right_coor[i] / line_speed;
 			}
 			
-			if(min_k2 > green_end_time[green_start_time.length - 1 - i] + relative_right_coor[i] / velocity)
+			if(min_k2 > green_end_time[green_start_time.length - 1 - i] + relative_right_coor[i] / line_speed)
 			{
-				min_k2 = green_end_time[green_start_time.length - 1 - i] + relative_right_coor[i] / velocity;
+				min_k2 = green_end_time[green_start_time.length - 1 - i] + relative_right_coor[i] / line_speed;
 			}
 		}
 		// 反向绿波带宽度
@@ -675,23 +300,22 @@ export default class LineSignalCal {
 		
 	}
 
-
 	// 计算控制方案
-	calLineControl = (cycle = this.publicCycle, velocity = this.velocity, green_ratio = this.phase_green_ratio, schema_cycle = this.schema_cycle, cross_dist = this.cross_dist, cross_name = this.cross_name) => {
+	calLineControl = ( cycle, line_speed, green_ratio, line_node_cycle, line_link_length, line_node_name ) => {
 
 		let gap_skip = this.gap_skip;
-		let min_actual2dream_gap = velocity * cycle / 2 - gap_skip * 10;
-		let max_actual2dream_gap = velocity * cycle / 2 + gap_skip * 10;
-		let gap_cross = this.calGreenWave(cross_dist, velocity, cycle, min_actual2dream_gap, max_actual2dream_gap, gap_skip);
+		let min_actual2dream_gap = line_speed * cycle / 2 - gap_skip * 10;
+		let max_actual2dream_gap = line_speed * cycle / 2 + gap_skip * 10;
+		let gap_cross = this.calGreenWave(line_link_length, line_speed, cycle, min_actual2dream_gap, max_actual2dream_gap, gap_skip);
 		
-		let coordinate = this.accumSum(cross_dist);
+		let coordinate = ArrayAccumulate(line_link_length);
 			
 		//  step 12 实际交叉口与理想协调交叉口距离
 		let actual2dreamlocation = this.calactual2dreamLocation(coordinate, gap_cross);
 		
 
 		// 计算相对相位差
-		let offset_arr = this.calOffset(green_ratio, schema_cycle, actual2dreamlocation[2]);
+		let offset_arr = this.calOffset(green_ratio, line_node_cycle, actual2dreamlocation[2]);
 		let relative_offset = this.calRelativeOffset(offset_arr, cycle, 0);				// 假设相对第1个交叉口进行相位差计算  
 		
 		// 计算绿灯起始时刻/结束时刻
@@ -699,185 +323,185 @@ export default class LineSignalCal {
 		let green_end_time_arr = this.calGreenEndTime(green_ratio, cycle, green_start_time_arr);
 
 		// 计算双向绿波宽度
-		let double_band_width = this.calGreenBandWidth(actual2dreamlocation[1], actual2dreamlocation[0], actual2dreamlocation[2], gap_cross[2], velocity, green_start_time_arr, green_end_time_arr);
+		let double_band_width = this.calGreenBandWidth(actual2dreamlocation[1], actual2dreamlocation[0], actual2dreamlocation[2], gap_cross[2], line_speed, green_start_time_arr, green_end_time_arr);
 
 		this.relative_offset = relative_offset;
 		this.green_start_time_arr = green_start_time_arr;
 		this.green_end_time_arr = green_end_time_arr;
 		
-		this.double_band_width = double_band_width;
+		this.double_band_width = double_band_width
 	
-	}
-
-	// 打印文字到textarea
-	printResult = (divID, cycle = this.publicCycle, double_band_width = this.double_band_width, green_start_time_arr = this.green_start_time_arr, green_end_time_arr = this.green_end_time_arr) => {
-		
-		let oText1 = document.getElementById(divID);
-		let str_cal_result = "";
-		if(double_band_width[0] > 0 && double_band_width[0] < cycle / 2) {
-			str_cal_result = '双向绿波带宽为' + double_band_width[0] + 's\n';
-		} else {
-			str_cal_result = '';
-		}
-		for(let i = 0; i < green_start_time_arr.length - 1; i++){
-			str_cal_result += '第' + (i+1) + '个交叉口绿灯启亮时刻：' + green_start_time_arr[i] + 's\n第' + (i+1) + '个交叉口绿灯停止时刻：' + green_end_time_arr[i] + 's\n';
-		}
-		oText1.innerHTML = str_cal_result;
-	}
-
-	// 画线段
-	drawSvgLine = (svg, lines) => {
-		svg.append("g").attr("id", "lines").selectAll("line").data(lines).enter().append("line").attr("x1", (d,i) => d[0]).attr("y1", (d,i) => d[1])
-		.attr("x2", (d,i) =>d[2]).attr("y2", (d,i) => d[3])
-		.attr("stroke", (d,i) => d[4]).attr("stroke-width", (d,i) => d[5])
-		.attr("transform", (d,i) => ("translate(" + d[6] + ", " + d[7] + "),rotate(" + d[8] + ")"));
-	}
-
-	// 画文字
-	drawSvgText = (svg, texts) => {
-		svg.append("g").attr("id", "texts").selectAll("text").data(texts).enter().append("text")
-		.attr("x", (d,i) => d[0]).attr("y", (d,i) => d[1]).attr("fill", (d,i)=> d[2])
-		.attr("font-size", (d,i) => d[3]).text((d,i) => d[4])
-		.attr("text-anchor", "middle");
-	}
-
-	// 画曲线
-	drawSvgPath = (svg, paths) => {
-		svg.append("g").attr("id", "paths").selectAll("path").data(paths).enter().append("path")
-		.attr("d", (d,i)=> d[0]).attr("stroke", (d,i)=> d[1]).attr("stroke-width", (d,i)=> d[2]).attr("fill", (d,i)=> d[3])
-		.attr("transform", (d, i) => ("translate(" + d[4] + ", " + d[5] + "),rotate(" + d[6] + ")"));
-
-	}
-
-	// 画图
-	drawInSvg = (divID, bgc = "#777", velocity=this.velocity, cycle = this.publicCycle, dist = this.cross_dist, band_width = this.double_band_width, start_time = this.green_start_time_arr, end_time = this.green_end_time_arr, cross_name = this.cross_name) => {
-
-		// 初始化
-		let odiv = $("#" + divID)[0];
-		let width = odiv.offsetWidth;
-		let height = odiv.offsetHeight;
-
-		// 清除已有内容
-		d3.select("body").select("#" + divID).selectAll("*").remove();
-		let svg = d3.select("body").select("#" + divID).append("svg").attr("width", width).attr("height", height).style("background", bgc);
-
-		// 参数计算
-		let actual_coor = dist;
-		let location = this.accumSum(actual_coor);
-		let show_cycle_num = parseInt(end_time[end_time.length - 1]/cycle, 10);
-
-		// 缩放计算
-		let scale_y = height / (show_cycle_num * cycle) / 1.5;
-		let scale_x = width / location[location.length - 1] / 1.2;
-		let offset_x = width/12;
-		let offset_y = height/12;
-		let font_size = 10;
-
-		// 画图最小周期
-		let mincycle = 4;
-
-		// 绘制中 绿灯起始时刻/结束时刻 最小值
-		let first_green = [];
-		let first_red = [];
-		for(let i = 0; i < start_time.length; i++)
-		{
-			let tmp = start_time[i] - cycle * mincycle;
-			let tmp2 = end_time[i] - cycle * mincycle;
-			first_green.push(tmp);
-			first_red.push(tmp2);
-		}
-
-		// 相位绘制
-		let lines = [];
-		let texts = [];
-		let paths = [];
-		for(let i = 0; i < location.length; i++)
-		{
-			for(let j = 0; j < show_cycle_num * 5; j++)
-			{
-				let green_y1 = first_green[i] + j * cycle;
-				let green_y2 = first_red[i] + j * cycle;
-				let red_y1 = first_red[i] + j * cycle;
-				let red_y2 = first_green[i] + (j + 1) * cycle;
-
-				if(green_y2<=0){
-					continue;
-				}
-				if(green_y2>0 && green_y1<=0){
-					green_y1 = 0;
-				}
-				
-				if(red_y2<=0){
-					continue;
-				}
-				if(red_y2>0 && red_y1<=0){
-					red_y1 = 0;
-				}
-
-				if(green_y1 >= (height-2*offset_y)/scale_y){
-					green_y1 = (height-2*offset_y)/scale_y;
-					green_y2 = (height-2*offset_y)/scale_y;
-				}
-				if(green_y1 < (height-2*offset_y)/scale_y && green_y2 >= (height-2*offset_y)/scale_y){
-					green_y2 = (height-2*offset_y)/scale_y;
-				}
-
-				if(red_y1 >= (height-2*offset_y)/scale_y){
-					red_y1 = (height-2*offset_y)/scale_y;
-					red_y2 = (height-2*offset_y)/scale_y;
-				}
-				if(red_y1 < (height-2*offset_y)/scale_y && red_y2 >= (height-2*offset_y)/scale_y){
-					red_y2 = (height-2*offset_y)/scale_y;
-				}
-
-				lines.push([location[i] * scale_x, scale_y * green_y1, location[i] * scale_x, scale_y * green_y2, "#0f0", 3, offset_x, offset_y, 0]);
-				lines.push([location[i] * scale_x, scale_y * red_y1, location[i] * scale_x, scale_y * red_y2, "#f00", 3, offset_x, offset_y, 0]);
-			}
-			texts.push([location[i] * scale_x + offset_x, height-offset_y + font_size + 5, "#0f0", font_size, cross_name[i]]);
-		}
-
-		// 速度线段
-		// 反向
-		let pt12 = [
-			location[0] * scale_x, 
-			scale_y * (first_green[first_green.length - 1] + cycle * mincycle - location[location.length - 1] / velocity), 
-			location[location.length - 1] * scale_x, 
-			scale_y * (first_green[first_green.length - 1] + cycle * mincycle)
-		];
-		let pt34 = [
-			location[0] * scale_x, 
-			scale_y * (first_green[first_green.length - 1] + cycle * mincycle - location[location.length - 1] / velocity + band_width[1]), 
-			location[location.length - 1] * scale_x, 
-			scale_y * (first_green[first_green.length - 1] + cycle * mincycle + band_width[1])]
-
-		// 正向
-		let cycle_index_positive = 2;
-		let pt56 = [
-			location[location.length - 1] * scale_x, 
-			scale_y * (first_red[first_red.length - 1] + cycle_index_positive * cycle), 
-			location[0] * scale_x, 
-			scale_y * (first_red[first_red.length - 1] + cycle_index_positive * cycle + location[location.length - 1] / velocity)
-		];
-		let pt78 = [
-			location[location.length - 1] * scale_x, 
-			scale_y * (first_red[first_red.length - 1] + cycle_index_positive * cycle - band_width[2]), 
-			location[0] * scale_x, 
-			scale_y * (first_red[first_red.length - 1] + cycle_index_positive * cycle + location[location.length - 1] / velocity - band_width[2])
-		];
-
-		let path_data = "M " + pt12[0] + "," + pt12[1] + " L " + pt12[2] + "," + pt12[3] + " L " + pt34[2] + "," + pt34[3] + " L " + pt34[0] + "," + pt34[1] + " Z";
-		paths.push([path_data, "#ff0", 1, "#ccc4", offset_x, offset_y, 0]);
-
-		path_data = "M " + pt56[0] + " " + pt56[1] + " L " + pt56[2] + " " + pt56[3] + " L " + pt78[2] + " " + pt78[3] + " L " + pt78[0] + " " + pt78[1] + " Z";
-		paths.push([path_data, "#ff0", 1, "#ccc4", offset_x, offset_y, 0]);
-		this.drawSvgLine(svg, lines);
-		this.drawSvgText(svg, texts);
-		this.drawSvgPath(svg, paths);
 	}
 
 	getOffset = () => {
 		return this.relative_offset;
 	}
+	getBandWidth = () => {
+		return this.double_band_width;
+	}
 
 }
+
+
+// 绘图类
+export class LineDepict {
+    constructor( divID = "", line_node_name, line_link_length, line_speed, line_cycle, line_node_phase_offset, line_node_green_ratio, line_node_phase_schema, line_node_phase_time, line_node_offset ){
+        this.divID = divID
+        this.svg = null
+        this.lines = []
+        this.texts = []
+        
+        // 上下左右空隙
+        this.left_right_gap = 200
+        this.top_bottom_gap = 30
+        this.font_size = 10
+        this.font_phase_gap = 20
+
+        this.line_node_name = line_node_name
+        this.line_node_phase_offset = line_node_phase_offset
+        this.line_node_green_ratio = line_node_green_ratio
+        this.line_node_offset = line_node_offset
+        this.line_speed = line_speed
+        this.line_cycle = line_cycle
+		this.line_link_length = line_link_length
+		this.line_node_phase_schema = line_node_phase_schema
+		this.line_node_phase_time = line_node_phase_time
+
+        this.initOption(line_link_length, line_node_phase_schema, line_node_phase_time)
+
+        this.initSvg();
+    }
+    // 初始化svg
+    initSvg = () => {
+
+		let odiv = $(this.divID)[0];
+		
+        this.width = odiv.offsetWidth;
+        this.height = odiv.offsetHeight;
+        this.svg = d3.select("body").select(this.divID).append("svg").attr('width', this.width).attr('height', this.height).style("background-color", '#ccc');
+        this.width_scale = this.width / (this.width_cursor + this.left_right_gap * 2)
+        this.height_scale = this.height / (this.height_cursor + this.top_bottom_gap * 2)
+    }
+
+    initOption = ( line_link_length, line_node_phase_schema, line_node_phase_time ) => {
+
+        // 计算数据
+        // 干线距离，速度，周期
+        let line_length = eval(line_link_length.join("+"))
+
+        // 图形宽度和高度的最大值 及画几个周期
+        this.width_cursor = line_length
+        this.height_cursor = Math.ceil(line_length / this.line_speed * 3.6 / this.line_cycle) * this.line_cycle
+        this.circle_cursor = Math.ceil(line_length / this.line_speed * 3.6 / this.line_cycle)
+
+        // 交叉口距离
+        this.line_node_location = ArrayAccumulate(line_link_length)
+
+        // 
+        this.line_node_schema = line_node_phase_schema.map( schema => schema.split(",").map( phase_id => PHASE_SCHEMA[phase_id] ) )
+        this.line_node_time = line_node_phase_time.map( schema => schema.split(",").map( time => time*1 ) ).map( e => [0, ...ArrayAccumulate(e)] )
+
+    }
+
+    // 设置属性
+    setOption = (line_speed, line_cycle) => {
+
+        this.lines = []
+        this.texts = []
+		this.clearSvg()
+		
+		this.line_speed = line_speed
+		this.line_cycle = line_cycle
+
+        let line_node_location = this.line_node_location
+        let line_node_offset = this.line_node_offset
+        let line_node_schema = this.line_node_schema
+        let line_node_time = this.line_node_time
+		let line_node_name = this.line_node_name
+		let line_link_length = this.line_link_length
+		let line_node_phase_schema = this.line_node_phase_schema
+		let line_node_phase_time = this.line_node_phase_time
+
+        this.initOption(line_link_length, line_node_phase_schema, line_node_phase_time)
+
+        // 各个路口信号相位
+        line_node_location.forEach( (node_location, node_index) => {
+            let x = node_location + this.left_right_gap
+            let y_min = this.top_bottom_gap
+			let y_max = this.height_cursor + this.top_bottom_gap
+			
+            // 相位绘制
+            for( let circle = -1; circle < this.circle_cursor; circle ++ ){
+                for( let phase_index = 0; phase_index < line_node_time[node_index].length - 1; phase_index ++ ){
+                    let pt1 = [ x, line_node_time[node_index][phase_index] + line_node_offset[node_index] + circle * this.line_cycle + this.top_bottom_gap ]
+                    let pt2 = [ x, line_node_time[node_index][phase_index + 1] + line_node_offset[node_index] + circle * this.line_cycle + this.top_bottom_gap ]
+
+                    console.log(`第${node_index}个路口，第${circle}周期， 第${phase_index}相位：${pt1}, ${pt2}`)
+
+                    let x1 = pt1[0] * this.width_scale
+                    let y1 = (y_max - (pt1[1] < y_min?y_min: pt1[1] > y_max?y_max: pt1[1]) + this.top_bottom_gap) * this.height_scale
+                    let x2 = pt2[0] * this.width_scale
+                    let y2 = (y_max - (pt2[1] < y_min?y_min: pt2[1] > y_max?y_max: pt2[1]) + this.top_bottom_gap) * this.height_scale
+
+                    if(phase_index === 0){
+                        this.lines.push([ x1, y1, x2, y2, "#0f0", 5, "", "", "translate(0,0),rotate(0)", line_node_schema[node_index][phase_index] ])
+                    }else{
+                        this.lines.push([ x1, y1, x2, y2, "#f00", 5, "", "", "translate(0,0),rotate(0)", line_node_schema[node_index][phase_index] ])
+                    }
+                }
+            }
+            // 名称绘制
+            let text_offset = node_index % 2 === 0? this.font_phase_gap : 5
+            this.texts.push([x * this.width_scale, ( y_max ) * this.height_scale + this.font_size + text_offset, line_node_name[node_index].replace("交叉口", ""), "", this.font_size, ""])
+
+        } )
+
+        // 正方向速度线
+        for( let node_index = 0; node_index < line_node_location.length - 1; node_index++ ){
+
+            let y_max = this.height_cursor + this.top_bottom_gap
+
+            for( let circle = 0; circle < 1/*this.circle_cursor*/; circle ++ ){
+                let x1 = line_node_location[node_index] + this.left_right_gap
+                let y1 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle
+                let x2 = line_node_location[node_index + 1] + this.left_right_gap
+                let y2 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle + (line_node_location[node_index + 1] - line_node_location[node_index])/ this.line_speed * 3.6
+                this.lines.push([ x1 * this.width_scale, (y_max - y1 + this.top_bottom_gap) * this.height_scale, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#0ff", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
+            }
+        }
+        // 反方向速度线
+        for( let node_index = line_node_location.length - 1; node_index > 0; node_index-- ){
+
+            let y_max = this.height_cursor + this.top_bottom_gap
+
+            for( let circle = 0; circle < 1/*this.circle_cursor*/; circle ++ ){
+                let x1 = line_node_location[node_index] + this.left_right_gap
+                let y1 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle
+                let x2 = line_node_location[node_index - 1] + this.left_right_gap
+                let y2 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle + (line_node_location[node_index] - line_node_location[node_index - 1])/ this.line_speed * 3.6
+                this.lines.push([ x1 * this.width_scale, (y_max - y1 + this.top_bottom_gap) * this.height_scale, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#ff0", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
+            }
+        }
+        this.draw();
+    }
+
+    // 绘制干线图
+    draw = () => {
+        this.svg.append("g").attr("id", "lines").selectAll("line").data(this.lines).enter().append("line")
+        .attr("x1", (d,i) => d[0]).attr("y1", (d,i) => d[1]).attr("x2", (d,i) => d[2]).attr("y2", (d,i) => d[3])
+        .attr("stroke", (d,i) => d[4]).attr("stroke-width", (d,i) => d[5])
+        .attr("stroke-dasharray", (d,i) => d[6]).attr("stroke-dashoffset", (d,i) => d[7])
+        .attr("transform", (d,i) => d[8]).on("click", (d,i) => alert(d[9]));
+        this.svg.append("g").attr("id", "texts").selectAll("text").data(this.texts).enter().append("text")
+        .attr("x", (d,i)=>d[0]).attr("y", (d,i)=>d[1]).attr("text-anchor", "middle").attr("font-family", "Times New Roman")
+        .text((d,i) => d[2]).attr("fill", (d,i)=> d[3]).attr("font-size", (d,i)=> d[4]).attr("transform", (d,i)=> d[5]);
+    }
+
+    // 清除svg
+    clearSvg = () => {
+		this.svg.selectAll("*").remove();
+	}
+}
+
+
 

@@ -65,20 +65,23 @@ class OptimizeSchema extends Component {
             dataIndex: "left_delay",
             align: 'center',
             width: 100,
+            render: left_delay => left_delay.toFixed(2),
         },{
             title: '直行延误',
             dataIndex: "t_delay",
             align: 'center',
             width: 100,
+            render: t_delay => t_delay.toFixed(2),
         },{
             title: '方向延误',
             dataIndex: "dir_delay",
             align: 'center',
             width: 100,
+            render: dir_delay => dir_delay.toFixed(2),
         }]
     }
 
-    // 加载点位
+    // 加载所有点位
     loadNodes = async () => {
         const result = await reqNodes()
         if(result.code === 1){
@@ -91,10 +94,10 @@ class OptimizeSchema extends Component {
             message.error(result.message)
         }
     }
-
+    // 加载点位信息
     loadNodeById = async (node_id) => {
         const result = await reqNodeById(node_id)
-        this.loadNodeFlowById(node_id)
+        this.loadNodeData(node_id)
         if(result.code === 1){
             memoryUtils.node = result.data
             this.setState({ node: result.data })
@@ -118,12 +121,12 @@ class OptimizeSchema extends Component {
             return option.props.children.indexOf(inputValue) === -1?false:true
         }
     }
-
+    // 提交请求
     handleSubmit = async (e) => {
         e.preventDefault()
-        this.loadNodeFlowById()
+        this.loadNodeData()
     }
-
+    // 加载执行方案
     loadExecNodeSchema = async (start_date, end_date, start_time, end_time, node_id) => {
         const result = await reqNodeSchemaExecSearch(start_date, end_date, start_time, end_time, node_id)
         if(result.code === 1){
@@ -136,7 +139,7 @@ class OptimizeSchema extends Component {
             message.error(result.message)
         }
     }
-
+    // 加载点位流量
     loadNodeFlowById = async(start_date, end_date, start_time, end_time, node_id) => {
         const result = await reqNodeFlowByNodeId(start_date, end_date, start_time, end_time, node_id)
         if(result.code === 1){
@@ -145,7 +148,7 @@ class OptimizeSchema extends Component {
             message.error(result.message)
         }
     }
-
+    // 加载点位延误
     loadNodeDelayById = async(start_date, end_date, start_time, end_time, node_id) => {
         const result = await reqNodeDelaySearch(start_date, end_date, start_time, end_time, node_id)
         if(result.code === 1){
@@ -154,8 +157,8 @@ class OptimizeSchema extends Component {
             message.error(result.message)
         }
     }
-
-    loadNodeFlowById = async () => {
+    // 加载点位数据
+    loadNodeData = async () => {
         let result = []
         this.props.form.validateFields( async (err, values) => {
             if( !err ){
@@ -352,7 +355,7 @@ class OptimizeSchema extends Component {
                                 </Item>
                             </div>
                             <div className="lyf-col-1 lyf-center" style={{ textAlign:"center" }}>
-                                <Button size="small" onClick={ () => this.loadNodeFlowById() }>查询方案</Button>
+                                <Button size="small" onClick={ () => this.loadNodeData() }>查询方案</Button>
                             </div>
                         </div>
                     </Form>

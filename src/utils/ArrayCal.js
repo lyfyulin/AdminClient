@@ -1,7 +1,7 @@
 
 
 // 求和
-export let ArraySum = (arr) => {
+export const ArraySum = (arr) => {
 	let sum = 0;
 	for(let i = 0; i < arr.length; i++){
 		sum += arr[i];
@@ -9,7 +9,7 @@ export let ArraySum = (arr) => {
 	return sum;
 }
 // 最大值
-export let ArrayMax = (arr) => {
+export const ArrayMax = (arr) => {
 	let max = arr[0];
 	for(let i = 0; i < arr.length; i++)	{
 		if(arr[i] > max){
@@ -19,7 +19,7 @@ export let ArrayMax = (arr) => {
 	return max;
 }
 // 最大值索引
-export let ArrayArgMax = (arr) => {
+export const ArrayArgMax = (arr) => {
 	let max = arr[0];
 	let max_index = 0;
 	for(let i = 0; i < arr.length; i++)	{
@@ -31,7 +31,7 @@ export let ArrayArgMax = (arr) => {
 	return max_index;
 }
 // 最小值
-export let ArrayMin = (arr) => {
+export const ArrayMin = (arr) => {
 	let min = arr[0];
 	for(let i = 0; i < arr.length; i++)	{
 		if(arr[i] < min){
@@ -41,7 +41,7 @@ export let ArrayMin = (arr) => {
 	return min;
 }
 // 数组累计和
-export let ArrayAccumulate = (arr) => {
+export const ArrayAccumulate = (arr) => {
 	let result = [];
 	let sum = 0;
 	for(let i = 0; i < arr.length; i++)
@@ -63,7 +63,7 @@ export let ArrayFindValueIndex = (arr, value) => {
 	return result;
 }
 // 找出某个数组索引
-export let ArrayFindArrayIndex = (arr, array) => {
+export const ArrayFindArrayIndex = (arr, array) => {
 	let result = [];
 	for (let i = 0; i < array.length; i++) {
 		let element = array[i];
