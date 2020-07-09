@@ -59,7 +59,7 @@ export default class LineInfo extends Component {
             render: line => (<span>
                 <LinkButton onClick = { () => {
                     memoryUtils.line = line
-                    this.props.history.push("/line/signal")
+                    this.props.history.push("/line/signal-add")
                 } }>干线控制</LinkButton>
             </span>)
         }]

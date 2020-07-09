@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import LinkButton from '../../components/link-button'
 import { Icon, Form, Input, InputNumber, Button, TimePicker, DatePicker, message } from 'antd'
 import {LineSignalCal, LineDepict} from '../../utils/traffic/line-signal-cal'
-import { ArrayMax } from '../../utils/ArrayCal'
+import { ArrayMax, ArraySum } from '../../utils/ArrayCal'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import { reqLineById, reqLineControlData } from '../../api'
@@ -20,64 +20,60 @@ export default class LineSignalAdd extends Component {
         line_node_name: [],
     }
 
-    
-    test_data = () => {
-
-        // 测试数据
-        let line_link_length = [0, 350, 400, 160, 540, 280, 280, 270]
-        let line_node_cycle = [80, 80, 80, 80, 80, 80, 80, 80]
-        let line_node_phase_offset = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]]
-        let line_node_green_ratio = [[0.55, 0.6, 0.65, 0.65, 0.6, 0.65, 0.7, 0.5], [0.55, 0.6, 0.65, 0.65, 0.6, 0.65, 0.7, 0.5]]
-        let line_node_phase_schema = ["0,5", "0,5", "0,5", "0,5", "0,5", "0,5", "0,5", "0,5"]
-        let line_node_phase_time = ["44,36", "48,32", "52,28", "52,28", "48,32", "52,28", "56,24", "40,40"]
-        let line_node_name = ["路口1", "路口2", "路口3", "路口4", "路口5", "路口6", "路口7", "路口8"]
-        // 干线周期
-        let line_cycle = 80
-        // 点位间速度 km/h
-        let line_speed = 45
-
-        this.line_link_length = line_link_length
-        this.line_node_cycle = line_node_cycle
-        this.line_node_phase_offset = line_node_phase_offset
-        this.line_node_green_ratio = line_node_green_ratio
-        this.line_node_phase_schema = line_node_phase_schema
-        this.line_node_phase_time = line_node_phase_time
-        this.line_node_name = line_node_name
-
-        this.setState({ line_node_name, line_cycle, line_speed })
-        return [line_cycle, line_speed]
-
-    }
-
     load_data = async () => {
 
         let line = this.state.line
-        let line_id = 10
+        let line_id = line.line_id
 
         const result = await reqLineById(line_id)
         const result2 = await reqLineControlData("2020-07-08", "2020-07-09", "07:00:00", "08:00:00", line_id)
         
         if(result.code === 1 && result2.code === 1){
 
+            console.log(result.data, result2.data)
+
+            // 交叉口名称
             let line_node_name = result.data.nodes.map( e => e.node_name )
 
-            let line_node_green_ratio = result2.data.line_node_green_ratio.filter( (e,i) => i < line_node_name.length ).map( e => e.green_ratio )
-            line_node_green_ratio = [line_node_green_ratio, line_node_green_ratio]
+            // 正向绿信比
+            let line_node_green_ratio1 = result2.data.line_node_green_ratio.filter( (e,i) => i < line_node_name.length ).map( e => e.green_ratio )
+            // 反向绿信比
+            let line_node_green_ratio2 = result2.data.line_node_green_ratio.filter( (e,i) => i >= line_node_name.length ).map( e => e.green_ratio )
+            // 双向绿信比
+            let line_node_green_ratio = [line_node_green_ratio1, line_node_green_ratio2]
             let line_node_cycle = result2.data.line_node_schema.map( e => e.schema_cycle )
             
             let line_node_phase_schema = result2.data.line_node_schema.map( e => e.phase_schema )
             let line_node_phase_time = result2.data.line_node_schema.map( e => e.phase_time )
             let line_link_length = result2.data.line_node_dist.map( e => e.link_length )
-            let line_speed = result2.data.line_speed.toFixed(0)
-    
-            let line_node_phase_offset = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]]
-    
-            let line_cycle = line_node_cycle[0]
+            let line_speed = (result2.data.line_speed || 35).toFixed(0)
 
+            // 计算协调相位在哪个时间
+            let line_node_time = line_node_phase_time.map( schema => schema.split(",").map( time => time * 1 ) )
+            let line_node_phase_index1 = result2.data.line_node_green_ratio.filter( (e,i) => i < line_node_name.length ).map( e => e.phase_index )
+            let line_node_phase_index2 = result2.data.line_node_green_ratio.filter( (e,i) => i >= line_node_name.length ).map( e => e.phase_index )
+            // 正向协调相位时间
+            let line_node_phase_time1 = result2.data.line_node_green_ratio.filter( (e,i) => i < line_node_name.length ).map( e => e.phase_time )
+            // 反向协调相位时间
+            let line_node_phase_time2 = result2.data.line_node_green_ratio.filter( (e,i) => i >= line_node_name.length ).map( e => e.phase_time )
+            
+            // 正向协调相位绿灯起始时间
+            let line_node_acc_time1 = line_node_time.map( (schema, node_index) => ArraySum(schema.filter( (phase, phase_index) => phase_index < line_node_phase_index1[node_index] )) - line_node_phase_time1[node_index] )
+            // 反向协调相位绿灯起始时间
+            let line_node_acc_time2 = line_node_time.map( (schema, node_index) => ArraySum(schema.filter( (phase, phase_index) => phase_index < line_node_phase_index2[node_index] )) - line_node_phase_time2[node_index] )
+            let line_node_phase_offset = [line_node_acc_time1, line_node_acc_time2]
 
+            // 公共周期选最大周期
+            let line_cycle = ArrayMax(line_node_cycle)
+
+            console.log(line_cycle, line_link_length, line_speed/3.6, line_node_cycle, line_node_green_ratio[0], line_node_name)
+
+            // 计算干线信号控制方案
             this.line_control = new LineSignalCal(line_cycle, line_link_length, line_speed/3.6, line_node_cycle, line_node_green_ratio[0], line_node_name)
             let line_node_offset = this.line_control.setOption( line_cycle, line_speed/3.6, line_node_cycle )
             let line_band_width = this.line_control.getBandWidth()
+            
+            // 绘制干线方案
             this.line_depict = new LineDepict("#svg", line_node_name, line_link_length, line_speed, line_cycle, line_node_phase_offset, line_node_green_ratio, line_node_phase_schema, line_node_phase_time, line_node_offset )
             this.line_depict.setOption(line_speed, line_cycle, line_node_offset, line_band_width)
 
@@ -89,20 +85,20 @@ export default class LineSignalAdd extends Component {
 
     }
 
-
-    
     set_data = async () => {
 
         let line = this.state.line
-        let line_id = 10
+        let line_id = line.line_id
 
         const result = await reqLineById(line_id)
         const result2 = await reqLineControlData("2020-07-08", "2020-07-09", "07:00:00", "08:00:00", line_id)
         
         if(result.code === 1 && result2.code === 1){
 
+            // 交叉口名称
             let line_node_name = result.data.nodes.map( e => e.node_name )
 
+            // 协调相位绿信比
             let line_node_green_ratio = result2.data.line_node_green_ratio.filter( (e,i) => i < line_node_name.length ).map( e => e.green_ratio )
             line_node_green_ratio = [line_node_green_ratio, line_node_green_ratio]
             let line_node_cycle = result2.data.line_node_schema.map( e => e.schema_cycle )
@@ -110,15 +106,37 @@ export default class LineSignalAdd extends Component {
             let line_node_phase_schema = result2.data.line_node_schema.map( e => e.phase_schema )
             let line_node_phase_time = result2.data.line_node_schema.map( e => e.phase_time )
             let line_link_length = result2.data.line_node_dist.map( e => e.link_length )
-            let line_speed = this.state.line_speed
-    
-            let line_node_phase_offset = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]]
-    
-            let line_cycle = this.state.line_cycle
 
+            let line_speed = this.state.line_speed
+            let line_cycle = this.state.line_cycle
+    
+            // 计算协调相位在哪个时间
+            let line_node_time = line_node_phase_time.map( schema => schema.split(",").map( time => time * 1 ) )
+            // 正向协调相位在第几个位置
+            let line_node_phase_index1 = result2.data.line_node_green_ratio.filter( (e,i) => i < line_node_name.length ).map( e => e.phase_index )
+            // 正向协调相位时间
+            let line_node_phase_time1 = result2.data.line_node_green_ratio.filter( (e,i) => i < line_node_name.length ).map( e => e.phase_time )
+            // 反向协调相位在第几个位置
+            let line_node_phase_index2 = result2.data.line_node_green_ratio.filter( (e,i) => i >= line_node_name.length ).map( e => e.phase_index )
+            // 反向协调相位时间
+            let line_node_phase_time2 = result2.data.line_node_green_ratio.filter( (e,i) => i >= line_node_name.length ).map( e => e.phase_time )
+            
+            // 正向协调相位绿灯起始时间
+            let line_node_acc_time1 = line_node_time.map( (schema, node_index) => ArraySum(schema.filter( (phase, phase_index) => phase_index < line_node_phase_index1[node_index] )) - line_node_phase_time1[node_index] )
+            // 反向协调相位绿灯起始时间
+            let line_node_acc_time2 = line_node_time.map( (schema, node_index) => ArraySum(schema.filter( (phase, phase_index) => phase_index < line_node_phase_index2[node_index] )) - line_node_phase_time2[node_index] )
+            let line_node_phase_offset = [line_node_acc_time1, line_node_acc_time2]
+
+
+            console.log(line_cycle, line_link_length, line_speed/3.6, line_node_cycle, line_node_green_ratio[0], line_node_name)
+            
+
+            // 计算干线控制方案
             this.line_control = new LineSignalCal(line_cycle, line_link_length, line_speed/3.6, line_node_cycle, line_node_green_ratio[0], line_node_name)
             let line_node_offset = this.line_control.setOption( line_cycle, line_speed/3.6, line_node_cycle )
             let line_band_width = this.line_control.getBandWidth()
+            
+            // 绘制干线
             this.line_depict = new LineDepict("#svg", line_node_name, line_link_length, line_speed, line_cycle, line_node_phase_offset, line_node_green_ratio, line_node_phase_schema, line_node_phase_time, line_node_offset )
             this.line_depict.setOption(line_speed, line_cycle, line_node_offset, line_band_width)
 
@@ -214,7 +232,9 @@ export default class LineSignalAdd extends Component {
                                 <Button htmlType="submit"> 提交 </Button>
                             </Form.Item>
                         
-
+                        {
+                            line_band_width.toString()
+                        }
                         <Form.Item label="绿波带宽">
                             <Input value={ line_band_width[2] } suffix="s"/>
                         </Form.Item>

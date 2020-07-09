@@ -11,7 +11,8 @@ export class LineSignalCal {
 
 	constructor(line_cycle, line_link_length, line_speed, line_node_cycle, line_node_green_ratio, line_node_name) {
 
-		this.line_link_length = line_link_length
+		this.line_link_length = [0, ...line_link_length]
+		
 		this.line_node_name = line_node_name
 		this.line_node_green_ratio = line_node_green_ratio
 
@@ -97,7 +98,7 @@ export class LineSignalCal {
 	calGreenWave = (line_link_length, line_speed, line_cycle, min_actual2dream_gap, max_actual2dream_gap, gap_skip) => {
 
 		let result = [];
-		let coordinate = ArrayAccumulate(line_link_length);
+		let coordinate = ArrayAccumulate(line_link_length)
 		
 		let dream_max_shift_gap = 0;
 		let dream_max_shift_gap_cross = 0;			// 最大挪移的交叉口
@@ -365,7 +366,7 @@ export class LineDepict {
         
         // 上下左右空隙
         this.left_right_gap = 200
-        this.top_bottom_gap = 30
+        this.top_bottom_gap = 20
         this.font_size = 10
         this.font_phase_gap = 20
 
@@ -379,8 +380,8 @@ export class LineDepict {
 		this.line_node_phase_schema = line_node_phase_schema
 		this.line_node_phase_time = line_node_phase_time
 
-        // 交叉口距离
-		this.line_node_location = ArrayAccumulate(line_link_length)
+        // 交叉口距离  把第一个位置加上
+		this.line_node_location = [0, ...ArrayAccumulate(line_link_length)]
 
         this.initOption(line_cycle)
 
@@ -420,10 +421,10 @@ export class LineDepict {
         this.line_node_schema = line_node_phase_schema.map( schema => schema.split(",").map( phase_id => PHASE_SCHEMA[phase_id] ) )
 		
 		// 按绿信比计算各路口相位绿灯时间
-		let line_node_time = line_node_phase_time.map( schema => schema.split(",").map( time => time*1 ) )
+		let line_node_time = line_node_phase_time.map( schema => schema.split(",").map( time => time * 1 ) )
 		let line_node_cycle = line_node_time.map( node_time => ArraySum(node_time) )
 		this.line_node_time = line_node_time.map( (schema, node_index) => schema.map( (phase_time, phase_index) => phase_time / line_node_cycle[node_index] * line_cycle ) ).map( e => [0, ...ArrayAccumulate(e)] )
-
+		
     }
 
     // 设置属性
@@ -446,6 +447,7 @@ export class LineDepict {
         let line_node_time = this.line_node_time
 		let line_node_name = this.line_node_name
 
+		let line_node_phase_offset = this.line_node_phase_offset
 
         // 各个路口信号相位
         line_node_location.forEach( (node_location, node_index) => {
@@ -457,10 +459,10 @@ export class LineDepict {
             // 相位绘制
             for( let circle = -1; circle < this.circle_cursor; circle ++ ){
                 for( let phase_index = 0; phase_index < line_node_time[node_index].length - 1; phase_index ++ ){
-                    let pt1 = [ x, line_node_time[node_index][phase_index] + line_node_offset[node_index] + circle * this.line_cycle + this.top_bottom_gap ]
-                    let pt2 = [ x, line_node_time[node_index][phase_index + 1] + line_node_offset[node_index] + circle * this.line_cycle + this.top_bottom_gap ]
+                    let pt1 = [ x, line_node_time[node_index][phase_index] + line_node_offset[node_index] - line_node_phase_offset[0][node_index] + circle * this.line_cycle + this.top_bottom_gap ]
+                    let pt2 = [ x, line_node_time[node_index][phase_index + 1] + line_node_offset[node_index] - line_node_phase_offset[0][node_index] + circle * this.line_cycle + this.top_bottom_gap ]
 
-                    // console.log(`第${node_index}个路口，第${circle}周期， 第${phase_index}相位：${pt1}, ${pt2}`)
+                    // console.log(`第${node_index}个路口，第${circle}周期， 第${phase_index}相位：${pt1}, ${pt2}, 协调相位差${line_node_phase_offset[0][node_index]}`)
 
                     let x1 = pt1[0] * this.width_scale
                     let y1 = (y_max - (pt1[1] < y_min?y_min: pt1[1] > y_max?y_max: pt1[1]) + this.top_bottom_gap) * this.height_scale
@@ -468,9 +470,9 @@ export class LineDepict {
                     let y2 = (y_max - (pt2[1] < y_min?y_min: pt2[1] > y_max?y_max: pt2[1]) + this.top_bottom_gap) * this.height_scale
 
                     if(phase_index === 0){
-                        this.lines.push([ x1, y1, x2, y2, "#0f0", 5, "", "", "translate(0,0),rotate(0)", line_node_schema[node_index][phase_index] ])
+                        this.lines.push([ x1, y1, x2, y2, "#0f0", 5, "", "", "translate(0,0),rotate(0)", line_node_schema[node_index][phase_index] + ":" + (line_node_time[node_index][phase_index + 1] - line_node_time[node_index][phase_index]) + "s" ])
                     }else{
-                        this.lines.push([ x1, y1, x2, y2, "#f00", 5, "", "", "translate(0,0),rotate(0)", line_node_schema[node_index][phase_index] ])
+                        this.lines.push([ x1, y1, x2, y2, "#f00", 5, "", "", "translate(0,0),rotate(0)", line_node_schema[node_index][phase_index] + ":" + (line_node_time[node_index][phase_index + 1] - line_node_time[node_index][phase_index]) + "s" ])
                     }
                 }
             }
@@ -480,32 +482,18 @@ export class LineDepict {
 
         } )
 
-		/*
-        // 正方向速度线
-        for( let node_index = 0; node_index < line_node_location.length - 1; node_index++ ){
-
-            let y_max = this.height_cursor + this.top_bottom_gap
-
-            for( let circle = 0; circle < 1; circle ++ ){
-                let x1 = line_node_location[node_index] + this.left_right_gap
-                let y1 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle
-                let x2 = line_node_location[node_index + 1] + this.left_right_gap
-                let y2 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle + (line_node_location[node_index + 1] - line_node_location[node_index])/ this.line_speed * 3.6
-                this.lines.push([ x1 * this.width_scale, (y_max - y1 + this.top_bottom_gap) * this.height_scale, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#0ff", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
-            }
-		}
-		*/
-
 		// 正向线
 		let y_max = this.height_cursor + this.top_bottom_gap
 		let start_b = []
         for( let node_index = 0; node_index < line_node_location.length; node_index++ ){
-
 			start_b.push( line_node_offset[node_index] - line_node_location[node_index] / line_speed * 3.6 )
 		}
-		let pos_start_b = ArrayMax(start_b)
+
+		let new_start_b = start_b//.map( e => (e + line_cycle)%line_cycle )
+		
+		let pos_start_b = ArrayMax(new_start_b)
 		let x1 = line_node_location[0] + this.left_right_gap
-		let y1 = pos_start_b + this.top_bottom_gap
+		let y1 = this.top_bottom_gap + pos_start_b
 		let x2 = line_node_location[line_node_location.length - 1] + this.left_right_gap
 		let y2 = line_node_location[line_node_location.length - 1] / line_speed * 3.6 + this.top_bottom_gap + pos_start_b
 		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
@@ -517,19 +505,17 @@ export class LineDepict {
 		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
 
 		
-
 		// 反向线
 		let end_b = []
         for( let node_index = 0; node_index < line_node_location.length; node_index++ ){
-
 			end_b.push( line_node_offset[node_index] + line_node_location[node_index] / line_speed * 3.6 )
 		}
 		let pos_end_b = ArrayMin(end_b)
 		
 		x1 = line_node_location[0] + this.left_right_gap
-		y1 = pos_end_b + this.top_bottom_gap + line_cycle * 2
+		y1 = pos_end_b + this.top_bottom_gap + line_cycle * 1
 		x2 = line_node_location[line_node_location.length - 1] + this.left_right_gap
-		y2 = - line_node_location[line_node_location.length - 1] / line_speed * 3.6 + this.top_bottom_gap + line_cycle * 2 + pos_end_b
+		y2 = - line_node_location[line_node_location.length - 1] / line_speed * 3.6 + this.top_bottom_gap + line_cycle * 1 + pos_end_b
 		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
 		
 		x1 = x1
@@ -538,24 +524,6 @@ export class LineDepict {
 		y2 = y2 + line_band_width[1]
 		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
 
-		
-
-
-		/*
-        // 反方向速度线
-        for( let node_index = line_node_location.length - 1; node_index > 0; node_index-- ){
-
-            let y_max = this.height_cursor + this.top_bottom_gap
-
-            for( let circle = 0; circle < 1; circle ++ ){
-                let x1 = line_node_location[node_index] + this.left_right_gap
-                let y1 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle
-                let x2 = line_node_location[node_index - 1] + this.left_right_gap
-                let y2 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle + (line_node_location[node_index] - line_node_location[node_index - 1])/ this.line_speed * 3.6
-                this.lines.push([ x1 * this.width_scale, (y_max - y1 + this.top_bottom_gap) * this.height_scale, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#ff0", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
-            }
-		}
-		*/
         this.draw();
     }
 
