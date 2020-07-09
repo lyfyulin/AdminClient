@@ -72,7 +72,7 @@ class UpdateSchema extends Component {
         signal_schema['node_id'] = memoryUtils.node.node_id
         signal_schema['start_time'] = getTodayDateString() + " " + start_time
         signal_schema['end_time'] = getTodayDateString() + " " + end_time
-        signal_schema['start_date'] = getTodayDateString()
+        signal_schema['start_date'] = "2020-01-01"
         signal_schema['end_date'] = getFutureDateString()
         signal_schema['phase_schema'] = phase_schema.join(",")
         signal_schema['phase_time'] = phase_time.join(",")

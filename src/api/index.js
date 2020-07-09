@@ -643,6 +643,12 @@ export const reqLineById = ( line_id ) => ajax( base + "/line/info", {
     }
 } )
 
+export const reqLineControlData = ( start_date, end_date, start_time, end_time, line_id ) => ajax( base + "/line/control", {
+    params: {
+        start_date, end_date, start_time, end_time, line_id
+    }
+} )
+
 export const reqInsertLine = ( line ) => ajax.post( base + "/insert/line",
     JSON.stringify(line),
     {
@@ -664,6 +670,12 @@ export const reqUpdateLine = ( line ) => ajax.post( base + "/update/line",
 export const reqDeleteLine = ( line_id ) => ajax.post( base + "/delete/line", { line_id } )
 
 export const reqNodeFlowByNodeId = ( start_date, end_date, start_time, end_time, node_id ) => ajax( base + "/node/flow", {
+    params: {
+        start_date, end_date, start_time, end_time, node_id
+    }
+} )
+
+export const reqNodeAvgFlowSearch = ( start_date, end_date, start_time, end_time, node_id ) => ajax( base + "/node/avg_flow", {
     params: {
         start_date, end_date, start_time, end_time, node_id
     }

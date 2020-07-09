@@ -6,7 +6,7 @@ import 'moment/locale/zh-cn'
 import memoryUtils from '../../utils/memoryUtils';
 import { PHASE_SCHEMA, PHASE_SCHEMA_FLOW, DIRECTION, DIRECTION_LIST, SIGNAL_SCHEMA, EW_SIGNAL_SCHEMA, SN_SIGNAL_SCHEMA } from '../../utils/ConstantUtils';
 import SignalSchema from './signal-schema'
-import { reqNodes, reqNodeById, reqNodeFlowByNodeId } from '../../api'
+import { reqNodes, reqNodeById, reqNodeFlowByNodeId, reqNodeAvgFlowSearch } from '../../api'
 import { vector, getStrCount } from '../../utils/ArrayCal'
 import { getDateString, getTimeString, getTodayDateString } from '../../utils/dateUtils'
 import _ from 'lodash'
@@ -111,7 +111,7 @@ class GenerateSchema extends Component {
                 let start_time = getTimeString(values['start_time'])
                 let end_time = getTimeString(values['end_time'])
                 let node_id = values["node_id"]
-                const result = await reqNodeFlowByNodeId(start_date, end_date, start_time, end_time, node_id)
+                const result = await reqNodeAvgFlowSearch(start_date, end_date, start_time, end_time, node_id)
                 
                 if(result.code === 1){
                     let node_flow = result.data

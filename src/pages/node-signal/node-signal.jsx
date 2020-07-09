@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
-import SignalInfo from './signal-info'
 import SignalSchema from './signal-schema'
 import AddSchema from './add'
 import UpdateSchema from './update'

@@ -1,8 +1,9 @@
-import {ArrayArgMax, ArrayFindValueIndex, ArrayMax, ArraySum, ArrayAccumulate} from '../ArrayCal'
+import {ArrayArgMax, ArrayFindValueIndex, ArrayMax, ArraySum, ArrayAccumulate, ArrayMin} from '../ArrayCal'
 import { PHASE_SCHEMA } from '../ConstantUtils'
 
 import $ from 'jquery'
 import {d3} from 'd3-node'
+import { message } from 'antd'
 
 
 // 干线配时计算
@@ -10,8 +11,12 @@ export class LineSignalCal {
 
 	constructor(line_cycle, line_link_length, line_speed, line_node_cycle, line_node_green_ratio, line_node_name) {
 
+		this.line_link_length = line_link_length
+		this.line_node_name = line_node_name
+		this.line_node_green_ratio = line_node_green_ratio
+
         // 初始化参数
-        this.init_params(line_cycle, line_link_length, line_speed, line_node_cycle, line_node_green_ratio, line_node_name)
+        this.init_params( line_cycle, line_speed, line_node_cycle )
 		// 参数及数据
 		this.gap_skip = 10
 		// 结果集
@@ -22,7 +27,11 @@ export class LineSignalCal {
 
     }
 	
-	init_params = (line_cycle, line_link_length, line_speed, line_node_cycle, line_node_green_ratio, line_node_name) => {
+	init_params = ( line_cycle, line_speed, line_node_cycle ) => {
+
+		let line_link_length = this.line_link_length
+		let line_node_name = this.line_node_name
+		let line_node_green_ratio = this.line_node_green_ratio
 
 		// 公共周期时长
 		this.line_cycle = line_cycle
@@ -39,9 +48,12 @@ export class LineSignalCal {
 
 	}
 
-	setOption = (line_cycle, line_link_length, line_speed, line_node_cycle, line_node_green_ratio, line_node_name) => {
+	setOption = ( line_cycle, line_speed, line_node_cycle ) => {
+
+		let line_link_length = this.line_link_length
+		let line_node_green_ratio = this.line_node_green_ratio
         
-        this.init_params(line_cycle, line_link_length, line_speed, line_node_cycle, line_node_green_ratio, line_node_name)
+        this.init_params( line_cycle, line_speed, line_node_cycle )
 
 		// 结果集
 		this.green_start_time_arr = []
@@ -49,8 +61,8 @@ export class LineSignalCal {
 		this.double_band_width = []
 		this.relative_offset = []
 
-		this.calLineControl(line_cycle, line_speed, line_node_green_ratio, line_node_cycle, line_link_length, line_node_name);
-		
+		let relative_offset = this.calLineControl(line_cycle, line_speed, line_node_green_ratio, line_node_cycle, line_link_length );
+		return relative_offset
 	}
 
 	// 数组排序返回序号
@@ -82,10 +94,10 @@ export class LineSignalCal {
 	}
 
 	// 计算实际交叉口与理想交叉口间距
-	calGreenWave = (arr, v, c, min_actual2dream_gap, max_actual2dream_gap, gap_skip) => {
+	calGreenWave = (line_link_length, line_speed, line_cycle, min_actual2dream_gap, max_actual2dream_gap, gap_skip) => {
 
 		let result = [];
-		let coordinate = ArrayAccumulate(arr);
+		let coordinate = ArrayAccumulate(line_link_length);
 		
 		let dream_max_shift_gap = 0;
 		let dream_max_shift_gap_cross = 0;			// 最大挪移的交叉口
@@ -94,7 +106,7 @@ export class LineSignalCal {
 		for(let gaps_arr = min_actual2dream_gap; gaps_arr < max_actual2dream_gap; gaps_arr += gap_skip)			// x值
 		{
 			let dream2actual_gap = [];				//与理想交叉口的距离
-			for(let i = 0; i < arr.length; i++)
+			for(let i = 0; i < line_link_length.length; i++)
 			{
 				dream2actual_gap.push(coordinate[i] - gaps_arr * parseInt(coordinate[i]/gaps_arr, 10));		// 表中间内容
 			}
@@ -301,36 +313,37 @@ export class LineSignalCal {
 	}
 
 	// 计算控制方案
-	calLineControl = ( cycle, line_speed, green_ratio, line_node_cycle, line_link_length, line_node_name ) => {
+	calLineControl = ( line_cycle, line_speed, green_ratio, line_node_cycle, line_link_length ) => {
 
 		let gap_skip = this.gap_skip;
-		let min_actual2dream_gap = line_speed * cycle / 2 - gap_skip * 10;
-		let max_actual2dream_gap = line_speed * cycle / 2 + gap_skip * 10;
-		let gap_cross = this.calGreenWave(line_link_length, line_speed, cycle, min_actual2dream_gap, max_actual2dream_gap, gap_skip);
+		let min_actual2dream_gap = line_speed * line_cycle / 2 - gap_skip * 10;
+		let max_actual2dream_gap = line_speed * line_cycle / 2 + gap_skip * 10;
+		let gap_cross = this.calGreenWave(line_link_length, line_speed, line_cycle, min_actual2dream_gap, max_actual2dream_gap, gap_skip);
 		
-		let coordinate = ArrayAccumulate(line_link_length);
+		let coordinate = ArrayAccumulate(line_link_length)
 			
 		//  step 12 实际交叉口与理想协调交叉口距离
 		let actual2dreamlocation = this.calactual2dreamLocation(coordinate, gap_cross);
-		
 
 		// 计算相对相位差
 		let offset_arr = this.calOffset(green_ratio, line_node_cycle, actual2dreamlocation[2]);
-		let relative_offset = this.calRelativeOffset(offset_arr, cycle, 0);				// 假设相对第1个交叉口进行相位差计算  
+		let relative_offset = this.calRelativeOffset(offset_arr, line_cycle, 0);				// 假设相对第1个交叉口进行相位差计算  
 		
 		// 计算绿灯起始时刻/结束时刻
-		let green_start_time_arr = this.calGreenStartTime(green_ratio, cycle, relative_offset, actual2dreamlocation[2]);
-		let green_end_time_arr = this.calGreenEndTime(green_ratio, cycle, green_start_time_arr);
+		let green_start_time_arr = this.calGreenStartTime(green_ratio, line_cycle, relative_offset, actual2dreamlocation[2]);
+		let green_end_time_arr = this.calGreenEndTime(green_ratio, line_cycle, green_start_time_arr);
 
 		// 计算双向绿波宽度
 		let double_band_width = this.calGreenBandWidth(actual2dreamlocation[1], actual2dreamlocation[0], actual2dreamlocation[2], gap_cross[2], line_speed, green_start_time_arr, green_end_time_arr);
 
-		this.relative_offset = relative_offset;
+		this.relative_offset = relative_offset
 		this.green_start_time_arr = green_start_time_arr;
 		this.green_end_time_arr = green_end_time_arr;
 		
 		this.double_band_width = double_band_width
-	
+
+		return relative_offset
+		
 	}
 
 	getOffset = () => {
@@ -341,7 +354,6 @@ export class LineSignalCal {
 	}
 
 }
-
 
 // 绘图类
 export class LineDepict {
@@ -367,65 +379,77 @@ export class LineDepict {
 		this.line_node_phase_schema = line_node_phase_schema
 		this.line_node_phase_time = line_node_phase_time
 
-        this.initOption(line_link_length, line_node_phase_schema, line_node_phase_time)
+        // 交叉口距离
+		this.line_node_location = ArrayAccumulate(line_link_length)
+
+        this.initOption(line_cycle)
 
         this.initSvg();
     }
     // 初始化svg
     initSvg = () => {
-
-		let odiv = $(this.divID)[0];
-		
-        this.width = odiv.offsetWidth;
-        this.height = odiv.offsetHeight;
+		$(this.divID).empty()
+		let o_div = $(this.divID)[0];
+		if(o_div && o_div.offsetWidth){
+			this.width = o_div.offsetWidth
+			this.height = o_div.offsetHeight
+		}else{
+			this.width = 200
+			this.height = 200
+		}
         this.svg = d3.select("body").select(this.divID).append("svg").attr('width', this.width).attr('height', this.height).style("background-color", '#ccc');
         this.width_scale = this.width / (this.width_cursor + this.left_right_gap * 2)
         this.height_scale = this.height / (this.height_cursor + this.top_bottom_gap * 2)
     }
 
-    initOption = ( line_link_length, line_node_phase_schema, line_node_phase_time ) => {
+    initOption = ( line_cycle ) => {
 
-        // 计算数据
-        // 干线距离，速度，周期
-        let line_length = eval(line_link_length.join("+"))
-
-        // 图形宽度和高度的最大值 及画几个周期
-        this.width_cursor = line_length
-        this.height_cursor = Math.ceil(line_length / this.line_speed * 3.6 / this.line_cycle) * this.line_cycle
-        this.circle_cursor = Math.ceil(line_length / this.line_speed * 3.6 / this.line_cycle)
-
-        // 交叉口距离
-        this.line_node_location = ArrayAccumulate(line_link_length)
-
-        // 
-        this.line_node_schema = line_node_phase_schema.map( schema => schema.split(",").map( phase_id => PHASE_SCHEMA[phase_id] ) )
-        this.line_node_time = line_node_phase_time.map( schema => schema.split(",").map( time => time*1 ) ).map( e => [0, ...ArrayAccumulate(e)] )
-
-    }
-
-    // 设置属性
-    setOption = (line_speed, line_cycle) => {
-
-        this.lines = []
-        this.texts = []
-		this.clearSvg()
-		
-		this.line_speed = line_speed
-		this.line_cycle = line_cycle
-
-        let line_node_location = this.line_node_location
-        let line_node_offset = this.line_node_offset
-        let line_node_schema = this.line_node_schema
-        let line_node_time = this.line_node_time
-		let line_node_name = this.line_node_name
 		let line_link_length = this.line_link_length
 		let line_node_phase_schema = this.line_node_phase_schema
 		let line_node_phase_time = this.line_node_phase_time
 
-        this.initOption(line_link_length, line_node_phase_schema, line_node_phase_time)
+		// 计算数据
+		let line_length = eval(line_link_length.join("+"))
+		
+        // 图形宽度和高度的最大值 及画几个周期
+        this.width_cursor = line_length
+        this.height_cursor = Math.ceil(line_length / this.line_speed * 3.6 / line_cycle + 1) * line_cycle
+        this.circle_cursor = Math.ceil(line_length / this.line_speed * 3.6 / line_cycle + 1)
+
+        // 各路口方案
+        this.line_node_schema = line_node_phase_schema.map( schema => schema.split(",").map( phase_id => PHASE_SCHEMA[phase_id] ) )
+		
+		// 按绿信比计算各路口相位绿灯时间
+		let line_node_time = line_node_phase_time.map( schema => schema.split(",").map( time => time*1 ) )
+		let line_node_cycle = line_node_time.map( node_time => ArraySum(node_time) )
+		this.line_node_time = line_node_time.map( (schema, node_index) => schema.map( (phase_time, phase_index) => phase_time / line_node_cycle[node_index] * line_cycle ) ).map( e => [0, ...ArrayAccumulate(e)] )
+
+    }
+
+    // 设置属性
+    setOption = (line_speed, line_cycle, line_node_offset, line_band_width) => {
+
+        this.lines = []
+        this.texts = []
+		this.clearSvg()
+
+		// 初始化参数
+		this.line_speed = line_speed
+		this.line_cycle = line_cycle
+
+        this.initOption( line_cycle )
+		
+        this.line_node_offset = line_node_offset
+
+        let line_node_location = this.line_node_location
+        let line_node_schema = this.line_node_schema
+        let line_node_time = this.line_node_time
+		let line_node_name = this.line_node_name
+
 
         // 各个路口信号相位
         line_node_location.forEach( (node_location, node_index) => {
+
             let x = node_location + this.left_right_gap
             let y_min = this.top_bottom_gap
 			let y_max = this.height_cursor + this.top_bottom_gap
@@ -436,7 +460,7 @@ export class LineDepict {
                     let pt1 = [ x, line_node_time[node_index][phase_index] + line_node_offset[node_index] + circle * this.line_cycle + this.top_bottom_gap ]
                     let pt2 = [ x, line_node_time[node_index][phase_index + 1] + line_node_offset[node_index] + circle * this.line_cycle + this.top_bottom_gap ]
 
-                    console.log(`第${node_index}个路口，第${circle}周期， 第${phase_index}相位：${pt1}, ${pt2}`)
+                    // console.log(`第${node_index}个路口，第${circle}周期， 第${phase_index}相位：${pt1}, ${pt2}`)
 
                     let x1 = pt1[0] * this.width_scale
                     let y1 = (y_max - (pt1[1] < y_min?y_min: pt1[1] > y_max?y_max: pt1[1]) + this.top_bottom_gap) * this.height_scale
@@ -456,32 +480,82 @@ export class LineDepict {
 
         } )
 
+		/*
         // 正方向速度线
         for( let node_index = 0; node_index < line_node_location.length - 1; node_index++ ){
 
             let y_max = this.height_cursor + this.top_bottom_gap
 
-            for( let circle = 0; circle < 1/*this.circle_cursor*/; circle ++ ){
+            for( let circle = 0; circle < 1; circle ++ ){
                 let x1 = line_node_location[node_index] + this.left_right_gap
                 let y1 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle
                 let x2 = line_node_location[node_index + 1] + this.left_right_gap
                 let y2 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle + (line_node_location[node_index + 1] - line_node_location[node_index])/ this.line_speed * 3.6
                 this.lines.push([ x1 * this.width_scale, (y_max - y1 + this.top_bottom_gap) * this.height_scale, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#0ff", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
             }
-        }
+		}
+		*/
+
+		// 正向线
+		let y_max = this.height_cursor + this.top_bottom_gap
+		let start_b = []
+        for( let node_index = 0; node_index < line_node_location.length; node_index++ ){
+
+			start_b.push( line_node_offset[node_index] - line_node_location[node_index] / line_speed * 3.6 )
+		}
+		let pos_start_b = ArrayMax(start_b)
+		let x1 = line_node_location[0] + this.left_right_gap
+		let y1 = pos_start_b + this.top_bottom_gap
+		let x2 = line_node_location[line_node_location.length - 1] + this.left_right_gap
+		let y2 = line_node_location[line_node_location.length - 1] / line_speed * 3.6 + this.top_bottom_gap + pos_start_b
+		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
+		
+		x1 = x1
+		y1 = y1 + line_band_width[0]
+		x2 = x2
+		y2 = y2 + line_band_width[0]
+		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
+
+		
+
+		// 反向线
+		let end_b = []
+        for( let node_index = 0; node_index < line_node_location.length; node_index++ ){
+
+			end_b.push( line_node_offset[node_index] + line_node_location[node_index] / line_speed * 3.6 )
+		}
+		let pos_end_b = ArrayMin(end_b)
+		
+		x1 = line_node_location[0] + this.left_right_gap
+		y1 = pos_end_b + this.top_bottom_gap + line_cycle * 2
+		x2 = line_node_location[line_node_location.length - 1] + this.left_right_gap
+		y2 = - line_node_location[line_node_location.length - 1] / line_speed * 3.6 + this.top_bottom_gap + line_cycle * 2 + pos_end_b
+		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
+		
+		x1 = x1
+		y1 = y1 + line_band_width[1]
+		x2 = x2
+		y2 = y2 + line_band_width[1]
+		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
+
+		
+
+
+		/*
         // 反方向速度线
         for( let node_index = line_node_location.length - 1; node_index > 0; node_index-- ){
 
             let y_max = this.height_cursor + this.top_bottom_gap
 
-            for( let circle = 0; circle < 1/*this.circle_cursor*/; circle ++ ){
+            for( let circle = 0; circle < 1; circle ++ ){
                 let x1 = line_node_location[node_index] + this.left_right_gap
                 let y1 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle
                 let x2 = line_node_location[node_index - 1] + this.left_right_gap
                 let y2 = line_node_offset[node_index] + this.top_bottom_gap + circle * this.line_cycle + (line_node_location[node_index] - line_node_location[node_index - 1])/ this.line_speed * 3.6
                 this.lines.push([ x1 * this.width_scale, (y_max - y1 + this.top_bottom_gap) * this.height_scale, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#ff0", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
             }
-        }
+		}
+		*/
         this.draw();
     }
 
@@ -491,7 +565,8 @@ export class LineDepict {
         .attr("x1", (d,i) => d[0]).attr("y1", (d,i) => d[1]).attr("x2", (d,i) => d[2]).attr("y2", (d,i) => d[3])
         .attr("stroke", (d,i) => d[4]).attr("stroke-width", (d,i) => d[5])
         .attr("stroke-dasharray", (d,i) => d[6]).attr("stroke-dashoffset", (d,i) => d[7])
-        .attr("transform", (d,i) => d[8]).on("click", (d,i) => alert(d[9]));
+		.attr("transform", (d,i) => d[8]).on("click", (d,i) => message.info(d[9]))
+		
         this.svg.append("g").attr("id", "texts").selectAll("text").data(this.texts).enter().append("text")
         .attr("x", (d,i)=>d[0]).attr("y", (d,i)=>d[1]).attr("text-anchor", "middle").attr("font-family", "Times New Roman")
         .text((d,i) => d[2]).attr("fill", (d,i)=> d[3]).attr("font-size", (d,i)=> d[4]).attr("transform", (d,i)=> d[5]);

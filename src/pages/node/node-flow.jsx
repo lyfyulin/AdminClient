@@ -8,7 +8,7 @@ import { getDateString, getTodayDateTimeString, getTimeString, getTodayDateStrin
 import { DIRECTION_LIST } from '../../utils/ConstantUtils'
 import NodeFlowDepict from '../../utils/traffic/node-flow-depict'
 import memoryUtils from '../../utils/memoryUtils'
-import { reqNodeFlowByNodeId, reqNodeById } from '../../api'
+import { reqNodeFlowByNodeId, reqNodeById, reqNodeAvgFlowSearch } from '../../api'
 
 const { TabPane } = Tabs
 
@@ -55,7 +55,7 @@ class NodeFlow extends Component {
 
     getNodeFlow = async (start_date, end_date, start_time, end_time, node_id) => {
 
-        const result = await reqNodeFlowByNodeId(start_date, end_date, start_time, end_time, node_id)
+        const result = await reqNodeAvgFlowSearch(start_date, end_date, start_time, end_time, node_id)
         
         if(result.code === 1){
             const flow = result.data.map( e => [ e.t_flow, e.left_flow, e.right_flow ])

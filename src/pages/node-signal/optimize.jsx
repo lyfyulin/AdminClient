@@ -6,7 +6,7 @@ import 'moment/locale/zh-cn'
 import memoryUtils from '../../utils/memoryUtils';
 import { PHASE_SCHEMA, PHASE_SCHEMA_FLOW, DIRECTION, DIRECTION_LIST, SIGNAL_SCHEMA, EW_SIGNAL_SCHEMA, SN_SIGNAL_SCHEMA } from '../../utils/ConstantUtils';
 import SignalSchema from './signal-schema'
-import { reqNodes, reqNodeById, reqNodeFlowByNodeId, reqNodeSchemaExecSearch, reqNodeDelaySearch } from '../../api'
+import { reqNodes, reqNodeById, reqNodeFlowByNodeId, reqNodeSchemaExecSearch, reqNodeDelaySearch, reqNodeAvgFlowSearch } from '../../api'
 import { vector, getStrCount } from '../../utils/ArrayCal'
 import { getDateString, getTimeString, getTodayDateString } from '../../utils/dateUtils'
 import _ from 'lodash'
@@ -141,7 +141,7 @@ class OptimizeSchema extends Component {
     }
     // 加载点位流量
     loadNodeFlowById = async(start_date, end_date, start_time, end_time, node_id) => {
-        const result = await reqNodeFlowByNodeId(start_date, end_date, start_time, end_time, node_id)
+        const result = await reqNodeAvgFlowSearch(start_date, end_date, start_time, end_time, node_id)
         if(result.code === 1){
             this.setState({ node_flow: result.data })
         }else{

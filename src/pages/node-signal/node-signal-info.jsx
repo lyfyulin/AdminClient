@@ -4,7 +4,7 @@ import moment from 'moment'
 import 'moment/locale/zh-cn'
 import { Table, message, Select, Button, Form, DatePicker, TimePicker, Radio, Checkbox } from 'antd'
 
-import { reqNodeSchemas, reqNodes, reqNodeSchemaById, reqDeleteNodeSchema, reqNodeSchemaExecSearch, reqNodeById } from '../../api'
+import { reqNodeSchemas, reqNodes, reqNodeSchemaById, reqDeleteNodeSchema, reqNodeSchemaExecSearch, reqNodeById, reqUrbanNodes } from '../../api'
 import { DIRECTION_LIST } from '../../utils/ConstantUtils'
 import { PHASE_SCHEMA } from '../../utils/ConstantUtils'
 import SignalSchema from './signal-schema'
@@ -110,7 +110,7 @@ class NodeSignalInfo extends Component {
 
     // 加载点位
     loadNodes = async () => {
-        const result = await reqNodes()
+        const result = await reqUrbanNodes()
         if(result.code === 1){
             const nodes = result.data
             if(!memoryUtils.node.node_id){

@@ -43,6 +43,12 @@ export function getLastNDayDateString(n) {
     return data.getFullYear() + '-' + ((data.getMonth() + 1) + '').padStart(2, '0') + '-' + (data.getDate() + '').padStart(2, '0')
 }
 
+export function getNextNDayDateString(n) {
+    let now = new Date()
+    let data = new Date(now + 86400 * 1000 * n)
+    return data.getFullYear() + '-' + ((data.getMonth() + 1) + '').padStart(2, '0') + '-' + (data.getDate() + '').padStart(2, '0')
+}
+
 
 export function getTodayDateTimeString() {
     let data = new Date()
