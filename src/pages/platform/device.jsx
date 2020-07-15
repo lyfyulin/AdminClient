@@ -122,12 +122,21 @@ export default class Device extends Component {
     }
 
     componentWillMount() {
-        this.load_data()
     }
 
     componentDidMount() {
+        this.load_data()
+        this.timer = setInterval( this.load_data, 300000 )
         this.initMap()
     }
+
+    componentWillUnmount() {
+        clearInterval( this.timer )
+        this.setState = (state, callback) => {
+            return
+        }
+    }
+    
     
     render() {
         const { firstRender, div11_data, div21_data, div31_option } = this.state
@@ -140,14 +149,14 @@ export default class Device extends Component {
                     <div className="lyf-col-6 lyf-center">
                         <DataBox title={ "设备状态" }>
                             <div id="map" className="full"></div>
-                            <a onClick={ () => this.downloadCsv(div11_data, "设备传输率") }><Icon type="download"/></a>
+                            <a onClick={ () => this.downloadCsv(div11_data, "设备传输率") } title="下载传输率低设备"><Icon type="download"/></a>
                         </DataBox>
                     </div>
                     <div className="lyf-col-4 lyf-center">
                         <DataBox title={ <span>设备识别率</span> }>
                             <LvqiTable data={ div21_data } rowNum = { 6 } slideTimer = { 3000 } dataType="tongqin"/>
                         </DataBox>
-                        <a onClick={ () => this.downloadCsv(div21_data, "设备识别率") }><Icon type="download"/></a>
+                        <a onClick={ () => this.downloadCsv(div21_data, "设备识别率") } title="下载识别率低设备"><Icon type="download"/></a>
                     </div>
                 </div>
                 

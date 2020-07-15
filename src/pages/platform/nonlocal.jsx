@@ -51,7 +51,8 @@ export default class Nonlocal extends Component {
         let div21_option
         if(result21.code === 1){
             let data21 = result21.data
-            div21_option = LineOption(data21.map( e => WEEK_DAY[e.day_id] ), data21.map( e => e.foreign_ratio ))
+            div21_option = LineOption(data21.map( e => WEEK_DAY[e.day_id - 1] ), data21.map( e => e.foreign_ratio ))
+            
         }else{
             message.error(result21.message)
         }
@@ -93,12 +94,9 @@ export default class Nonlocal extends Component {
             this.nodes[i].setRadius(e.foreign_ratio*400)
         })
     }
-
-    componentWillMount() {
-        this.load_data()
-    }
     
     componentDidMount() {
+        this.load_data()
         this.initMap()
         this.timer = setInterval( this.load_data, 100000 )
     }
@@ -138,7 +136,7 @@ export default class Nonlocal extends Component {
                     </div>
                 </div>
                 <div className="lyf-row-3 lyf-center">
-                    <DataBox title={ "外地车比例日变化" }>
+                    <DataBox title={ "出租车网约车在途量" }>
                         <Chart option={ div31_option }/>
                     </DataBox>
                 </div>

@@ -12,11 +12,13 @@ import { reqPathByPlate } from '../../api'
 import { getDateString } from '../../utils/dateUtils'
 import { bd09togcj02 } from '../../utils/lnglatUtils'
 import { ang } from '../../utils/ArrayCal'
+import _ from 'lodash'
 
 class Trajectory extends Component {
 
     state = {
-        paths: []
+        paths: [],
+        tableBodyHeight: 480,
     }
 
     // 初始化地图
@@ -36,21 +38,23 @@ class Trajectory extends Component {
             title: '序号',
             align: 'center',
             dataIndex: "rn",
+            width: 100,
         },{
             title: '点位',
             align: 'center',
+            width: 200,
             dataIndex: "node_name",
+        },{
+            title: '时间',
+            align: 'center',
+            width: 200,
+            dataIndex: "time_point",
         },{
             title: '停留时间',
             align: 'center',
+            width: 100,
             dataIndex: "tt",
-            render: tt => tt?(parseFloat(tt).toFixed(2) + '分钟'):"",
-        },{
-            title: '定位',
-            align: 'center',
-            render: data => {
-                
-            },
+            render: tt => parseFloat(tt)<5?'0分钟':(parseFloat(tt - 5).toFixed(2) + '分钟'),
         }]
     }
 
@@ -97,13 +101,20 @@ class Trajectory extends Component {
         } )
     }
 
+    onWindowResize = _.throttle(() => {
+        this.setState({ tableBodyHeight: window.innerHeight - 250  })
+    }, 800)
+
     componentDidMount() {
         this.seqGroup = null
         this.initColumns()
         this.initMap()
+        window.addEventListener('resize', this.onWindowResize)
+
     }
     
     componentWillUnmount() {
+        window.removeEventListener('resize', this.onWindowResize)
         this.setState = (state, callback) => {
             return
         }
@@ -113,7 +124,7 @@ class Trajectory extends Component {
         
         const { getFieldDecorator }  = this.props.form
 
-        const { paths } = this.state
+        const { paths, tableBodyHeight } = this.state
 
         const formLayout = {
             labelCol : { span: 6 } ,
@@ -122,7 +133,7 @@ class Trajectory extends Component {
 
         return (
             <div className="full">
-                <div className="lyf-row-1">
+                <div style={{ height: 60, width: '100%' }}>
                     <Form
                         { ...formLayout } 
                         onSubmit = { this.handleSubmit }
@@ -130,101 +141,92 @@ class Trajectory extends Component {
                         style = {{ width: '100%', height: '100%', margin: 0, padding: 0 }}
                     >
                         <div className="lyf-col-2">
-                        <LyfItem label="车牌号">
-                            {
-                                getFieldDecorator("car_num", {
-                                    initialValue: "",
-                                })(<Input size="small"/>)
-                            }
-                        </LyfItem>
+                            <LyfItem label="车牌号">
+                                {
+                                    getFieldDecorator("car_num", {
+                                        initialValue: "",
+                                    })(<Input size="small"/>)
+                                }
+                            </LyfItem>
                         </div>
                         <div className="lyf-col-3">
-                        <LyfItem label="日期范围">
-                            {
-                                getFieldDecorator("start_date", {
-                                    initialValue: moment(),
-                                })(
-                                    <DatePicker 
-                                        style={{ width:'100%' }} 
-                                        placeholder="请选择日期" 
-                                        size="small"
-                                        format = "YYYY-MM-DD"
-                                    />
-                                )
-                            }
-                            &nbsp;-&nbsp;
-                            {
-                                getFieldDecorator("end_date", {
-                                    initialValue: moment(),
-                                })(
-                                    <DatePicker 
-                                        style={{ width:'100%' }} 
-                                        placeholder="请选择日期" 
-                                        size="small"
-                                        format = "YYYY-MM-DD"
-                                    />
-                                )
-                            }
-                        </LyfItem>
+                            <LyfItem label="日期范围">
+                                {
+                                    getFieldDecorator("start_date", {
+                                        initialValue: moment(),
+                                    })(
+                                        <DatePicker 
+                                            style={{ width:'100%' }} 
+                                            placeholder="请选择日期" 
+                                            size="small"
+                                            format = "YYYY-MM-DD"
+                                        />
+                                    )
+                                }
+                                &nbsp;-&nbsp;
+                                {
+                                    getFieldDecorator("end_date", {
+                                        initialValue: moment(),
+                                    })(
+                                        <DatePicker 
+                                            style={{ width:'100%' }} 
+                                            placeholder="请选择日期" 
+                                            size="small"
+                                            format = "YYYY-MM-DD"
+                                        />
+                                    )
+                                }
+                            </LyfItem>
                         </div>
                         <div className="lyf-col-3">
-                        <LyfItem label="时间范围">
-                            {
-                                getFieldDecorator("start_time", {
-                                    initialValue: moment("2020-01-01 00:00:00"),
-                                })(
-                                    <TimePicker 
-                                        style={{ width:'100%' }} 
-                                        placeholder="请选择时间" 
-                                        size="small"
-                                        format = "HH:mm:ss"
-                                    />
-                                )
-                            }
-                            &nbsp;-&nbsp;
-                            {
-                                getFieldDecorator("end_time", {
-                                    initialValue: moment("2020-01-01 23:59:59"),
-                                })(
-                                    <TimePicker 
-                                        style={{ width:'100%' }} 
-                                        placeholder="请选择时间" 
-                                        size="small"
-                                        format = "HH:mm:ss"
-                                    />
-                                )
-                            }
-                        </LyfItem>
+                            <LyfItem label="时间范围">
+                                {
+                                    getFieldDecorator("start_time", {
+                                        initialValue: moment("2020-01-01 00:00:00"),
+                                    })(
+                                        <TimePicker 
+                                            style={{ width:'100%' }} 
+                                            placeholder="请选择时间" 
+                                            size="small"
+                                            format = "HH:mm:ss"
+                                        />
+                                    )
+                                }
+                                &nbsp;-&nbsp;
+                                {
+                                    getFieldDecorator("end_time", {
+                                        initialValue: moment("2020-01-01 23:59:59"),
+                                    })(
+                                        <TimePicker 
+                                            style={{ width:'100%' }} 
+                                            placeholder="请选择时间" 
+                                            size="small"
+                                            format = "HH:mm:ss"
+                                        />
+                                    )
+                                }
+                            </LyfItem>
                         </div>
-                        <div className="lyf-col-1">
+                        <div className="lyf-center">
                             <Button size="small" htmlType="submit">查询</Button>
                         </div>
                     </Form>
                 </div>
-                <div className="lyf-row-9" style={{ display: "flex", flexWrap: "nowrap" }}>
+                <div style={{ height: 'calc(100% - 60px)', display: "flex", flexWrap: "nowrap" }}>
                     <div className="lyf-col-5" id="map">
                     </div>
                     <div className="lyf-col-5">
-                        <div className="lyf-row-1 lyf-center lyf-font-4">
+                        <div className="lyf-center lyf-font-4" style={{ height: 50 }}>
                             常驻点:{paths.length<1?"":paths.filter(e => e.time_point.substr(11, 10) >= '04:00:00' )[0].node_name}
                         </div>
-                        <div className="lyf-row-9" style={{ overflow: 'scroll' }}>
                             <Table
                                 bordered = { true }
                                 rowKey = "rn"
                                 columns = { this.columns }
                                 dataSource = { paths }
+                                scroll={{ y: tableBodyHeight }}
                                 pagination = { false }
-                                onRow = {
-                                    record => {
-                                        return {
-                                            onClick: event => console.log(event.target)
-                                        }
-                                    }
-                                }
-                                style={{ width: '100%', height: '100%' }}
                             />
-                        </div>
                     </div>
                 </div>
             </div>

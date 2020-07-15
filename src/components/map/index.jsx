@@ -51,7 +51,7 @@ export default class LvqiMap extends Component {
 
     setLink = (link_state) => {
         link_state.forEach( (e, i) => {
-            this.link[i].setStyle({ color: LINK_COLOR[parseInt(e.stateindex / 2)] })
+            this.link[i]?this.link[i].setStyle({ color: LINK_COLOR[parseInt(e.stateindex / 2)] }):console.log()
         })
     }
 

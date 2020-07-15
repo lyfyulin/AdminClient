@@ -31,7 +31,7 @@ export default class StrategyHome extends Component {
             {
                 title: '策略内容',
                 dataIndex: 'strategy_content',
-                render: strategy_content => strategy_content.length>20?(strategy_content.slice(0, 20) + "..."):strategy_content
+                render: strategy_content => strategy_content.length>20?(strategy_content.replace("<p>", "").replace("</p>", "").slice(0, 20) + "..."):strategy_content.replace("<p>", "").replace("</p>", "")
             },
             {
                 title: '用户',

@@ -63,8 +63,6 @@ class StrategyAddUpdate extends Component {
         this.props.form.validateFields( async ( err, values ) => {
             if( !err ){
 
-                console.log(values)
-
                 let strategy_images_url = this.picWallRef.current.getImages()
 
                 strategy_images_url = !strategy_images_url? '': strategy_images_url.join(";")

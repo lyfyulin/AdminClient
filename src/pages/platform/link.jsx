@@ -23,14 +23,14 @@ export default class Link extends Component {
         const result21 = await reqTodayRdnetState()
         const result32_1 = await reqLastRdnetState()
 
-        let data21
+        let data21 = []
         if(result21.code === 1){
             data21 = result21.data.map( e => e.speed )
         }else{
             message.error(result21.message)
         }
         
-        let div22_option
+        let div22_option = {}
         if(result32_1.code === 1){
             let data32_1 = result32_1.data.map( e => e.speed )
             div22_option = BiLineOption( TIME_POINT, data32_1, data21 )
@@ -38,7 +38,7 @@ export default class Link extends Component {
             message.error(result32_1.message)
         }
 
-        let div11_data
+        let div11_data = []
         if(result11.code === 1){
             div11_data = result11.data
         }else{
@@ -50,16 +50,16 @@ export default class Link extends Component {
         })
     }
 
-    componentWillMount() {
-        this.load_data()
-    }
-
     componentDidMount = () => {
+        this.load_data()
         this.timer = setInterval( this.load_data, 100000 )
     }
 
     componentWillUnmount() {
         clearInterval( this.timer )
+        this.setState = (state, callback) => {
+            return
+        }
     }
 
     render() {

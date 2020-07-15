@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css'
 import '../node/node-info.less'
 import LinkButton from '../../components/link-button'
 import { TMS, MAP_CENTER, DEVICE_CONFIG } from '../../utils/baoshan'
-import { reqDevices, reqDeleteDevice, reqUrbanDevices, reqHighwayDevices, reqDJDevices } from '../../api'
+import { reqDevices, reqDeleteDevice, reqUrbanDevices, reqHighwayDevices, reqDJDevices, reqQuxianDevices } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import { bd09togcj02 } from '../../utils/lnglatUtils'
 import _ from 'lodash'
@@ -65,9 +65,7 @@ export default class DeviceInfo extends Component {
     // 加载点位列表
     load_devices = async (dev_location) => {
         // 1-全部;2-城区;3-高速;4-电警
-        console.log();
-        
-        const result = dev_location === '1'? await reqDevices(): dev_location === '2'? await reqUrbanDevices(): dev_location === '3'? await reqHighwayDevices(): await reqDJDevices()
+        const result = dev_location === '1'? await reqDevices(): dev_location === '2'? await reqUrbanDevices(): dev_location === '3'? await reqHighwayDevices(): dev_location === '4'?await reqQuxianDevices(): await reqDJDevices()
         if(result.code === 1){
             const devices = result.data.map( (e, index) => ({ key: index, ...e }) )
             this.setDevice(devices)
@@ -85,7 +83,7 @@ export default class DeviceInfo extends Component {
             let lng = bd09togcj02(e.dev_lng, e.dev_lat)[0]
             // let lat = e.dev_lat
             // let lng = e.dev_lng
-            this.device.push( L.circle([lat, lng], { ...DEVICE_CONFIG }).bindPopup(e.dev_name) )
+            this.device.push( L.circle([lat, lng], { ...DEVICE_CONFIG }).bindPopup(`设备名称${e.dev_name}<br/><img style='width: 300px;height:auto;' src='http://192.122.2.196/dev/${e.dev_id}.png' alt='${e.dev_name}' />`) )
         })
         this.map.removeLayer(this.devices_circle)
         this.devices_circle = L.layerGroup(this.device)
@@ -153,7 +151,8 @@ export default class DeviceInfo extends Component {
                             <Radio.Button value="1">全部</Radio.Button>
                             <Radio.Button value="2">城区</Radio.Button>
                             <Radio.Button value="3">高速</Radio.Button>
-                            <Radio.Button value="4">电警</Radio.Button>
+                            <Radio.Button value="4">区县</Radio.Button>
+                            <Radio.Button value="5">电警</Radio.Button>
                         </Radio.Group>
                     </div>
                     <div className="lvqi-card-content" id="table">

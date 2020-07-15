@@ -196,6 +196,7 @@ export const reqNonlocalVnSearch = (start_date, end_date) => ajax( base + "/sear
 export const reqDevices = () => ajax( base + "/device/list")
 export const reqUrbanDevices = () => ajax( base + "/device/urban/list")
 export const reqHighwayDevices = () => ajax( base + "/device/highway/list")
+export const reqQuxianDevices = () => ajax( base + "/device/quxian/list")
 export const reqDJDevices = () => ajax( base + "/device/dj/list")
 
 export const reqDeviceById = (dev_id) => ajax( base + "/device/info", {
@@ -334,7 +335,6 @@ export const reqUniquePlateCnt = (start_date, end_date) => ajax( base + "/search
 } )	
 
 
-
 // od
 export const reqLastOdTrip = () => ajax( base + "/od/last/trip")
 
@@ -406,6 +406,13 @@ export const reqAccidents = () => ajax( base + "/accident/list")
 export const reqAccidentById = (accident_id) => ajax( base + "/accident/info", {
     params: {
         accident_id
+    }
+} )	
+
+
+export const reqAccidentsSearch = ( start_time, end_time, accident_type, road_condition, climate, accident_specific_location, car_damage, people_hurt,illegal_behavior ) => ajax( base + "/search/accident", {
+    params: {
+        start_time, end_time, accident_type, road_condition, climate, accident_specific_location, car_damage, people_hurt,illegal_behavior
     }
 } )	
 
@@ -544,6 +551,7 @@ export const reqWeekInterDelay = (inter_id) => ajax( base + "/inter/delay/week",
 export const reqNodes = () => ajax( base + "/node/list" )	
 export const reqUrbanNodes = () => ajax( base + "/node/urban/list" )	
 export const reqHighwayNodes = () => ajax( base + "/node/highway/list" )	
+export const reqQuxianNodes = () => ajax( base + "/node/quxian/list" )	
 export const reqDJNodes = () => ajax( base + "/node/dj/list" )	
 
 export const  reqNodeById = ( node_id ) => ajax( base + "/node/info", {

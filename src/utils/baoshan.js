@@ -239,15 +239,150 @@ export const ILLEGAL_BEHAVIOR = ['无', '闯红灯', '酒驾醉驾', '无证驾�
 export const CAR_DAMAGE = ['无', '轻微车损', '严重车损']
 
 // search data
+export const SEARCH_TYPE_TITLE = [{
+    value: 'safety',
+    label: '交通安全',
+    children: [{
+        value: 'location',
+        label: '事故点位',
+    }],
+},{
+    value: 'control',
+    label: '交通控制',
+    children: [{
+        value: 'flow',
+        label: '流量',
+    },{
+        value: 'schema',
+        label: '信号方案',
+        children: [{
+            value: 'node',
+            label: '点位',
+        }],
+    },{
+        value: 'evaluation',
+        label: '信号评价',
+        children: [{
+            value: 'node',
+            label: '点位',
+        }],
+    }],
+},{
+    value: 'od',
+    label: '机动车出行',
+    children: [{
+        value: 'trips',
+        label: '出行矩阵',
+    },{
+        value: 'cnts',
+        label: '出行量',
+    },{
+        value: 'o_cnts',
+        label: '发生量',
+    },{
+        value: 'd_cnts',
+        label: '吸引量',
+    },{
+        value: 'trip_time',
+        label: '出行时间',
+    },{
+        value: 'trip_dist',
+        label: '出行距离',
+    },{
+        value: 'trip_freq',
+        label: '出行次数',
+    }],
+},{
+    value: 'car',
+    label: '主题车辆',
+    children: [{
+        value: 'changzhu',
+        label: '常驻车',
+    },{
+        value: 'nonlocal',
+        label: '外地车',
+    },{
+        value: 'tongqin',
+        label: '通勤车',
+    },{
+        value: 'taxi',
+        label: '出租车',
+    },{
+        value: 'online',
+        label: '网约车',
+    },{
+        value: 'yellow',
+        label: '黄牌车',
+    },{
+        value: 'yellow_flow',
+        label: '黄牌车流量',
+    },{
+        value: 'province',
+        label: '各省车牌',
+    },{
+        value: 'province_flow',
+        label: '各省车牌流量',
+    },{
+        value: 'tongqin_carnum',
+        label: '通勤车车牌',
+    }]
+},{
+    value: 'state',
+    label: '交通态势',
+    children: [{
+        value: 'rdnet',
+        label: '路网速度',
+    },{
+        value: 'vn',
+        label: '在途量',
+    },{
+        value: 'link',
+        label: '路段状态',
+    },{
+        value: 'road',
+        label: '道路状态',
+    },{
+        value: 'area',
+        label: '区域状态',
+    },{
+        value: 'intersection',
+        label: '路口状态',
+    }]
+
+},{
+    value: 'device',
+    label: '设备状态',
+    children: [{
+        value: 'rcg_rate',
+        label: '识别率',
+    },{
+        value: 'not_miss_rate',
+        label: '传输率',
+    }]
+},{
+    value: 'highway',
+    label: '高速公路',
+    children: [{
+        value: 'cnts',
+        label: '车辆数',
+    },{
+        value: 'ramp_cnts',
+        label: '匝道车辆数',
+    },{
+        value: 'quxian_cnts',
+        label: '区县界道路',
+    },{
+        value: 'nonlocal_carnum',
+        label: '外地车车牌',
+    }]
+}]
+
+
 export const SEARCH_TYPE = {
     'safety/location': [],
     'control/flow': [{name:"node_id", title:"路口名称"}],
     'control/schema/node': [{name:"node_id", title:"路口名称"}],
-    'control/schema/line': [{name:"line_id", title:"干线名称"}],
-    'control/schema/area': [{name:"area_id", title:"区域名称"}],
     'control/evaluation/node': [{name:"node_id", title:"路口名称"}],
-    'control/evaluation/line': [{name:"line_id", title:"干线名称"}],
-    'control/evaluation/area': [{name:"area_id", title:"区域名称"}],
     'od/trips': [],
     'od/cnts': [],
     'od/o_cnts': [],
@@ -255,6 +390,7 @@ export const SEARCH_TYPE = {
     'od/trip_time': [],
     'od/trip_dist': [],
     'od/trip_freq': [],
+    'car/changzhu': [],
     'car/nonlocal': [{name:"dev_id", title:"设备名称"}],
     'car/yellow': [],
     'car/yellow_flow': [],
@@ -263,6 +399,7 @@ export const SEARCH_TYPE = {
     'car/tongqin': [],
     'car/taxi': [],
     'car/online': [],
+    'car/tongqin_carnum': [],
     'state/rdnet': [],
     'state/vn': [],
     'state/link': [{name:"link_id", title:"路段名称"}],
@@ -271,17 +408,17 @@ export const SEARCH_TYPE = {
     'state/intersection': [{name:"node_id", title:"路口名称"}],
     'device/rcg_rate': [{name:"dev_id", title:"设备名称"}],
     'device/not_miss_rate': [{name:"dev_id", title:"设备名称"}],
+    'highway/cnts': [],
+    'highway/ramp_cnts': [],
+    'highway/quxian_cnts': [],
+    'highway/nonlocal_carnum': [],
 }
 
 export const SEARCH_TIPS = {
     'safety/location': "事故信息下载",
     'control/flow': "点位流量下载",
     'control/schema/node': "点位控制方案",
-    'control/schema/line': "干线控制方案",
-    'control/schema/area': "区域控制方案",
     'control/evaluation/node': "点位控制方案评价（5分钟）",
-    'control/evaluation/line': "干线控制方案评价（5分钟）",
-    'control/evaluation/area': "区域控制方案评价（5分钟）",
     'od/trips': "出行矩阵（1天）",
     'od/cnts': "出行总量（1天）",
     'od/o_cnts': "点位发生量（1天）\n选择一日数据",
@@ -289,6 +426,7 @@ export const SEARCH_TIPS = {
     'od/trip_time': "出行时长（1天）",
     'od/trip_dist': "出行距离（1天）",
     'od/trip_freq': "出行次数（1天）",
+    'car/changzhu': "常驻车辆数（1天）\nloc_small:本地小车;\tloc_large:本地大车;\tfore_small:外地小车;\tfore_large:外地大车;",
     'car/nonlocal': "外地车在途车辆数（5分钟）",
     'car/yellow': "黄牌车辆\n选择一日数据,否则查询数据量过大容易造成死机",
     'car/yellow_flow': "黄牌车流量（1小时）",
@@ -297,6 +435,7 @@ export const SEARCH_TIPS = {
     'car/tongqin': "通勤车在途车辆数（5分钟）",
     'car/taxi': "出租车在途车辆数（5分钟）",
     'car/online': "网约车在途车辆数（5分钟）",
+    'car/tongqin': "通勤车车牌",
     'state/rdnet': "路网状态（5分钟）",
     'state/vn': "路网在途车辆数（5分钟）",
     'state/link': "路段状态（5分钟）",
@@ -305,6 +444,10 @@ export const SEARCH_TIPS = {
     'state/intersection': "路口延误（5分钟）",
     'device/rcg_rate': "设备识别率（15分钟）",
     'device/not_miss_rate': "设备传输率（15分钟）",
+    'highway/cnts': "高速公路车辆数（1小时）",
+    'highway/ramp_cnts': "高速公路各匝道进保山车辆数（1小时）",
+    'highway/quxian_cnts': "区县界道路进保山车辆数（1小时）",
+    'highway/nonlocal_carnum': "高速公路外地车牌",
 }
 
 export const PROVINCE = ['京', '津', '沪', '渝', '蒙', '新', '藏', '宁', '桂', '港', '澳', '黑', '吉', '辽', '晋', '冀', '青', '鲁', '豫', '苏', '皖', '浙', '闽', '赣', '湘', '鄂', '粤', '琼', '甘', '陕', '贵', '川']

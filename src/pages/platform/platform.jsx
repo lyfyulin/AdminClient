@@ -63,6 +63,14 @@ class Platform extends Component {
 
     componentDidMount() {
         this.load_warning()
+        this.timer = setInterval( this.load_warning, 300000 )
+    }
+
+    componentWillUnmount() {
+        clearInterval( this.timer )
+        this.setState = (state, callback) => {
+            return
+        }
     }
     
     render() {

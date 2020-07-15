@@ -9,8 +9,6 @@ export default class Home extends Component {
         pop: false,
     }
 
-
-
     render() {
         return (
             <div className="home">
@@ -21,8 +19,8 @@ export default class Home extends Component {
                             <Icon type="table"/>
                         </div>
                         <div className = "lvqi-card-title">
-                            <h1>路网数字化建模</h1>
-                            <p>数字化建模存储交叉口, 路段等交通参数, 包括<b>组织、渠化、控制方案</b>等, 匹配结构化数据.</p>
+                            <h1>交通态势感知</h1>
+                            <p>实时感知路网宏观、微观运行状况，监控设备运行质量，分析主题车辆运行特征。</p>
                         </div>
                     </div>
                 </div>
@@ -33,8 +31,8 @@ export default class Home extends Component {
                             {/* <img src={require("./images/home_img2.png")} alt="产品特点2" /> */}
                         </div>
                         <div className = "lvqi-card-title">
-                            <h1>信号控制辅助优化</h1>
-                            <p>融合处理线圈、视频等结构化数据预测交通流量, 实时计算<b> 单点、干线、区域 </b>配时优化方案。</p>
+                            <h1>信号辅助优化</h1>
+                            <p>结合路口渠化和视频结构化数据统计交通流量, 优化、评价<b> 单点、干线、区域 </b>配时优化方案。</p>
                         </div>
                     </div>
                 </div>
@@ -45,8 +43,8 @@ export default class Home extends Component {
                             {/* <img src={require("./images/home_img3.png")} alt="产品特点3" /> */}
                         </div>
                         <div className = "lvqi-card-title">
-                            <h1>信号控制评价</h1>
-                            <p>基于历史结构化数据, 评价信号控制效果, 包括: <b>排队次数、失调指数、延误</b> 等。</p>
+                            <h1>安全隐患防控</h1>
+                            <p>录入事故信息，阶段性分析事故隐患点，构建防控策略库，为隐患点推荐防控策略。</p>
                         </div>
                     </div>
                 </div>

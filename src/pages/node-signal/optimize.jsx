@@ -65,19 +65,19 @@ class OptimizeSchema extends Component {
             dataIndex: "left_delay",
             align: 'center',
             width: 100,
-            render: left_delay => left_delay.toFixed(2),
+            render: left_delay => left_delay?left_delay.toFixed(2):"0",
         },{
             title: '直行延误',
             dataIndex: "t_delay",
             align: 'center',
             width: 100,
-            render: t_delay => t_delay.toFixed(2),
+            render: t_delay => t_delay?t_delay.toFixed(2):"0",
         },{
             title: '方向延误',
             dataIndex: "dir_delay",
             align: 'center',
             width: 100,
-            render: dir_delay => dir_delay.toFixed(2),
+            render: dir_delay => dir_delay?dir_delay.toFixed(2):"0",
         }]
     }
 
@@ -129,6 +129,7 @@ class OptimizeSchema extends Component {
     // 加载执行方案
     loadExecNodeSchema = async (start_date, end_date, start_time, end_time, node_id) => {
         const result = await reqNodeSchemaExecSearch(start_date, end_date, start_time, end_time, node_id)
+
         if(result.code === 1){
             let node_schema = result.data
             let schema_phases = vector.property_unique(node_schema.phases, 'phase_index')
@@ -136,7 +137,8 @@ class OptimizeSchema extends Component {
             memoryUtils.node_schema = node_schema
             this.setState({ schema_phases })
         } else {
-            message.error(result.message)
+            this.setState({ schema_phases: [] })
+            message.error("此时段为检索到信号方案！")
         }
     }
     // 加载点位流量
@@ -151,6 +153,7 @@ class OptimizeSchema extends Component {
     // 加载点位延误
     loadNodeDelayById = async(start_date, end_date, start_time, end_time, node_id) => {
         const result = await reqNodeDelaySearch(start_date, end_date, start_time, end_time, node_id)
+
         if(result.code === 1){
             this.setState({ node_delay: result.data })
         }else{
@@ -180,7 +183,6 @@ class OptimizeSchema extends Component {
     }
 
     cal_signal_schema = () => {
-        console.log("配时计算")
 
         const { node, node_flow, ew_signal_schema, sn_signal_schema, fix_cycle, cycle_time } = this.state
 
@@ -205,8 +207,9 @@ class OptimizeSchema extends Component {
         signal_option.phase_schema_group = [ ew_signal_schema, sn_signal_schema ]
         
         let result = cal_control_time(signal_option)
+
         let phase_schema = [...result[0][0], ...result[0][1]].map( e => e.slice(0, 1) * 1 > 4? (e.slice(0, 1) * 1 - 5): (e.slice(0, 1) * 1 + 5) )
-        let phase_time = [...result[1][0], ...result[1][1]].map( e => e.toFixed(0) )
+        let phase_time = [...result[1][0], ...result[1][1]].map( e => e?e.toFixed(0):"0" )
 
         let schema_phases = phase_schema.map( (e, i) => ({ phase_index: (i + 1), phase_schema: e, phase_time: phase_time[i] }) )
         this.setState({ schema_phases })

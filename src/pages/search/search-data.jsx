@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Input, DatePicker, Form, TimePicker, Cascader, message, Button, Select, Table, Icon, Tooltip, Tabs } from 'antd'
 import { reqNodes, reqLinks, reqDevices, reqExportCsv, reqVnSearch, reqLines, reqAreas, reqSearchData } from '../../api'
-import { SEARCH_TYPE, SEARCH_TIPS, ROAD_NAME, PROVINCE } from '../../utils/baoshan'
+import { SEARCH_TYPE, SEARCH_TIPS, ROAD_NAME, PROVINCE, SEARCH_TYPE_TITLE } from '../../utils/baoshan'
 
 import { getNowDateTimeString, getDateString, getTimeString } from '../../utils/dateUtils'
 import OptionalChart from './optional_chart'
@@ -30,133 +30,7 @@ class SearchData extends Component {
 
     // 定义搜索列表
     initSearchType = () => {
-        this.options = [{
-            value: 'safety',
-            label: '交通安全',
-            children: [{
-                value: 'location',
-                label: '事故点位',
-            }],
-        },{
-            value: 'control',
-            label: '交通控制',
-            children: [{
-                value: 'flow',
-                label: '流量',
-            },{
-                value: 'schema',
-                label: '信号方案',
-                children: [{
-                    value: 'node',
-                    label: '点位',
-                },{
-                    value: 'line',
-                    label: '干线',
-                },{
-                    value: 'area',
-                    label: '区域',
-                }],
-            },{
-                value: 'evaluation',
-                label: '信号评价',
-                children: [{
-                    value: 'node',
-                    label: '点位',
-                },{
-                    value: 'line',
-                    label: '干线',
-                },{
-                    value: 'area',
-                    label: '区域',
-                }],
-            }],
-        },{
-            value: 'od',
-            label: '机动车出行',
-            children: [{
-                value: 'trips',
-                label: '出行矩阵',
-            },{
-                value: 'cnts',
-                label: '出行量',
-            },{
-                value: 'o_cnts',
-                label: '发生量',
-            },{
-                value: 'd_cnts',
-                label: '吸引量',
-            },{
-                value: 'trip_time',
-                label: '出行时间',
-            },{
-                value: 'trip_dist',
-                label: '出行距离',
-            },{
-                value: 'trip_freq',
-                label: '出行次数',
-            }],
-        },{
-            value: 'car',
-            label: '主题车辆',
-            children: [{
-                value: 'nonlocal',
-                label: '外地车',
-            },{
-                value: 'tongqin',
-                label: '通勤车',
-            },{
-                value: 'taxi',
-                label: '出租车',
-            },{
-                value: 'online',
-                label: '网约车',
-            },{
-                value: 'yellow',
-                label: '黄牌车',
-            },{
-                value: 'yellow_flow',
-                label: '黄牌车流量',
-            },{
-                value: 'province',
-                label: '各省车牌',
-            },{
-                value: 'province_flow',
-                label: '各省车牌流量',
-            }]
-        },{
-            value: 'state',
-            label: '交通态势',
-            children: [{
-                value: 'rdnet',
-                label: '路网速度',
-            },{
-                value: 'vn',
-                label: '在途量',
-            },{
-                value: 'link',
-                label: '路段状态',
-            },{
-                value: 'road',
-                label: '道路状态',
-            },{
-                value: 'area',
-                label: '区域状态',
-            },{
-                value: 'intersection',
-                label: '路口状态',
-            }]
-
-        },{
-            value: 'device',
-            label: '设备状态',
-            children: [{
-                value: 'rcg_rate',
-                label: '识别率',
-            },{
-                value: 'not_miss_rate',
-                label: '传输率',
-            }]
-        }]
+        this.options = SEARCH_TYPE_TITLE
     }
 
     // 加载基础数据

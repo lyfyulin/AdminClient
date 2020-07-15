@@ -63,7 +63,7 @@ class Login extends Component {
             <div className="login">
                 <div className="login-header">
                     <img src={logo} alt="logo" />
-                    <h1>交通指数运行平台</h1>
+                    <h1>保山交通数据研判分析平台</h1>
                 </div>
                 <div className="login-content">
                     <h1>登 录</h1>

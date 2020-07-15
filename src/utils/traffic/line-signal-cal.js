@@ -348,10 +348,16 @@ export class LineSignalCal {
 	}
 
 	getOffset = () => {
-		return this.relative_offset;
+		return this.relative_offset
 	}
 	getBandWidth = () => {
-		return this.double_band_width;
+		return this.double_band_width
+	}
+	getGreenStartTime = () => {
+		return this.green_start_time_arr
+	}
+	getGreenEndTime = () => {
+		return this.green_end_time_arr
 	}
 
 }
@@ -489,20 +495,19 @@ export class LineDepict {
 			start_b.push( line_node_offset[node_index] - line_node_location[node_index] / line_speed * 3.6 )
 		}
 
-		let new_start_b = start_b//.map( e => (e + line_cycle)%line_cycle )
+		let new_start_b = start_b.map( e => (e + line_cycle*2)%line_cycle )
 		
 		let pos_start_b = ArrayMax(new_start_b)
 		let x1 = line_node_location[0] + this.left_right_gap
-		let y1 = this.top_bottom_gap + pos_start_b
+		let y1 = pos_start_b
 		let x2 = line_node_location[line_node_location.length - 1] + this.left_right_gap
-		let y2 = line_node_location[line_node_location.length - 1] / line_speed * 3.6 + this.top_bottom_gap + pos_start_b
-		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
-		
+		let y2 = line_node_location[line_node_location.length - 1] / line_speed * 3.6 + pos_start_b
+		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale, x2 * this.width_scale, (y_max - y2) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
 		x1 = x1
 		y1 = y1 + line_band_width[0]
 		x2 = x2
 		y2 = y2 + line_band_width[0]
-		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
+		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale, x2 * this.width_scale, (y_max - y2) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
 
 		
 		// 反向线
@@ -510,21 +515,20 @@ export class LineDepict {
         for( let node_index = 0; node_index < line_node_location.length; node_index++ ){
 			end_b.push( line_node_offset[node_index] + line_node_location[node_index] / line_speed * 3.6 )
 		}
-		let pos_end_b = ArrayMin(end_b)
+		let neg_end_b = ArrayMin(end_b)
 		
 		x1 = line_node_location[0] + this.left_right_gap
-		y1 = pos_end_b + this.top_bottom_gap + line_cycle * 1
+		y1 = neg_end_b + line_cycle * 1
 		x2 = line_node_location[line_node_location.length - 1] + this.left_right_gap
-		y2 = - line_node_location[line_node_location.length - 1] / line_speed * 3.6 + this.top_bottom_gap + line_cycle * 1 + pos_end_b
-		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
-		
+		y2 = - line_node_location[line_node_location.length - 1] / line_speed * 3.6 + line_cycle * 1 + neg_end_b
+		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale, x2 * this.width_scale, (y_max - y2) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
 		x1 = x1
 		y1 = y1 + line_band_width[1]
 		x2 = x2
 		y2 = y2 + line_band_width[1]
-		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale + this.top_bottom_gap, x2 * this.width_scale, (y_max - y2 + this.top_bottom_gap) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
-
-        this.draw();
+		this.lines.push([ x1 * this.width_scale, (y_max - y1) * this.height_scale, x2 * this.width_scale, (y_max - y2) * this.height_scale, "#c2f", 3, "10,10", "", "translate(0,0),rotate(0)", "速度值:" + this.line_speed ])
+		
+		this.draw();
     }
 
     // 绘制干线图

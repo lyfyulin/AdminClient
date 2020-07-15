@@ -66,7 +66,6 @@ export default class PictureWall extends Component {
             }
         } else if ( file.status === "removed" ){
             const result = await reqDeleteImage( file.name )
-            console.log(result);
             
             if( result.code === 1 ){
                 message.success(" 删除图片成功！ ")
@@ -79,7 +78,6 @@ export default class PictureWall extends Component {
 
     componentWillMount() {
         const images = this.props.images
-        console.log(images);
         const imgs = images?images.split(";"):''
         if( imgs && imgs !== '' ){
             const fileList = imgs.map( (img, index) => ({

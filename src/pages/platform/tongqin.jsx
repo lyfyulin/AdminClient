@@ -39,7 +39,7 @@ export default class Tongqin extends Component {
         const result31_1 = await reqCurrentTongqinRatio()
         const result31_2 = await reqTodayVn()
 
-        let div21_data
+        let div21_data = []
         if(result11.code === 1){
             this.setLink(result11.data)
             div21_data = result11.data.map( e => ({ name: LINK_NAME[e.link_id - 1], value: e.cnt + '辆' }) )
@@ -47,7 +47,7 @@ export default class Tongqin extends Component {
             message.error(result11.message)
         }
 
-        let div31_option
+        let div31_option = {}
         if(result31_1.code === 1 && result31_2.code === 1){
             let data2 = result31_1.data.map( e => e.tongqin_ratio )
             let data1 = result31_2.data.map( e => e.all_num )
@@ -79,17 +79,21 @@ export default class Tongqin extends Component {
 
     setLink = (data) => {
         data.forEach( (e, i) => {
-            this.links[i].setStyle({ opacity: e.cnt/200 })
+            this.links[i].setStyle({ opacity: e.cnt/600 })
         })
     }
 
-    componentWillMount() {
-        this.load_data()
-    }
-    
-
     componentDidMount() {
+        this.load_data()
         this.initMap()
+        this.timer = setInterval( this.load_data, 100000 )
+    }
+
+    componentWillUnmount() {
+        clearInterval( this.timer )
+        this.setState = (state, callback) => {
+            return
+        }
     }
 
     render() {

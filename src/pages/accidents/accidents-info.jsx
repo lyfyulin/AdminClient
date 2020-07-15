@@ -7,10 +7,10 @@ import L from 'leaflet'
 import heatlayer from '../../utils/leaflet/heatlayer'
 import LinkButton from '../../components/link-button'
 import { MAP_CENTER, TMS } from '../../utils/baoshan'
-import { reqAccidents, reqDeleteAccident } from '../../api'
+import { reqAccidents, reqDeleteAccident, reqAccidentsSearch } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import _ from 'lodash'
-import { getTodayDateTimeString, getNowDateTimeString } from '../../utils/dateUtils'
+import { getTodayDateTimeString, getNowDateTimeString, getTimeString, getDateTimeString } from '../../utils/dateUtils'
 
 const Item = Form.Item
 const Option = Select.Option
@@ -169,9 +169,23 @@ class AccidentsInfo extends Component {
     // 查询提交
     handleSubmit = ( e ) => {
         e.preventDefault();
-        this.props.form.validateFields( (err, values) => {
+        this.props.form.validateFields( async (err, values) => {
             if( !err ){
-                console.log( values );
+
+                let start_time = getDateTimeString(values['start_time'])
+                let end_time = getDateTimeString(values['end_time'])
+                let accident_type = values['accident_type']
+                let road_condition = values['road_condition']
+                let climate = values['climate']
+                let accident_specific_location = values['accident_specific_location']
+
+                let car_damage = values['car_damage']?2:1
+                let people_hurt = values['people_hurt']?1:0
+                let illegal_behavior = values['illegal_behavior']
+                const result = await reqAccidentsSearch(start_time, end_time, accident_type, road_condition, climate, accident_specific_location, car_damage, people_hurt,illegal_behavior)
+            
+                result.code === 1?this.setState({ accidents: result.data }):message.error(result.message)
+
             }
         } )
     }

@@ -27,23 +27,23 @@ export default class Inter extends Component {
 
         let data22_1 = result22_1.data.map( e => e.all_num )
         let data22_2 = result22_2.data.map( e => e.all_num )
-        let div22_option = BiLineOption( TIME_POINT, data22_2, data22_1 )
+        let div22_option = BiLineOption( TIME_POINT, data22_2, data22_1, 0 )
 
         this.setState({
             div11_data, div22_option, firstRender: true 
         })
     }
 
-    componentWillMount() {
-        this.load_data()
-    }
-
     componentDidMount = () => {
+        this.load_data()
         this.timer = setInterval( this.load_data, 100000 )
     }
 
     componentWillUnmount() {
         clearInterval( this.timer )
+        this.setState = (state, callback) => {
+            return
+        }
     }
 
     render() {

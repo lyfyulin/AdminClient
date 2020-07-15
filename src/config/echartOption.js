@@ -1019,7 +1019,7 @@ export const LineOption = ( x_data = [], y_data = [] ) => ({
 })
 
 // 双折线图
-export const BiLineOption = (x_data = [], y_data1 = [], y_data2 = []) => ({
+export const BiLineOption = (x_data = [], y_data1 = [], y_data2 = [], color = 1) => ({
     grid: {
         bottom: '15%',
         left: '10%',
@@ -1095,7 +1095,7 @@ export const BiLineOption = (x_data = [], y_data1 = [], y_data2 = []) => ({
         splitArea: {
             show: true,
             areaStyle: {
-                color: ['#F70012', '#FE6C00', '#FED100',  '#A2EE00', '#34D800'],
+                color: color?['#F70012', '#FE6C00', '#FED100',  '#A2EE00', '#34D800']:['#34D800', '#A2EE00', '#A2EE00', '#FED100', '#FE6C00', '#F70012'],
             },
         }
     }],

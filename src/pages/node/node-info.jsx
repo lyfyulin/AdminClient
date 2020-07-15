@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Table, message, Icon, Radio } from 'antd'
 import L from 'leaflet'
 import LinkButton from '../../components/link-button'
-import { reqNodes, reqUrbanNodes, reqHighwayNodes, reqDJNodes } from '../../api'
+import { reqNodes, reqUrbanNodes, reqHighwayNodes, reqDJNodes, reqQuxianDevices, reqQuxianNodes } from '../../api'
 import { TMS, MAP_CENTER, NODE_CONFIG } from '../../utils/baoshan'
 import memoryUtils from '../../utils/memoryUtils'
 import _ from 'lodash'
@@ -49,7 +49,7 @@ export default class NodeInfo extends Component {
 
     // 加载点位列表
     loadNodes = async (node_location) => {
-        const result = node_location === '1'? await reqNodes():node_location === '2'? await reqUrbanNodes(): node_location === '3'? await reqHighwayNodes(): await reqDJNodes()
+        const result = node_location === '1'? await reqNodes():node_location === '2'? await reqUrbanNodes(): node_location === '3'? await reqHighwayNodes(): node_location === '4'?  await reqQuxianNodes(): await reqDJNodes()
 
         if(result.code === 1){
             this.setNode(result.data)
@@ -140,7 +140,8 @@ export default class NodeInfo extends Component {
                             <Radio.Button value="1">全部</Radio.Button>
                             <Radio.Button value="2">城区</Radio.Button>
                             <Radio.Button value="3">高速</Radio.Button>
-                            <Radio.Button value="4">电警</Radio.Button>
+                            <Radio.Button value="4">区县界</Radio.Button>
+                            <Radio.Button value="5">电警</Radio.Button>
                         </Radio.Group>
                     </div>
                     <div className="lvqi-card-content" id="table">

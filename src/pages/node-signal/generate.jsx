@@ -128,8 +128,6 @@ class GenerateSchema extends Component {
     }
 
     cal_signal_schema = () => {
-        console.log("配时计算")
-
         const { node, node_flow, ew_signal_schema, sn_signal_schema, fix_cycle, cycle_time } = this.state
 
         let ql = node_flow.map( e => e.left_flow )

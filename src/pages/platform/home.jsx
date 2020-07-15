@@ -215,12 +215,9 @@ export default class Home extends Component {
 
     }
 
-    componentWillMount() {
-        this.load_data()
-    }
-
     componentDidMount = () => {
-        this.timer = setInterval( this.load_data, 100000 )
+        this.load_data()
+        this.timer = setInterval( this.load_data, 60000 )
     }
 
     componentWillUnmount() {

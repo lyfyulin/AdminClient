@@ -30,8 +30,6 @@ export default class LineSignalAdd extends Component {
         
         if(result.code === 1 && result2.code === 1){
 
-            console.log(result.data, result2.data)
-
             // 交叉口名称
             let line_node_name = result.data.nodes.map( e => e.node_name )
 
@@ -66,13 +64,12 @@ export default class LineSignalAdd extends Component {
             // 公共周期选最大周期
             let line_cycle = ArrayMax(line_node_cycle)
 
-            console.log(line_cycle, line_link_length, line_speed/3.6, line_node_cycle, line_node_green_ratio[0], line_node_name)
 
             // 计算干线信号控制方案
             this.line_control = new LineSignalCal(line_cycle, line_link_length, line_speed/3.6, line_node_cycle, line_node_green_ratio[0], line_node_name)
             let line_node_offset = this.line_control.setOption( line_cycle, line_speed/3.6, line_node_cycle )
             let line_band_width = this.line_control.getBandWidth()
-            
+
             // 绘制干线方案
             this.line_depict = new LineDepict("#svg", line_node_name, line_link_length, line_speed, line_cycle, line_node_phase_offset, line_node_green_ratio, line_node_phase_schema, line_node_phase_time, line_node_offset )
             this.line_depict.setOption(line_speed, line_cycle, line_node_offset, line_band_width)
@@ -126,10 +123,6 @@ export default class LineSignalAdd extends Component {
             // 反向协调相位绿灯起始时间
             let line_node_acc_time2 = line_node_time.map( (schema, node_index) => ArraySum(schema.filter( (phase, phase_index) => phase_index < line_node_phase_index2[node_index] )) - line_node_phase_time2[node_index] )
             let line_node_phase_offset = [line_node_acc_time1, line_node_acc_time2]
-
-
-            console.log(line_cycle, line_link_length, line_speed/3.6, line_node_cycle, line_node_green_ratio[0], line_node_name)
-            
 
             // 计算干线控制方案
             this.line_control = new LineSignalCal(line_cycle, line_link_length, line_speed/3.6, line_node_cycle, line_node_green_ratio[0], line_node_name)
@@ -232,9 +225,6 @@ export default class LineSignalAdd extends Component {
                                 <Button htmlType="submit"> 提交 </Button>
                             </Form.Item>
                         
-                        {
-                            line_band_width.toString()
-                        }
                         <Form.Item label="绿波带宽">
                             <Input value={ line_band_width[2] } suffix="s"/>
                         </Form.Item>
