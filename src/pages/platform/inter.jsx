@@ -52,12 +52,12 @@ export default class Inter extends Component {
             <div className="full lyf-center">
                 <div className="lyf-row-7" style={{ display: 'flex' }}>
                     <div className="lyf-col-6 lyf-center">
-                        <DataBox title={ "路段主体" }>
+                        <DataBox title={ "路口状态" }>
                             <LvqiMap data = {div11_data} dataType="inter"/>
                         </DataBox>
                     </div>
                     <div className="lyf-col-4 lyf-center">
-                        <DataBox title={ "路段运行状态" }>
+                        <DataBox title={ "路口运行状态" }>
                             <LvqiTable data={ div11_data } slideTimer = { 3000 } rowNum={ 5 } dataType="inter"/>
                         </DataBox>
                     </div>

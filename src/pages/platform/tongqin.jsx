@@ -106,7 +106,7 @@ export default class Tongqin extends Component {
                 </div>
                 <div className="lyf-row-7" style={{ display: 'flex' }}>
                     <div className="lyf-col-6 lyf-center">
-                        <DataBox title={ "热点路段" }>
+                        <DataBox title={ "通勤热点路段" }>
                             <div id="map" className="full"></div>
                         </DataBox>
                     </div>
@@ -117,7 +117,7 @@ export default class Tongqin extends Component {
                     </div>
                 </div>
                 <div className="lyf-row-3 lyf-center">
-                    <DataBox title={ "路段通勤流量" }>
+                    <DataBox title={ "通勤在途量" }>
                         <Chart option={ div31_option }/>
                     </DataBox>
                 </div>
@@ -125,3 +125,6 @@ export default class Tongqin extends Component {
         )
     }
 }
+
+
+
