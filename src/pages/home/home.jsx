@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import './home.less'
 import { Icon, notification, Popconfirm } from 'antd'
+import { NODE_INFO } from '../../utils/baoshan'
 
 export default class Home extends Component {
 

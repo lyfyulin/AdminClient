@@ -85,12 +85,15 @@ export default class Home extends Component {
 
         let div11_option
 
+        
         if(result11.code === 1){
             let data11 = result11.data.slice(0, 10)
-            div11_option = RadarOption2(data11.map(e => NODE_INFO[e.o_node][1]), data11.map((e, i) => e.cnts), "right" )
+            div11_option = RadarOption2(data11.map(e => NODE_INFO[e.o_node - 1][1]), data11.map((e, i) => e.cnts), "right" )
         }else{
             message.error(result11.message)
         }
+
+
 
         let div12_option
 
@@ -182,7 +185,7 @@ export default class Home extends Component {
 
         if(result51.code === 1){
             let data51 = result51.data.slice(0, 10)
-            div51_option = RadarOption2(data51.map(e => NODE_INFO[e.d_node][1]), data51.map((e, i) => e.cnts), "left" )
+            div51_option = RadarOption2(data51.map(e => NODE_INFO[e.d_node - 1][1]), data51.map((e, i) => e.cnts), "left" )
         }else{
             message.error(result51.message)
         }
